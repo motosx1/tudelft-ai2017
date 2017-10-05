@@ -1,0 +1,7 @@
+<?xml version="1.0" ?><Session>
+<NegotiationOutcome currentTime="Thu Oct 05 18:29:08 CEST 2017" timeOfAgreement="0.0784313725490196" lastAction="(Accept  bid:Bid[Food: Handmade Food, Drinks: Handmade Cocktails, Location: Party Room, Invitations: Custom, Printed, Music: MP3, Cleanup: Special Equiment, ])" domain="etc/templates/partydomain/party_domain.xml" bids="6" runtime="144.707280861" finalOutcome="Bid[Food: Handmade Food, Drinks: Handmade Cocktails, Location: Party Room, Invitations: Custom, Printed, Music: MP3, Cleanup: Special Equiment, ]" startingAgent="-" deadline="50rounds">
+<resultsOfAgent agent="Group5@2" agentDesc="example party group 5" utilspace="etc/templates/partydomain/party1_utility.xml" agentClass="src.ai2017.Group5" finalUtility="0.6883333333333334" discountedUtility="0.6883333333333334" discount="1.0">
+</resultsOfAgent>
+<resultsOfAgent agent="BayesianAgent@3" agentDesc="Agent BayesianAgent" utilspace="etc/templates/partydomain/party2_utility.xml" agentClass="agents.BayesianAgent" finalUtility="0.7556104994818091" discountedUtility="0.7556104994818091" discount="1.0">
+</resultsOfAgent>
+</NegotiationOutcome></Session>

@@ -1,0 +1,10 @@
+<negotiation_template> 
+<utility_space number_of_issues="1"> 
+<objective name="party_Lucas" index="0" description="" etype="objective" type="objective"> 
+<issue vtype="discrete" name="Location" index="1" etype="discrete" type="discrete"> 
+<item index="1" value="dorm"> 
+</item> 
+</issue> 
+</objective> 
+</utility_space> 
+</negotiation_template> 

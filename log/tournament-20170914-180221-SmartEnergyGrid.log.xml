@@ -1,0 +1,151 @@
+<?xml version="1.0" ?><Tournament>
+<NegotiationOutcome currentTime="Thu Sep 14 18:02:22 CEST 2017" lastAction="(Offer  bid:Bid[06-09: 0 kW,, 09-19: 75 kW,, 19-22: 75 kW,, 22-06: 75 kW,, ])" domain="etc/templates/ANAC2016/AgentLightSmartGrid/SmartEnergyGrid.xml" bids="360" runtime="0.534949233" finalOutcome="-" startingAgent="-" deadline="180rounds">
+<resultsOfAgent agent="MaxOops@0" agentDesc="ANAC2016 MaxOops" utilspace="etc/templates/ANAC2016/AgentLightSmartGrid/SmartEnergyGrid_util2.xml" agentClass="agents.anac.y2016.maxoops.MaxOops" finalUtility="0.0" discountedUtility="0.0" discount="1.0">
+</resultsOfAgent>
+<resultsOfAgent agent="MaxOops@1" agentDesc="ANAC2016 MaxOops" utilspace="etc/templates/ANAC2016/AgentLightSmartGrid/SmartEnergyGrid_util3.xml" agentClass="agents.anac.y2016.maxoops.MaxOops" finalUtility="0.0" discountedUtility="0.0" discount="1.0">
+</resultsOfAgent>
+</NegotiationOutcome>
+<NegotiationOutcome currentTime="Thu Sep 14 18:02:22 CEST 2017" timeOfAgreement="0.9447513812154696" lastAction="(Accept  bid:Bid[06-09: 0 kW,, 09-19: 100 kW,, 19-22: 75 kW,, 22-06: 75 kW,, ])" domain="etc/templates/ANAC2016/AgentLightSmartGrid/SmartEnergyGrid.xml" bids="340" runtime="0.198033083" finalOutcome="Bid[06-09: 0 kW,, 09-19: 100 kW,, 19-22: 75 kW,, 22-06: 75 kW,, ]" startingAgent="GrandmaAgent@2" deadline="180rounds">
+<resultsOfAgent agent="GrandmaAgent@2" agentDesc="ANAC2016 Grandma: You are all the same in grandma's eyes" utilspace="etc/templates/ANAC2016/AgentLightSmartGrid/SmartEnergyGrid_util2.xml" agentClass="agents.anac.y2016.grandma.GrandmaAgent" finalUtility="0.7201011159598114" discountedUtility="0.7201011159598114" discount="1.0">
+</resultsOfAgent>
+<resultsOfAgent agent="MaxOops@3" agentDesc="ANAC2016 MaxOops" utilspace="etc/templates/ANAC2016/AgentLightSmartGrid/SmartEnergyGrid_util3.xml" agentClass="agents.anac.y2016.maxoops.MaxOops" finalUtility="0.9999999999999999" discountedUtility="0.9999999999999999" discount="1.0">
+</resultsOfAgent>
+</NegotiationOutcome>
+<NegotiationOutcome currentTime="Thu Sep 14 18:02:22 CEST 2017" timeOfAgreement="0.856353591160221" lastAction="(Accept  bid:Bid[06-09: 0 kW,, 09-19: 100 kW,, 19-22: 75 kW,, 22-06: 75 kW,, ])" domain="etc/templates/ANAC2016/AgentLightSmartGrid/SmartEnergyGrid.xml" bids="308" runtime="0.20057453" finalOutcome="Bid[06-09: 0 kW,, 09-19: 100 kW,, 19-22: 75 kW,, 22-06: 75 kW,, ]" startingAgent="AgentHP2_main@4" deadline="180rounds">
+<resultsOfAgent agent="AgentHP2_main@4" agentDesc="ANAC2016 agenthp2" utilspace="etc/templates/ANAC2016/AgentLightSmartGrid/SmartEnergyGrid_util2.xml" agentClass="agents.anac.y2016.agenthp2.AgentHP2_main" finalUtility="0.7201011159598114" discountedUtility="0.7201011159598114" discount="1.0">
+</resultsOfAgent>
+<resultsOfAgent agent="MaxOops@5" agentDesc="ANAC2016 MaxOops" utilspace="etc/templates/ANAC2016/AgentLightSmartGrid/SmartEnergyGrid_util3.xml" agentClass="agents.anac.y2016.maxoops.MaxOops" finalUtility="0.9999999999999999" discountedUtility="0.9999999999999999" discount="1.0">
+</resultsOfAgent>
+</NegotiationOutcome>
+<NegotiationOutcome currentTime="Thu Sep 14 18:02:25 CEST 2017" timeOfAgreement="0.9502762430939227" lastAction="(Accept  bid:Bid[06-09: 0 kW,, 09-19: 100 kW,, 19-22: 100 kW,, 22-06: 100 kW,, ])" domain="etc/templates/ANAC2016/AgentLightSmartGrid/SmartEnergyGrid.xml" bids="342" runtime="2.300639941" finalOutcome="Bid[06-09: 0 kW,, 09-19: 100 kW,, 19-22: 100 kW,, 22-06: 100 kW,, ]" startingAgent="ClockworkAgent@6" deadline="180rounds">
+<resultsOfAgent agent="ClockworkAgent@6" agentDesc="ANAC2016 Clockwork Agent - Considers time." utilspace="etc/templates/ANAC2016/AgentLightSmartGrid/SmartEnergyGrid_util2.xml" agentClass="agents.anac.y2016.clockworkagent.ClockworkAgent" finalUtility="0.6444697686570273" discountedUtility="0.6444697686570273" discount="1.0">
+</resultsOfAgent>
+<resultsOfAgent agent="MaxOops@7" agentDesc="ANAC2016 MaxOops" utilspace="etc/templates/ANAC2016/AgentLightSmartGrid/SmartEnergyGrid_util3.xml" agentClass="agents.anac.y2016.maxoops.MaxOops" finalUtility="0.9588259622569032" discountedUtility="0.9588259622569032" discount="1.0">
+</resultsOfAgent>
+</NegotiationOutcome>
+<NegotiationOutcome currentTime="Thu Sep 14 18:02:25 CEST 2017" timeOfAgreement="0.06077348066298342" lastAction="(Accept  bid:Bid[06-09: 0 kW,, 09-19: 100 kW,, 19-22: 75 kW,, 22-06: 75 kW,, ])" domain="etc/templates/ANAC2016/AgentLightSmartGrid/SmartEnergyGrid.xml" bids="20" runtime="0.015950952" finalOutcome="Bid[06-09: 0 kW,, 09-19: 100 kW,, 19-22: 75 kW,, 22-06: 75 kW,, ]" startingAgent="Terra@8" deadline="180rounds">
+<resultsOfAgent agent="Terra@8" agentDesc="ANAC2016 Terra Agent" utilspace="etc/templates/ANAC2016/AgentLightSmartGrid/SmartEnergyGrid_util2.xml" agentClass="agents.anac.y2016.terra.Terra" finalUtility="0.7201011159598114" discountedUtility="0.7201011159598114" discount="1.0">
+</resultsOfAgent>
+<resultsOfAgent agent="MaxOops@9" agentDesc="ANAC2016 MaxOops" utilspace="etc/templates/ANAC2016/AgentLightSmartGrid/SmartEnergyGrid_util3.xml" agentClass="agents.anac.y2016.maxoops.MaxOops" finalUtility="0.9999999999999999" discountedUtility="0.9999999999999999" discount="1.0">
+</resultsOfAgent>
+</NegotiationOutcome>
+<NegotiationOutcome currentTime="Thu Sep 14 18:02:25 CEST 2017" timeOfAgreement="0.17679558011049723" lastAction="(Accept  bid:Bid[06-09: 0 kW,, 09-19: 75 kW,, 19-22: 0 kW,, 22-06: 50 kW,, ])" domain="etc/templates/ANAC2016/AgentLightSmartGrid/SmartEnergyGrid.xml" bids="63" runtime="0.038750941" finalOutcome="Bid[06-09: 0 kW,, 09-19: 75 kW,, 19-22: 0 kW,, 22-06: 50 kW,, ]" startingAgent="MaxOops@10" deadline="180rounds">
+<resultsOfAgent agent="MaxOops@10" agentDesc="ANAC2016 MaxOops" utilspace="etc/templates/ANAC2016/AgentLightSmartGrid/SmartEnergyGrid_util2.xml" agentClass="agents.anac.y2016.maxoops.MaxOops" finalUtility="0.9294521133371342" discountedUtility="0.9294521133371342" discount="1.0">
+</resultsOfAgent>
+<resultsOfAgent agent="GrandmaAgent@11" agentDesc="ANAC2016 Grandma: You are all the same in grandma's eyes" utilspace="etc/templates/ANAC2016/AgentLightSmartGrid/SmartEnergyGrid_util3.xml" agentClass="agents.anac.y2016.grandma.GrandmaAgent" finalUtility="0.6429633954667028" discountedUtility="0.6429633954667028" discount="1.0">
+</resultsOfAgent>
+</NegotiationOutcome>
+<NegotiationOutcome currentTime="Thu Sep 14 18:02:25 CEST 2017" timeOfAgreement="0.8839779005524862" lastAction="(Accept  bid:Bid[06-09: 0 kW,, 09-19: 75 kW,, 19-22: 25 kW,, 22-06: 75 kW,, ])" domain="etc/templates/ANAC2016/AgentLightSmartGrid/SmartEnergyGrid.xml" bids="318" runtime="0.180314409" finalOutcome="Bid[06-09: 0 kW,, 09-19: 75 kW,, 19-22: 25 kW,, 22-06: 75 kW,, ]" startingAgent="GrandmaAgent@12" deadline="180rounds">
+<resultsOfAgent agent="GrandmaAgent@12" agentDesc="ANAC2016 Grandma: You are all the same in grandma's eyes" utilspace="etc/templates/ANAC2016/AgentLightSmartGrid/SmartEnergyGrid_util2.xml" agentClass="agents.anac.y2016.grandma.GrandmaAgent" finalUtility="0.8773866645188294" discountedUtility="0.8773866645188294" discount="1.0">
+</resultsOfAgent>
+<resultsOfAgent agent="GrandmaAgent@13" agentDesc="ANAC2016 Grandma: You are all the same in grandma's eyes" utilspace="etc/templates/ANAC2016/AgentLightSmartGrid/SmartEnergyGrid_util3.xml" agentClass="agents.anac.y2016.grandma.GrandmaAgent" finalUtility="0.8577029502735191" discountedUtility="0.8577029502735191" discount="1.0">
+</resultsOfAgent>
+</NegotiationOutcome>
+<NegotiationOutcome currentTime="Thu Sep 14 18:02:25 CEST 2017" timeOfAgreement="0.26519337016574585" lastAction="(Accept  bid:Bid[06-09: 0 kW,, 09-19: 50 kW,, 19-22: 25 kW,, 22-06: 75 kW,, ])" domain="etc/templates/ANAC2016/AgentLightSmartGrid/SmartEnergyGrid.xml" bids="95" runtime="0.057539013" finalOutcome="Bid[06-09: 0 kW,, 09-19: 50 kW,, 19-22: 25 kW,, 22-06: 75 kW,, ]" startingAgent="AgentHP2_main@14" deadline="180rounds">
+<resultsOfAgent agent="AgentHP2_main@14" agentDesc="ANAC2016 agenthp2" utilspace="etc/templates/ANAC2016/AgentLightSmartGrid/SmartEnergyGrid_util2.xml" agentClass="agents.anac.y2016.agenthp2.AgentHP2_main" finalUtility="0.8923846890653628" discountedUtility="0.8923846890653628" discount="1.0">
+</resultsOfAgent>
+<resultsOfAgent agent="GrandmaAgent@15" agentDesc="ANAC2016 Grandma: You are all the same in grandma's eyes" utilspace="etc/templates/ANAC2016/AgentLightSmartGrid/SmartEnergyGrid_util3.xml" agentClass="agents.anac.y2016.grandma.GrandmaAgent" finalUtility="0.7641303803149874" discountedUtility="0.7641303803149874" discount="1.0">
+</resultsOfAgent>
+</NegotiationOutcome>
+<NegotiationOutcome currentTime="Thu Sep 14 18:02:26 CEST 2017" timeOfAgreement="0.16574585635359115" lastAction="(Accept  bid:Bid[06-09: 0 kW,, 09-19: 75 kW,, 19-22: 0 kW,, 22-06: 75 kW,, ])" domain="etc/templates/ANAC2016/AgentLightSmartGrid/SmartEnergyGrid.xml" bids="58" runtime="0.416306155" finalOutcome="Bid[06-09: 0 kW,, 09-19: 75 kW,, 19-22: 0 kW,, 22-06: 75 kW,, ]" startingAgent="ClockworkAgent@16" deadline="180rounds">
+<resultsOfAgent agent="ClockworkAgent@16" agentDesc="ANAC2016 Clockwork Agent - Considers time." utilspace="etc/templates/ANAC2016/AgentLightSmartGrid/SmartEnergyGrid_util2.xml" agentClass="agents.anac.y2016.clockworkagent.ClockworkAgent" finalUtility="0.9038983003138686" discountedUtility="0.9038983003138686" discount="1.0">
+</resultsOfAgent>
+<resultsOfAgent agent="GrandmaAgent@17" agentDesc="ANAC2016 Grandma: You are all the same in grandma's eyes" utilspace="etc/templates/ANAC2016/AgentLightSmartGrid/SmartEnergyGrid_util3.xml" agentClass="agents.anac.y2016.grandma.GrandmaAgent" finalUtility="0.7446365994923441" discountedUtility="0.7446365994923441" discount="1.0">
+</resultsOfAgent>
+</NegotiationOutcome>
+<NegotiationOutcome currentTime="Thu Sep 14 18:02:26 CEST 2017" timeOfAgreement="0.06629834254143646" lastAction="(Accept  bid:Bid[06-09: 0 kW,, 09-19: 100 kW,, 19-22: 75 kW,, 22-06: 50 kW,, ])" domain="etc/templates/ANAC2016/AgentLightSmartGrid/SmartEnergyGrid.xml" bids="22" runtime="0.015382897" finalOutcome="Bid[06-09: 0 kW,, 09-19: 100 kW,, 19-22: 75 kW,, 22-06: 50 kW,, ]" startingAgent="Terra@18" deadline="180rounds">
+<resultsOfAgent agent="Terra@18" agentDesc="ANAC2016 Terra Agent" utilspace="etc/templates/ANAC2016/AgentLightSmartGrid/SmartEnergyGrid_util2.xml" agentClass="agents.anac.y2016.terra.Terra" finalUtility="0.745654928983077" discountedUtility="0.745654928983077" discount="1.0">
+</resultsOfAgent>
+<resultsOfAgent agent="GrandmaAgent@19" agentDesc="ANAC2016 Grandma: You are all the same in grandma's eyes" utilspace="etc/templates/ANAC2016/AgentLightSmartGrid/SmartEnergyGrid_util3.xml" agentClass="agents.anac.y2016.grandma.GrandmaAgent" finalUtility="0.8983267959743586" discountedUtility="0.8983267959743586" discount="1.0">
+</resultsOfAgent>
+</NegotiationOutcome>
+<NegotiationOutcome currentTime="Thu Sep 14 18:02:26 CEST 2017" timeOfAgreement="0.281767955801105" lastAction="(Accept  bid:Bid[06-09: 0 kW,, 09-19: 75 kW,, 19-22: 0 kW,, 22-06: 75 kW,, ])" domain="etc/templates/ANAC2016/AgentLightSmartGrid/SmartEnergyGrid.xml" bids="101" runtime="0.079682126" finalOutcome="Bid[06-09: 0 kW,, 09-19: 75 kW,, 19-22: 0 kW,, 22-06: 75 kW,, ]" startingAgent="MaxOops@20" deadline="180rounds">
+<resultsOfAgent agent="MaxOops@20" agentDesc="ANAC2016 MaxOops" utilspace="etc/templates/ANAC2016/AgentLightSmartGrid/SmartEnergyGrid_util2.xml" agentClass="agents.anac.y2016.maxoops.MaxOops" finalUtility="0.9038983003138686" discountedUtility="0.9038983003138686" discount="1.0">
+</resultsOfAgent>
+<resultsOfAgent agent="AgentHP2_main@21" agentDesc="ANAC2016 agenthp2" utilspace="etc/templates/ANAC2016/AgentLightSmartGrid/SmartEnergyGrid_util3.xml" agentClass="agents.anac.y2016.agenthp2.AgentHP2_main" finalUtility="0.7446365994923441" discountedUtility="0.7446365994923441" discount="1.0">
+</resultsOfAgent>
+</NegotiationOutcome>
+<NegotiationOutcome currentTime="Thu Sep 14 18:02:26 CEST 2017" timeOfAgreement="0.22099447513812154" lastAction="(Accept  bid:Bid[06-09: 0 kW,, 09-19: 100 kW,, 19-22: 25 kW,, 22-06: 75 kW,, ])" domain="etc/templates/ANAC2016/AgentLightSmartGrid/SmartEnergyGrid.xml" bids="79" runtime="0.074198949" finalOutcome="Bid[06-09: 0 kW,, 09-19: 100 kW,, 19-22: 25 kW,, 22-06: 75 kW,, ]" startingAgent="GrandmaAgent@22" deadline="180rounds">
+<resultsOfAgent agent="GrandmaAgent@22" agentDesc="ANAC2016 Grandma: You are all the same in grandma's eyes" utilspace="etc/templates/ANAC2016/AgentLightSmartGrid/SmartEnergyGrid_util2.xml" agentClass="agents.anac.y2016.grandma.GrandmaAgent" finalUtility="0.867387981487807" discountedUtility="0.867387981487807" discount="1.0">
+</resultsOfAgent>
+<resultsOfAgent agent="AgentHP2_main@23" agentDesc="ANAC2016 agenthp2" utilspace="etc/templates/ANAC2016/AgentLightSmartGrid/SmartEnergyGrid_util3.xml" agentClass="agents.anac.y2016.agenthp2.AgentHP2_main" finalUtility="0.8828955652623546" discountedUtility="0.8828955652623546" discount="1.0">
+</resultsOfAgent>
+</NegotiationOutcome>
+<NegotiationOutcome currentTime="Thu Sep 14 18:02:26 CEST 2017" timeOfAgreement="0.36464088397790057" lastAction="(Accept  bid:Bid[06-09: 0 kW,, 09-19: 100 kW,, 19-22: 25 kW,, 22-06: 75 kW,, ])" domain="etc/templates/ANAC2016/AgentLightSmartGrid/SmartEnergyGrid.xml" bids="131" runtime="0.102858318" finalOutcome="Bid[06-09: 0 kW,, 09-19: 100 kW,, 19-22: 25 kW,, 22-06: 75 kW,, ]" startingAgent="AgentHP2_main@24" deadline="180rounds">
+<resultsOfAgent agent="AgentHP2_main@24" agentDesc="ANAC2016 agenthp2" utilspace="etc/templates/ANAC2016/AgentLightSmartGrid/SmartEnergyGrid_util2.xml" agentClass="agents.anac.y2016.agenthp2.AgentHP2_main" finalUtility="0.867387981487807" discountedUtility="0.867387981487807" discount="1.0">
+</resultsOfAgent>
+<resultsOfAgent agent="AgentHP2_main@25" agentDesc="ANAC2016 agenthp2" utilspace="etc/templates/ANAC2016/AgentLightSmartGrid/SmartEnergyGrid_util3.xml" agentClass="agents.anac.y2016.agenthp2.AgentHP2_main" finalUtility="0.8828955652623546" discountedUtility="0.8828955652623546" discount="1.0">
+</resultsOfAgent>
+</NegotiationOutcome>
+<NegotiationOutcome currentTime="Thu Sep 14 18:02:28 CEST 2017" timeOfAgreement="0.8950276243093923" lastAction="(Accept  bid:Bid[06-09: 0 kW,, 09-19: 75 kW,, 19-22: 0 kW,, 22-06: 75 kW,, ])" domain="etc/templates/ANAC2016/AgentLightSmartGrid/SmartEnergyGrid.xml" bids="322" runtime="1.749014193" finalOutcome="Bid[06-09: 0 kW,, 09-19: 75 kW,, 19-22: 0 kW,, 22-06: 75 kW,, ]" startingAgent="ClockworkAgent@26" deadline="180rounds">
+<resultsOfAgent agent="ClockworkAgent@26" agentDesc="ANAC2016 Clockwork Agent - Considers time." utilspace="etc/templates/ANAC2016/AgentLightSmartGrid/SmartEnergyGrid_util2.xml" agentClass="agents.anac.y2016.clockworkagent.ClockworkAgent" finalUtility="0.9038983003138686" discountedUtility="0.9038983003138686" discount="1.0">
+</resultsOfAgent>
+<resultsOfAgent agent="AgentHP2_main@27" agentDesc="ANAC2016 agenthp2" utilspace="etc/templates/ANAC2016/AgentLightSmartGrid/SmartEnergyGrid_util3.xml" agentClass="agents.anac.y2016.agenthp2.AgentHP2_main" finalUtility="0.7446365994923441" discountedUtility="0.7446365994923441" discount="1.0">
+</resultsOfAgent>
+</NegotiationOutcome>
+<NegotiationOutcome currentTime="Thu Sep 14 18:02:28 CEST 2017" timeOfAgreement="0.07734806629834254" lastAction="(Accept  bid:Bid[06-09: 0 kW,, 09-19: 100 kW,, 19-22: 75 kW,, 22-06: 75 kW,, ])" domain="etc/templates/ANAC2016/AgentLightSmartGrid/SmartEnergyGrid.xml" bids="26" runtime="0.015924899" finalOutcome="Bid[06-09: 0 kW,, 09-19: 100 kW,, 19-22: 75 kW,, 22-06: 75 kW,, ]" startingAgent="Terra@28" deadline="180rounds">
+<resultsOfAgent agent="Terra@28" agentDesc="ANAC2016 Terra Agent" utilspace="etc/templates/ANAC2016/AgentLightSmartGrid/SmartEnergyGrid_util2.xml" agentClass="agents.anac.y2016.terra.Terra" finalUtility="0.7201011159598114" discountedUtility="0.7201011159598114" discount="1.0">
+</resultsOfAgent>
+<resultsOfAgent agent="AgentHP2_main@29" agentDesc="ANAC2016 agenthp2" utilspace="etc/templates/ANAC2016/AgentLightSmartGrid/SmartEnergyGrid_util3.xml" agentClass="agents.anac.y2016.agenthp2.AgentHP2_main" finalUtility="0.9999999999999999" discountedUtility="0.9999999999999999" discount="1.0">
+</resultsOfAgent>
+</NegotiationOutcome>
+<NegotiationOutcome currentTime="Thu Sep 14 18:02:30 CEST 2017" lastAction="(Offer  bid:Bid[06-09: 0 kW,, 09-19: 100 kW,, 19-22: 75 kW,, 22-06: 75 kW,, ])" domain="etc/templates/ANAC2016/AgentLightSmartGrid/SmartEnergyGrid.xml" bids="360" runtime="1.986461408" finalOutcome="-" startingAgent="MaxOops@30" deadline="180rounds">
+<resultsOfAgent agent="MaxOops@30" agentDesc="ANAC2016 MaxOops" utilspace="etc/templates/ANAC2016/AgentLightSmartGrid/SmartEnergyGrid_util2.xml" agentClass="agents.anac.y2016.maxoops.MaxOops" finalUtility="0.0" discountedUtility="0.0" discount="1.0">
+</resultsOfAgent>
+<resultsOfAgent agent="ClockworkAgent@31" agentDesc="ANAC2016 Clockwork Agent - Considers time." utilspace="etc/templates/ANAC2016/AgentLightSmartGrid/SmartEnergyGrid_util3.xml" agentClass="agents.anac.y2016.clockworkagent.ClockworkAgent" finalUtility="0.0" discountedUtility="0.0" discount="1.0">
+</resultsOfAgent>
+</NegotiationOutcome>
+<NegotiationOutcome currentTime="Thu Sep 14 18:02:31 CEST 2017" timeOfAgreement="0.35359116022099446" lastAction="(Accept  bid:Bid[06-09: 0 kW,, 09-19: 50 kW,, 19-22: 50 kW,, 22-06: 50 kW,, ])" domain="etc/templates/ANAC2016/AgentLightSmartGrid/SmartEnergyGrid.xml" bids="126" runtime="0.862209227" finalOutcome="Bid[06-09: 0 kW,, 09-19: 50 kW,, 19-22: 50 kW,, 22-06: 50 kW,, ]" startingAgent="GrandmaAgent@32" deadline="180rounds">
+<resultsOfAgent agent="GrandmaAgent@32" agentDesc="ANAC2016 Grandma: You are all the same in grandma's eyes" utilspace="etc/templates/ANAC2016/AgentLightSmartGrid/SmartEnergyGrid_util2.xml" agentClass="agents.anac.y2016.grandma.GrandmaAgent" finalUtility="0.8590237558774301" discountedUtility="0.8590237558774301" discount="1.0">
+</resultsOfAgent>
+<resultsOfAgent agent="ClockworkAgent@33" agentDesc="ANAC2016 Clockwork Agent - Considers time." utilspace="etc/templates/ANAC2016/AgentLightSmartGrid/SmartEnergyGrid_util3.xml" agentClass="agents.anac.y2016.clockworkagent.ClockworkAgent" finalUtility="0.7391807714622861" discountedUtility="0.7391807714622861" discount="1.0">
+</resultsOfAgent>
+</NegotiationOutcome>
+<NegotiationOutcome currentTime="Thu Sep 14 18:02:32 CEST 2017" timeOfAgreement="0.5414364640883977" lastAction="(Accept  bid:Bid[06-09: 0 kW,, 09-19: 100 kW,, 19-22: 50 kW,, 22-06: 75 kW,, ])" domain="etc/templates/ANAC2016/AgentLightSmartGrid/SmartEnergyGrid.xml" bids="195" runtime="1.154248593" finalOutcome="Bid[06-09: 0 kW,, 09-19: 100 kW,, 19-22: 50 kW,, 22-06: 75 kW,, ]" startingAgent="AgentHP2_main@34" deadline="180rounds">
+<resultsOfAgent agent="AgentHP2_main@34" agentDesc="ANAC2016 agenthp2" utilspace="etc/templates/ANAC2016/AgentLightSmartGrid/SmartEnergyGrid_util2.xml" agentClass="agents.anac.y2016.agenthp2.AgentHP2_main" finalUtility="0.8084732352766089" discountedUtility="0.8084732352766089" discount="1.0">
+</resultsOfAgent>
+<resultsOfAgent agent="ClockworkAgent@35" agentDesc="ANAC2016 Clockwork Agent - Considers time." utilspace="etc/templates/ANAC2016/AgentLightSmartGrid/SmartEnergyGrid_util3.xml" agentClass="agents.anac.y2016.clockworkagent.ClockworkAgent" finalUtility="0.9596191604352946" discountedUtility="0.9596191604352946" discount="1.0">
+</resultsOfAgent>
+</NegotiationOutcome>
+<NegotiationOutcome currentTime="Thu Sep 14 18:02:34 CEST 2017" timeOfAgreement="0.6629834254143646" lastAction="(Accept  bid:Bid[06-09: 0 kW,, 09-19: 25 kW,, 19-22: 25 kW,, 22-06: 0 kW,, ])" domain="etc/templates/ANAC2016/AgentLightSmartGrid/SmartEnergyGrid.xml" bids="238" runtime="2.489694667" finalOutcome="Bid[06-09: 0 kW,, 09-19: 25 kW,, 19-22: 25 kW,, 22-06: 0 kW,, ]" startingAgent="ClockworkAgent@36" deadline="180rounds">
+<resultsOfAgent agent="ClockworkAgent@36" agentDesc="ANAC2016 Clockwork Agent - Considers time." utilspace="etc/templates/ANAC2016/AgentLightSmartGrid/SmartEnergyGrid_util2.xml" agentClass="agents.anac.y2016.clockworkagent.ClockworkAgent" finalUtility="0.9634896811739385" discountedUtility="0.9634896811739385" discount="1.0">
+</resultsOfAgent>
+<resultsOfAgent agent="ClockworkAgent@37" agentDesc="ANAC2016 Clockwork Agent - Considers time." utilspace="etc/templates/ANAC2016/AgentLightSmartGrid/SmartEnergyGrid_util3.xml" agentClass="agents.anac.y2016.clockworkagent.ClockworkAgent" finalUtility="0.4193759263381553" discountedUtility="0.4193759263381553" discount="1.0">
+</resultsOfAgent>
+</NegotiationOutcome>
+<NegotiationOutcome currentTime="Thu Sep 14 18:02:35 CEST 2017" timeOfAgreement="0.06077348066298342" lastAction="(Accept  bid:Bid[06-09: 0 kW,, 09-19: 100 kW,, 19-22: 75 kW,, 22-06: 75 kW,, ])" domain="etc/templates/ANAC2016/AgentLightSmartGrid/SmartEnergyGrid.xml" bids="20" runtime="0.140138789" finalOutcome="Bid[06-09: 0 kW,, 09-19: 100 kW,, 19-22: 75 kW,, 22-06: 75 kW,, ]" startingAgent="Terra@38" deadline="180rounds">
+<resultsOfAgent agent="Terra@38" agentDesc="ANAC2016 Terra Agent" utilspace="etc/templates/ANAC2016/AgentLightSmartGrid/SmartEnergyGrid_util2.xml" agentClass="agents.anac.y2016.terra.Terra" finalUtility="0.7201011159598114" discountedUtility="0.7201011159598114" discount="1.0">
+</resultsOfAgent>
+<resultsOfAgent agent="ClockworkAgent@39" agentDesc="ANAC2016 Clockwork Agent - Considers time." utilspace="etc/templates/ANAC2016/AgentLightSmartGrid/SmartEnergyGrid_util3.xml" agentClass="agents.anac.y2016.clockworkagent.ClockworkAgent" finalUtility="0.9999999999999999" discountedUtility="0.9999999999999999" discount="1.0">
+</resultsOfAgent>
+</NegotiationOutcome>
+<NegotiationOutcome currentTime="Thu Sep 14 18:02:35 CEST 2017" timeOfAgreement="0.1712707182320442" lastAction="(Accept  bid:Bid[06-09: 0 kW,, 09-19: 25 kW,, 19-22: 25 kW,, 22-06: 0 kW,, ])" domain="etc/templates/ANAC2016/AgentLightSmartGrid/SmartEnergyGrid.xml" bids="61" runtime="0.037546932" finalOutcome="Bid[06-09: 0 kW,, 09-19: 25 kW,, 19-22: 25 kW,, 22-06: 0 kW,, ]" startingAgent="MaxOops@40" deadline="180rounds">
+<resultsOfAgent agent="MaxOops@40" agentDesc="ANAC2016 MaxOops" utilspace="etc/templates/ANAC2016/AgentLightSmartGrid/SmartEnergyGrid_util2.xml" agentClass="agents.anac.y2016.maxoops.MaxOops" finalUtility="0.9634896811739385" discountedUtility="0.9634896811739385" discount="1.0">
+</resultsOfAgent>
+<resultsOfAgent agent="Terra@41" agentDesc="ANAC2016 Terra Agent" utilspace="etc/templates/ANAC2016/AgentLightSmartGrid/SmartEnergyGrid_util3.xml" agentClass="agents.anac.y2016.terra.Terra" finalUtility="0.4193759263381553" discountedUtility="0.4193759263381553" discount="1.0">
+</resultsOfAgent>
+</NegotiationOutcome>
+<NegotiationOutcome currentTime="Thu Sep 14 18:02:35 CEST 2017" timeOfAgreement="0.11049723756906077" lastAction="(Accept  bid:Bid[06-09: 0 kW,, 09-19: 100 kW,, 19-22: 0 kW,, 22-06: 75 kW,, ])" domain="etc/templates/ANAC2016/AgentLightSmartGrid/SmartEnergyGrid.xml" bids="39" runtime="0.035706969" finalOutcome="Bid[06-09: 0 kW,, 09-19: 100 kW,, 19-22: 0 kW,, 22-06: 75 kW,, ]" startingAgent="GrandmaAgent@42" deadline="180rounds">
+<resultsOfAgent agent="GrandmaAgent@42" agentDesc="ANAC2016 Grandma: You are all the same in grandma's eyes" utilspace="etc/templates/ANAC2016/AgentLightSmartGrid/SmartEnergyGrid_util2.xml" agentClass="agents.anac.y2016.grandma.GrandmaAgent" finalUtility="0.8938996172828463" discountedUtility="0.8938996172828463" discount="1.0">
+</resultsOfAgent>
+<resultsOfAgent agent="Terra@43" agentDesc="ANAC2016 Terra Agent" utilspace="etc/templates/ANAC2016/AgentLightSmartGrid/SmartEnergyGrid_util3.xml" agentClass="agents.anac.y2016.terra.Terra" finalUtility="0.7698292144811796" discountedUtility="0.7698292144811796" discount="1.0">
+</resultsOfAgent>
+</NegotiationOutcome>
+<NegotiationOutcome currentTime="Thu Sep 14 18:02:35 CEST 2017" timeOfAgreement="0.1712707182320442" lastAction="(Accept  bid:Bid[06-09: 0 kW,, 09-19: 100 kW,, 19-22: 0 kW,, 22-06: 0 kW,, ])" domain="etc/templates/ANAC2016/AgentLightSmartGrid/SmartEnergyGrid.xml" bids="61" runtime="0.029903644" finalOutcome="Bid[06-09: 0 kW,, 09-19: 100 kW,, 19-22: 0 kW,, 22-06: 0 kW,, ]" startingAgent="AgentHP2_main@44" deadline="180rounds">
+<resultsOfAgent agent="AgentHP2_main@44" agentDesc="ANAC2016 agenthp2" utilspace="etc/templates/ANAC2016/AgentLightSmartGrid/SmartEnergyGrid_util2.xml" agentClass="agents.anac.y2016.agenthp2.AgentHP2_main" finalUtility="0.9450072433293774" discountedUtility="0.9450072433293774" discount="1.0">
+</resultsOfAgent>
+<resultsOfAgent agent="Terra@45" agentDesc="ANAC2016 Terra Agent" utilspace="etc/templates/ANAC2016/AgentLightSmartGrid/SmartEnergyGrid_util3.xml" agentClass="agents.anac.y2016.terra.Terra" finalUtility="0.5834283404341706" discountedUtility="0.5834283404341706" discount="1.0">
+</resultsOfAgent>
+</NegotiationOutcome>
+<NegotiationOutcome currentTime="Thu Sep 14 18:02:36 CEST 2017" timeOfAgreement="0.1712707182320442" lastAction="(Accept  bid:Bid[06-09: 0 kW,, 09-19: 0 kW,, 19-22: 0 kW,, 22-06: 0 kW,, ])" domain="etc/templates/ANAC2016/AgentLightSmartGrid/SmartEnergyGrid.xml" bids="61" runtime="0.43370547" finalOutcome="Bid[06-09: 0 kW,, 09-19: 0 kW,, 19-22: 0 kW,, 22-06: 0 kW,, ]" startingAgent="ClockworkAgent@46" deadline="180rounds">
+<resultsOfAgent agent="ClockworkAgent@46" agentDesc="ANAC2016 Clockwork Agent - Considers time." utilspace="etc/templates/ANAC2016/AgentLightSmartGrid/SmartEnergyGrid_util2.xml" agentClass="agents.anac.y2016.clockworkagent.ClockworkAgent" finalUtility="1.0" discountedUtility="1.0" discount="1.0">
+</resultsOfAgent>
+<resultsOfAgent agent="Terra@47" agentDesc="ANAC2016 Terra Agent" utilspace="etc/templates/ANAC2016/AgentLightSmartGrid/SmartEnergyGrid_util3.xml" agentClass="agents.anac.y2016.terra.Terra" finalUtility="0.2271327855920689" discountedUtility="0.2271327855920689" discount="1.0">
+</resultsOfAgent>
+</NegotiationOutcome>
+<NegotiationOutcome currentTime="Thu Sep 14 18:02:36 CEST 2017" timeOfAgreement="0.09944751381215469" lastAction="(Accept  bid:Bid[06-09: 0 kW,, 09-19: 100 kW,, 19-22: 50 kW,, 22-06: 75 kW,, ])" domain="etc/templates/ANAC2016/AgentLightSmartGrid/SmartEnergyGrid.xml" bids="34" runtime="0.015026431" finalOutcome="Bid[06-09: 0 kW,, 09-19: 100 kW,, 19-22: 50 kW,, 22-06: 75 kW,, ]" startingAgent="Terra@48" deadline="180rounds">
+<resultsOfAgent agent="Terra@48" agentDesc="ANAC2016 Terra Agent" utilspace="etc/templates/ANAC2016/AgentLightSmartGrid/SmartEnergyGrid_util2.xml" agentClass="agents.anac.y2016.terra.Terra" finalUtility="0.8084732352766089" discountedUtility="0.8084732352766089" discount="1.0">
+</resultsOfAgent>
+<resultsOfAgent agent="Terra@49" agentDesc="ANAC2016 Terra Agent" utilspace="etc/templates/ANAC2016/AgentLightSmartGrid/SmartEnergyGrid_util3.xml" agentClass="agents.anac.y2016.terra.Terra" finalUtility="0.9596191604352946" discountedUtility="0.9596191604352946" discount="1.0">
+</resultsOfAgent>
+</NegotiationOutcome></Tournament>

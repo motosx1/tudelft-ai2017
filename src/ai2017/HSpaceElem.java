@@ -16,6 +16,10 @@ public class HSpaceElem {
 
     }
 
+    public List<CriterionFeatures> getCriterionFeatures() {
+        return criterionFeatures;
+    }
+
     public Double getWeight() {
         return weight;
     }
@@ -28,7 +32,7 @@ public class HSpaceElem {
     public String toString() {
         return "HSpaceElem{" +
                 "criteria=" + criterionFeatures +
-                ", w=" + round(weight, 2) +
+                ", w=" + round(weight, 5) +
                 '}';
     }
 }

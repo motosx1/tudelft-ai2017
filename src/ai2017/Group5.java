@@ -47,13 +47,28 @@ public class Group5 extends AbstractNegotiationParty {
         prepareHSpace();
 
 
-        System.out.println("end");
+//        System.out.println("end");
 
         try {
             fight();
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private void fight() throws IOException {
+        MathHelper mathHelper = new MathHelper();
+        Bid oppBid = generateDummyBid();
+
+
+        for (HSpaceElem hSpaceElem : hSpace) {
+            double newPhb = mathHelper.calculatePhb(oppBid, hSpaceElem, step);
+            hSpaceElem.setWeight(newPhb);
+        }
+        step++;
+
+        System.out.println('x');
+
     }
 
     private void prepareHSpace() {
@@ -68,7 +83,7 @@ public class Group5 extends AbstractNegotiationParty {
         }
 
 
-        System.out.println(featuresPermutationsMap);
+//        System.out.println(featuresPermutationsMap);
 
 
         List<List<CriterionFeatures>> criterionFeaturesList = new ArrayList<>();
@@ -76,7 +91,7 @@ public class Group5 extends AbstractNegotiationParty {
         for (Map.Entry<String, List<Map<ValueDiscrete, Double>>> entry1 : featuresPermutationsMap.entrySet()) {
             List<CriterionFeatures> criterionFeaturesList1 = new ArrayList<>();
             for (Map<ValueDiscrete, Double> entry2 : entry1.getValue()) {
-                System.out.println(entry1.getKey() + " -> " + entry2.entrySet());
+//                System.out.println(entry1.getKey() + " -> " + entry2.entrySet());
                 CriterionFeatures criterionFeatures = new CriterionFeatures(entry1.getKey(), entry2);
                 criterionFeaturesList1.add(criterionFeatures);
             }
@@ -100,9 +115,9 @@ public class Group5 extends AbstractNegotiationParty {
 
         assignProbabilitiesToHSpace();
 
-        System.out.println("-------");
+        System.out.println("------- hSpace ------");
         System.out.println(hSpace);
-        System.out.println("-------");
+        System.out.println("--------------------");
     }
 
     private List<Map<ValueDiscrete, Double>> assignWeightsToFeatures(List<List<ValueDiscrete>> featuresPermutations) {
@@ -125,6 +140,7 @@ public class Group5 extends AbstractNegotiationParty {
         return featuresPermutationsWithWeights;
     }
 
+
     private void assignWeightsToCriteria(List<List<CriterionFeatures>> criterionPermutations) {
         for (List<CriterionFeatures> criterionPermutation : criterionPermutations) {
             int n = criterionPermutation.size();
@@ -139,69 +155,10 @@ public class Group5 extends AbstractNegotiationParty {
         }
     }
 
-
     private void assignProbabilitiesToHSpace() {
         for (HSpaceElem hSpaceElem : hSpace) {
             hSpaceElem.setWeight(1/(double)hSpace.size());
         }
-    }
-
-    private void fight() throws IOException {
-        Bid oppBid = generateDummyBid();
-
-//        System.out.println(Arrays.toString(hSpace.entrySet().toArray()));
-
-
-//        for (Map.Entry<Map<Map.Entry<String, List<Map<ValueDiscrete, Double>>>, Double>, Double> hSpaceEntry : hSpace.entrySet()) {
-//            System.out.println(hSpaceEntry.getKey());
-//            for (Map.Entry<Map.Entry<String, List<Map<ValueDiscrete, Double>>>, Double> entry1 : hSpaceEntry.getKey().entrySet()) {
-//                System.out.println("\t" + entry1);
-//                for (Map<ValueDiscrete, Double> entry2 : entry1.getKey().getValue()) {
-//                    System.out.println("\t\t" + entry2);
-//
-//                    for (Map.Entry<ValueDiscrete, Double> entry3 : entry2.entrySet()) {
-////                        System.out.println("->" + hSpaceEntry + "(" + entry1.getValue() + "){" + entry3.getKey() + "(" + entry3.getValue() + ")" + "}");
-//                    }
-//
-//
-//                }
-//            }
-//        }
-
-//        System.out.println("end");
-
-//        for (Map.Entry<Map<Map.Entry<String, List<Map<ValueDiscrete, Double>>>, Double>, Double> hSpaceEntry : hSpace.entrySet()) {
-//
-//            double newPhb = calculatePhb(oppBid, hSpaceEntry);
-//        }
-
-    }
-
-    private double calculatePhb(Bid oppBid, Map.Entry<Map<Map.Entry<String, List<Map<ValueDiscrete, Double>>>, Double>, Double> hSpaceEntry) {
-        Map<Map.Entry<String, List<Map<ValueDiscrete, Double>>>, Double> hj = hSpaceEntry.getKey();
-        Double phj = hSpaceEntry.getValue();
-
-        double numerator = phj * calculatePbh();
-        double denominator = 1;
-
-        return numerator / denominator;
-    }
-
-    private double calculatePbh() {
-        double sigma = 0.4;
-        double c = 1 / (sigma * Math.sqrt(2 * Math.PI));
-
-        double index = Math.pow(utilityBgivenH() - utilityB(), 2) / (2 * Math.pow(sigma, 2));
-
-        return c * Math.exp(index);
-    }
-
-    private double utilityBgivenH() {
-        return 1;
-    }
-
-    private double utilityB() {
-        return 1 - 0.05 * step++;  //TODO change to consider time horizon
     }
 
 
@@ -223,16 +180,16 @@ public class Group5 extends AbstractNegotiationParty {
     private void prepareDummy() {
         try {
             EvaluatorDiscrete eval = new EvaluatorDiscrete();
-            eval.setWeight(0.5);
-            eval.setEvaluationDouble(new ValueDiscrete("Plain"), 0.6);
-            eval.setEvaluationDouble(new ValueDiscrete("Photo"), 0.4);
+            eval.setWeight(0.33);
+            eval.setEvaluationDouble(new ValueDiscrete("Plain"), 0.33);
+            eval.setEvaluationDouble(new ValueDiscrete("Photo"), 0.66);
             dummyUtilitySpace.put("Invitations", eval);
 
 
             eval = new EvaluatorDiscrete();
-            eval.setWeight(0.1);
-            eval.setEvaluationDouble(new ValueDiscrete("Party Room"), 0.8);
-            eval.setEvaluationDouble(new ValueDiscrete("Your Dorm"), 0.2);
+            eval.setWeight(0.66);
+            eval.setEvaluationDouble(new ValueDiscrete("Your Dorm"), 0.66);
+            eval.setEvaluationDouble(new ValueDiscrete("Party Room"), 0.33);
             dummyUtilitySpace.put("Location", eval);
 
 //            eval = new EvaluatorDiscrete();

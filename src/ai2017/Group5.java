@@ -27,7 +27,7 @@ public class Group5 extends AbstractNegotiationParty {
 
     private Map<String, EvaluatorDiscrete> dummyUtilitySpace = new HashMap<>(); // == fevaluators
 
-    private Map<Map<Map.Entry<String, List<Map<ValueDiscrete, Double>>>, Double>, Double> hSpace = new HashMap<Map<Map.Entry<String, List<Map<ValueDiscrete, Double>>>, Double>, Double>();
+    private List<List<CriterionFeatures>> hSpace = new ArrayList<>();
 
     double a = 0.5;//0.2 + Math.sin(Math.PI / 6);
 
@@ -44,17 +44,26 @@ public class Group5 extends AbstractNegotiationParty {
 
         prepareDummy();
 
-        List<Map.Entry<String, EvaluatorDiscrete>> utilitySpaceList = new ArrayList<>(dummyUtilitySpace.entrySet());
+        prepareHSpace();
+
+
+        System.out.println("end");
+
+        try {
+            fight();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void prepareHSpace() {
         Map<String, List<Map<ValueDiscrete, Double>>> featuresPermutationsMap = new HashMap<>();
         for (Map.Entry<String, EvaluatorDiscrete> entry : dummyUtilitySpace.entrySet()) {
             Set<ValueDiscrete> features = entry.getValue().getValues();
-            List<ValueDiscrete> featuresList = new ArrayList<>(features);
-            List<List<ValueDiscrete>> featuresPermutations = SetPermutations.getSetPermutations(featuresList);
+            List<List<ValueDiscrete>> featuresPermutations = SetPermutations.getSetPermutations(new ArrayList<>(features));
             List<Map<ValueDiscrete, Double>> featuresPermutationsWithWeights = new ArrayList<>();
 
             // assign weights
-
-
             for (List<ValueDiscrete> permutation : featuresPermutations) {
                 Map<ValueDiscrete, Double> featureWeightMap = new HashMap<>();
                 int n = featuresPermutations.size();
@@ -68,8 +77,6 @@ public class Group5 extends AbstractNegotiationParty {
 
                 featuresPermutationsWithWeights.add(featureWeightMap);
 
-
-//                System.out.println('x');
             }
 
 
@@ -77,44 +84,60 @@ public class Group5 extends AbstractNegotiationParty {
 
         }
 
-        Set<Map.Entry<String, List<Map<ValueDiscrete, Double>>>> featuresPermutationsMapEntries = featuresPermutationsMap.entrySet();
-        List<Map.Entry<String, List<Map<ValueDiscrete, Double>>>> entries = new ArrayList<>(featuresPermutationsMapEntries);
-        List<List<Map.Entry<String, List<Map<ValueDiscrete, Double>>>>> setPermutations = SetPermutations.getSetPermutations(entries);
+//        Set<Map.Entry<String, List<Map<ValueDiscrete, Double>>>> featuresPermutationsMapEntries = featuresPermutationsMap.entrySet();
+//        List<List<Map.Entry<String, List<Map<ValueDiscrete, Double>>>>> setPermutations = SetPermutations.getSetPermutations(new ArrayList<>(featuresPermutationsMapEntries));
 
         System.out.println(featuresPermutationsMap);
 
+
+        List<List<CriterionFeatures>> criterionFeaturesList = new ArrayList<>();
+
         for (Map.Entry<String, List<Map<ValueDiscrete, Double>>> entry1 : featuresPermutationsMap.entrySet()) {
+            List<CriterionFeatures> criterionFeaturesList1 = new ArrayList<>();
             for (Map<ValueDiscrete, Double> entry2 : entry1.getValue()) {
-                for (Map.Entry<ValueDiscrete, Double> entry3 : entry2.entrySet()) {
-                    System.out.println(entry1.getKey() + " -> " + entry3.getKey() + " -> " + entry3.getValue());
+                System.out.println(entry1.getKey() + " -> " + entry2.entrySet());
+                CriterionFeatures criterionFeatures = new CriterionFeatures(entry1.getKey(), entry2);
+                criterionFeaturesList1.add(criterionFeatures);
+            }
+            criterionFeaturesList.add(criterionFeaturesList1);
+        }
+
+
+        List<List<CriterionFeatures>> cartesianProduct = CartesianProduct.calculate(criterionFeaturesList);
+
+//        System.out.println(cartesianProduct);
+
+        List<CriterionFeaturesWeight> criterionFeaturesWeightList = new ArrayList<>();
+        for (List<CriterionFeatures> criterionFeatures : cartesianProduct) {
+            criterionFeaturesWeightList.add(new CriterionFeaturesWeight(criterionFeatures));
+        }
+
+
+        for (CriterionFeaturesWeight criterionFeaturesWeight : criterionFeaturesWeightList) {
+            List<List<CriterionFeatures>> criterionPermutations = SetPermutations.getSetPermutations(criterionFeaturesWeight.getCriterionFeatures());
+            criterionPermutations = CriterionFeatures.fixCriterionFeaturesPermutations(criterionPermutations);
+
+
+            for (List<CriterionFeatures> criterionPermutation : criterionPermutations) {
+                int n = criterionPermutation.size();
+                double sn = (1 - Math.pow(a, n)) / (1 - a);
+                double cwn = 1 / sn;
+                for (CriterionFeatures criterionFeatures : criterionPermutation) {
+                    criterionFeatures.setWeight(cwn);
+                    cwn = cwn * a;
                 }
+                hSpace.add(criterionPermutation);
+
             }
+
+
         }
 
+//        assignProbabilitiesToHSpace();
+    }
 
+    private void assignProbabilitiesToHSpace() {
 
-
-
-        for (List<Map.Entry<String, List<Map<ValueDiscrete, Double>>>> setPermutation : setPermutations) {
-            Map<Map.Entry<String, List<Map<ValueDiscrete, Double>>>, Double> hElem = new HashMap<>();
-            int n = setPermutation.size();
-            double sn = (1 - Math.pow(a, n)) / (1 - a);
-            double cwn = 1 / sn;
-            for (Map.Entry<String, List<Map<ValueDiscrete, Double>>> entry1 : setPermutation) {
-                hElem.put(entry1, cwn);
-                cwn = cwn * a;
-            }
-            hSpace.put(hElem, 1 / (double) setPermutations.size());
-        }
-
-
-        System.out.println("end");
-
-        try {
-            fight();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 
     private void fight() throws IOException {

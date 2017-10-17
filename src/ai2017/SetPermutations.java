@@ -28,7 +28,8 @@ public class SetPermutations<E> {
     private void permute(List<E> prefix, List<E> suffix) {
         int n = suffix.size();
         if (n == 0) {
-            result.add(prefix);
+            List<E> newPrefix = new ArrayList<>(prefix);
+            result.add(newPrefix);
         } else {
             for (int i = 0; i < n; i++) {
                 List<E> newPrefix = new ArrayList<>(prefix);

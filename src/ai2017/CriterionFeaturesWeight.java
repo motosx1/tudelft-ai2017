@@ -2,6 +2,8 @@ package src.ai2017;
 
 import java.util.List;
 
+import static org.apache.commons.math.util.MathUtils.round;
+
 /**
  * Created by bartosz on 17.10.2017.
  */
@@ -27,9 +29,9 @@ public class CriterionFeaturesWeight {
 
     @Override
     public String toString() {
-        return "CFweight{" +
-                "CF=" + criterionFeatures +
-                ", w=" + weight +
+        return
+                "criterion=" + criterionFeatures +
+                ", w=" + round(weight, 2) +
                 '}';
     }
 

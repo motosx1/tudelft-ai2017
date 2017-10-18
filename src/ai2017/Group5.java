@@ -23,11 +23,10 @@ import java.util.*;
 public class Group5 extends AbstractNegotiationParty {
     private Random rand = new Random(200);
     private Bid lastReceivedBid = null;
-    private int step = 1;
 
     private Map<String, EvaluatorDiscrete> dummyUtilitySpace = new HashMap<>(); // == fevaluators
 
-//    private List<List<CriterionFeatures>> hSpace = new ArrayList<>();
+    //    private List<List<CriterionFeatures>> hSpace = new ArrayList<>();
     private List<HSpaceElem> hSpace = new ArrayList<>();
 
 
@@ -56,42 +55,63 @@ public class Group5 extends AbstractNegotiationParty {
 
     private void fight() throws IOException {
         MathHelper mathHelper = new MathHelper();
-        Bid oppBid = generateDummyBid();
+        Bid oppBid1 = generateDummyBid1();
+        Bid oppBid2 = generateDummyBid2();
 
+        List<Bid> bids = new ArrayList<>(Arrays.asList(oppBid1, oppBid2));
 
-        for (HSpaceElem hSpaceElem : hSpace) {
-            double newPhb = mathHelper.calculatePhb(oppBid, hSpaceElem, step);
-            hSpaceElem.setWeight(newPhb);
+        int steps = bids.size();
+
+        for (int step = 0; step < steps; step++) {
+            for (int i = 0; i < hSpace.size(); i++) {
+                HSpaceElem hSpaceElem = hSpace.get(i);
+                double newPhb = mathHelper.calculatePhb(bids.get(step), hSpaceElem, i, step);
+                hSpaceElem.setWeight(newPhb);
+            }
+            System.out.println();
+            System.out.println("=============== NEXT STEP ===============");
+            System.out.println();
         }
-        step++;
+
 
         System.out.println('x');
 
     }
 
 
-
-    private Bid generateDummyBid() throws IOException {
+    private Bid generateDummyBid1() throws IOException {
         DomainImpl domain = new DomainImpl(new File("etc/templates/partydomain/simple/party_domain.xml"));
         HashMap values = new HashMap();
 
-        for (Issue issue : domain.getIssues()) {
-            IssueDiscrete discreteIssue = (IssueDiscrete) issue;
-            int index = 0;//rand.nextInt(discreteIssue.getNumberOfValues());
-            ValueDiscrete value = discreteIssue.getValue(index);
-            values.put(issue.getNumber(), value);
-
-        }
+        putBidToValues(0, 0, domain, values);
+        putBidToValues(1, 0, domain, values);
 
         return new Bid(domain, values);
+    }
+
+    private Bid generateDummyBid2() throws IOException {
+        DomainImpl domain = new DomainImpl(new File("etc/templates/partydomain/simple/party_domain.xml"));
+        HashMap values = new HashMap();
+
+        putBidToValues(0, 0, domain, values);
+        putBidToValues(1, 1, domain, values);
+
+        return new Bid(domain, values);
+    }
+
+    private void putBidToValues(int issueNumber, int valueNumber, DomainImpl domain, HashMap values) {
+        Issue issue = domain.getIssues().get(issueNumber);
+        IssueDiscrete discreteIssue = (IssueDiscrete) issue;
+        ValueDiscrete value = discreteIssue.getValue(valueNumber);
+        values.put(issue.getNumber(), value);
     }
 
     private void prepareDummy() {
         try {
             EvaluatorDiscrete eval = new EvaluatorDiscrete();
             eval.setWeight(0.33);
-            eval.setEvaluationDouble(new ValueDiscrete("Plain"), 0.33);
-            eval.setEvaluationDouble(new ValueDiscrete("Photo"), 0.66);
+            eval.setEvaluationDouble(new ValueDiscrete("Photo"), 0.33);
+            eval.setEvaluationDouble(new ValueDiscrete("Plain"), 0.66);
             dummyUtilitySpace.put("Invitations", eval);
 
 

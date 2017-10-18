@@ -6,15 +6,22 @@ import negotiator.issue.Value;
 import java.util.HashMap;
 import java.util.Map;
 
-public class MathHelper {
+class MathHelper {
+    private Map<Integer, Double> history = new HashMap<>();
 
-    public double calculatePhb(Bid oppBid, HSpaceElem hSpaceEntry, int step) {
+    double calculatePhb(Bid oppBid, HSpaceElem hSpaceEntry, int elementIndex, int step) {
         Double phj = hSpaceEntry.getWeight();
 
         double numerator = phj * calculatePbh(oppBid, hSpaceEntry, step);
-        double denominator = 1;
+        double denominator = calculateDenominator(elementIndex);
+
+        history.merge(elementIndex, numerator, (inMap, toAdd) -> inMap + toAdd);
 
         return numerator / denominator;
+    }
+
+    private double calculateDenominator(int elementIndex) {
+        return history.get(elementIndex) == null ? 1 : history.get(elementIndex);
     }
 
     private double calculatePbh(Bid oppBid, HSpaceElem hSpaceEntry, int step) {
@@ -49,7 +56,7 @@ public class MathHelper {
 
             utility += probableCriterionWeight * probableFeatureWeight;
         }
-        System.out.println("\tutility="+utility);
+        System.out.println("\tutility=" + utility);
         System.out.println("---");
 
         return utility;

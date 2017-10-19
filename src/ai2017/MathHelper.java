@@ -4,24 +4,40 @@ import negotiator.Bid;
 import negotiator.issue.Value;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 class MathHelper {
-    private Map<Integer, Double> history = new HashMap<>();
+//    private Map<Integer, Double> history = new HashMap<>();
 
-    double calculatePhb(Bid oppBid, HSpaceElem hSpaceEntry, int elementIndex, int step) {
+    public Map<Integer, Double> calculatePhbMap(Bid oppBid, List<HSpaceElem> hSpace, int step) {
+        Map<Integer, Double> pBHMap = new HashMap<>();
+
+        for (int i = 0; i < hSpace.size(); i++) {
+            HSpaceElem hSpaceEntry = hSpace.get(i);
+            pBHMap.put(i, calculatePbh(oppBid, hSpaceEntry, step));
+        }
+
+        return pBHMap;
+    }
+
+    double calculatePhb(Bid oppBid, List<HSpaceElem> hSpace, int elementIndex, int step, Map<Integer, Double> pBHMap, double denominator) {
+        HSpaceElem hSpaceEntry = hSpace.get(elementIndex);
         Double phj = hSpaceEntry.getWeight();
 
-        double numerator = phj * calculatePbh(oppBid, hSpaceEntry, step);
-        double denominator = calculateDenominator(elementIndex);
-
-        history.merge(elementIndex, numerator, (inMap, toAdd) -> inMap + toAdd);
-
+        double numerator = phj * pBHMap.get(elementIndex);
         return numerator / denominator;
     }
 
-    private double calculateDenominator(int elementIndex) {
-        return history.get(elementIndex) == null ? 1 : history.get(elementIndex);
+    public double calculateDenominator(List<HSpaceElem> hSpace, Map<Integer, Double> pBHMap) {
+        double result = 0;
+
+        for (int i = 0; i < hSpace.size(); i++) {
+            result += hSpace.get(i).getWeight() * pBHMap.get(i);
+        }
+
+        return result;
+
     }
 
     private double calculatePbh(Bid oppBid, HSpaceElem hSpaceEntry, int step) {
@@ -30,7 +46,7 @@ class MathHelper {
 
         double index = Math.pow(utilityBgivenH(oppBid, hSpaceEntry) - utilityB(step), 2) / (2 * Math.pow(sigma, 2));
 
-        return c * Math.exp(index);
+        return c * Math.exp(-index);
     }
 
     private double utilityBgivenH(Bid oppBid, HSpaceElem hSpaceEntry) {
@@ -73,9 +89,8 @@ class MathHelper {
         return discreteOppValues;
     }
 
+
     private double utilityB(int step) {
         return 1 - 0.05 * step;  //TODO change to consider time horizon
     }
-
-
 }

@@ -57,20 +57,23 @@ public class Group5 extends AbstractNegotiationParty {
         MathHelper mathHelper = new MathHelper();
         Bid oppBid1 = generateDummyBid1();
         Bid oppBid2 = generateDummyBid2();
+        Bid oppBid3 = generateDummyBid3();
+        Bid oppBid4 = generateDummyBid4();
 
-        List<Bid> bids = new ArrayList<>(Arrays.asList(oppBid1, oppBid2));
+        List<Bid> bids = new ArrayList<>(Arrays.asList(oppBid1, oppBid2, oppBid3, oppBid4));
 
         int steps = bids.size();
 
         for (int step = 0; step < steps; step++) {
+
+            Map<Integer, Double> pBHMap = mathHelper.calculatePhbMap(bids.get(step), hSpace, step);
+            double denominator = mathHelper.calculateDenominator(hSpace, pBHMap);
             for (int i = 0; i < hSpace.size(); i++) {
                 HSpaceElem hSpaceElem = hSpace.get(i);
-                double newPhb = mathHelper.calculatePhb(bids.get(step), hSpaceElem, i, step);
+                double newPhb = mathHelper.calculatePhb(bids.get(step), hSpace, i, step, pBHMap, denominator);
                 hSpaceElem.setWeight(newPhb);
             }
-            System.out.println();
-            System.out.println("=============== NEXT STEP ===============");
-            System.out.println();
+            System.out.println("\n=============== NEXT STEP ===============\n");
         }
 
 
@@ -94,6 +97,26 @@ public class Group5 extends AbstractNegotiationParty {
         HashMap values = new HashMap();
 
         putBidToValues(0, 0, domain, values);
+        putBidToValues(1, 1, domain, values);
+
+        return new Bid(domain, values);
+    }
+
+    private Bid generateDummyBid3() throws IOException {
+        DomainImpl domain = new DomainImpl(new File("etc/templates/partydomain/simple/party_domain.xml"));
+        HashMap values = new HashMap();
+
+        putBidToValues(0, 1, domain, values);
+        putBidToValues(1, 0, domain, values);
+
+        return new Bid(domain, values);
+    }
+
+    private Bid generateDummyBid4() throws IOException {
+        DomainImpl domain = new DomainImpl(new File("etc/templates/partydomain/simple/party_domain.xml"));
+        HashMap values = new HashMap();
+
+        putBidToValues(0, 1, domain, values);
         putBidToValues(1, 1, domain, values);
 
         return new Bid(domain, values);

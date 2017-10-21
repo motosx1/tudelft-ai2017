@@ -1,13 +1,16 @@
 package src.ai2017;
 
 import negotiator.Bid;
+import negotiator.issue.Issue;
 import negotiator.issue.Value;
+import negotiator.utility.EvaluatorDiscrete;
 
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-class MathHelper {
+class UtilitiesHelper {
 //    private Map<Integer, Double> history = new HashMap<>();
 
     public Map<Integer, Double> calculatePhbMap(Bid oppBid, List<HSpaceElem> hSpace, int step) {
@@ -21,7 +24,7 @@ class MathHelper {
         return pBHMap;
     }
 
-    double calculatePhb(Bid oppBid, List<HSpaceElem> hSpace, int elementIndex, int step, Map<Integer, Double> pBHMap, double denominator) {
+    double calculatePhb(List<HSpaceElem> hSpace, int elementIndex, Map<Integer, Double> pBHMap, double denominator) {
         HSpaceElem hSpaceEntry = hSpace.get(elementIndex);
         Double phj = hSpaceEntry.getWeight();
 
@@ -44,12 +47,12 @@ class MathHelper {
         double sigma = 0.3;
         double c = 1 / (sigma * Math.sqrt(2 * Math.PI));
 
-        double index = Math.pow(utilityBgivenH(oppBid, hSpaceEntry) - utilityB(step), 2) / (2 * Math.pow(sigma, 2));
+        double index = Math.pow(calculateUtility(oppBid, hSpaceEntry) - utilityB(step), 2) / (2 * Math.pow(sigma, 2));
 
         return c * Math.exp(-index);
     }
 
-    private double utilityBgivenH(Bid oppBid, HSpaceElem hSpaceEntry) {
+    public double calculateUtility(Bid oppBid, HSpaceElem hSpaceEntry) {
         Map<String, Value> discreteOppValues = getDiscreteBidMap(oppBid);
 
         double utility = 0;
@@ -92,5 +95,9 @@ class MathHelper {
 
     private double utilityB(int step) {
         return 1 - 0.05 * step;  //TODO change to consider time horizon
+    }
+
+    Double getMaxUtility(Map<Bid, Double> myPossibleBids) {
+        return myPossibleBids.entrySet().stream().max(Comparator.comparingDouble(Map.Entry::getValue)).get().getValue();
     }
 }

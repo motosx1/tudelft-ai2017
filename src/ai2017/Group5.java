@@ -2,157 +2,139 @@ package src.ai2017;
 
 import negotiator.AgentID;
 import negotiator.Bid;
-import negotiator.DomainImpl;
-import negotiator.actions.Accept;
+import negotiator.Domain;
 import negotiator.actions.Action;
 import negotiator.actions.Offer;
-import negotiator.issue.Issue;
 import negotiator.issue.IssueDiscrete;
 import negotiator.issue.ValueDiscrete;
 import negotiator.parties.AbstractNegotiationParty;
 import negotiator.parties.NegotiationInfo;
+import negotiator.utility.AbstractUtilitySpace;
+import negotiator.utility.AdditiveUtilitySpace;
 import negotiator.utility.EvaluatorDiscrete;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.*;
 
 /**
  * This is your negotiation party.
  */
 public class Group5 extends AbstractNegotiationParty {
-    private Random rand = new Random(200);
     private Bid lastReceivedBid = null;
-
-    private Map<String, EvaluatorDiscrete> dummyUtilitySpace = new HashMap<>(); // == fevaluators
-
-    //    private List<List<CriterionFeatures>> hSpace = new ArrayList<>();
+    private UtilitiesHelper utilitiesHelper = new UtilitiesHelper();
+    private AdditiveUtilitySpace myUtilitySpace = null;
     private List<HSpaceElem> hSpace = new ArrayList<>();
+    private Map<Bid, Double> myPossibleBids = new HashMap<>();
+    private int step = 0;
 
+    private Position myPreviousPosition = null;
+    private Position opponentPreviousPosition = null;
+    private NegotiationInfo info = null;
 
     @Override
     public void init(NegotiationInfo info) {
 
         super.init(info);
+        this.info = info;
+        myUtilitySpace = (AdditiveUtilitySpace) info.getUtilitySpace();
+        step = 0;
+        SpacePreparationHelper spacePreparationHelper = new SpacePreparationHelper();
+        Map<String, EvaluatorDiscrete> oppUtilitySpace = prepareOpponentUtilitySpace(info.getUtilitySpace());
+        hSpace = spacePreparationHelper.prepareHSpace(oppUtilitySpace);
+        myPossibleBids = spacePreparationHelper.generateMyPossibleBids(myUtilitySpace);
+        myPreviousPosition = new Position(utilitiesHelper.getMaxUtility(myPossibleBids), 0.0);
+
 
         System.out.println("Discount Factor is " + info.getUtilitySpace().getDiscountFactor());
         System.out.println("Reservation Value is " + info.getUtilitySpace().getReservationValueUndiscounted());
     }
 
-    public void initForTest() {
+    private Map<String, EvaluatorDiscrete> prepareOpponentUtilitySpace(AbstractUtilitySpace utilitySpace) {
+        Domain domain = utilitySpace.getDomain();
+        Map<String, EvaluatorDiscrete> result = new HashMap<>();
+        for (int i = 0; i < domain.getIssues().size(); i++) {
+            String criterionName = domain.getIssues().get(i).getName();
+            IssueDiscrete issueDiscrete = (IssueDiscrete) domain.getObjectives().get(i + 1);
 
-        prepareDummy();
-
-        HSpacePreparationHelper hSpacePreparationHelper = new HSpacePreparationHelper(dummyUtilitySpace);
-        hSpace = hSpacePreparationHelper.prepareHSpace();
-
-        try {
-            fight();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void fight() throws IOException {
-        MathHelper mathHelper = new MathHelper();
-        Bid oppBid1 = generateDummyBid1();
-        Bid oppBid2 = generateDummyBid2();
-        Bid oppBid3 = generateDummyBid3();
-        Bid oppBid4 = generateDummyBid4();
-
-        List<Bid> bids = new ArrayList<>(Arrays.asList(oppBid1, oppBid2, oppBid3, oppBid4));
-
-        int steps = bids.size();
-
-        for (int step = 0; step < steps; step++) {
-
-            Map<Integer, Double> pBHMap = mathHelper.calculatePhbMap(bids.get(step), hSpace, step);
-            double denominator = mathHelper.calculateDenominator(hSpace, pBHMap);
-            for (int i = 0; i < hSpace.size(); i++) {
-                HSpaceElem hSpaceElem = hSpace.get(i);
-                double newPhb = mathHelper.calculatePhb(bids.get(step), hSpace, i, step, pBHMap, denominator);
-                hSpaceElem.setWeight(newPhb);
-            }
-            System.out.println("\n=============== NEXT STEP ===============\n");
-        }
-
-
-        System.out.println('x');
-
-    }
-
-
-    private Bid generateDummyBid1() throws IOException {
-        DomainImpl domain = new DomainImpl(new File("etc/templates/partydomain/simple/party_domain.xml"));
-        HashMap values = new HashMap();
-
-        putBidToValues(0, 0, domain, values);
-        putBidToValues(1, 0, domain, values);
-
-        return new Bid(domain, values);
-    }
-
-    private Bid generateDummyBid2() throws IOException {
-        DomainImpl domain = new DomainImpl(new File("etc/templates/partydomain/simple/party_domain.xml"));
-        HashMap values = new HashMap();
-
-        putBidToValues(0, 0, domain, values);
-        putBidToValues(1, 1, domain, values);
-
-        return new Bid(domain, values);
-    }
-
-    private Bid generateDummyBid3() throws IOException {
-        DomainImpl domain = new DomainImpl(new File("etc/templates/partydomain/simple/party_domain.xml"));
-        HashMap values = new HashMap();
-
-        putBidToValues(0, 1, domain, values);
-        putBidToValues(1, 0, domain, values);
-
-        return new Bid(domain, values);
-    }
-
-    private Bid generateDummyBid4() throws IOException {
-        DomainImpl domain = new DomainImpl(new File("etc/templates/partydomain/simple/party_domain.xml"));
-        HashMap values = new HashMap();
-
-        putBidToValues(0, 1, domain, values);
-        putBidToValues(1, 1, domain, values);
-
-        return new Bid(domain, values);
-    }
-
-    private void putBidToValues(int issueNumber, int valueNumber, DomainImpl domain, HashMap values) {
-        Issue issue = domain.getIssues().get(issueNumber);
-        IssueDiscrete discreteIssue = (IssueDiscrete) issue;
-        ValueDiscrete value = discreteIssue.getValue(valueNumber);
-        values.put(issue.getNumber(), value);
-    }
-
-    private void prepareDummy() {
-        try {
             EvaluatorDiscrete eval = new EvaluatorDiscrete();
-            eval.setWeight(0.33);
-            eval.setEvaluationDouble(new ValueDiscrete("Photo"), 0.33);
-            eval.setEvaluationDouble(new ValueDiscrete("Plain"), 0.66);
-            dummyUtilitySpace.put("Invitations", eval);
+            try {
+
+                for (ValueDiscrete valueDiscrete : issueDiscrete.getValues()) {
+                    eval.setEvaluationDouble(valueDiscrete, 0);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            result.put(criterionName, eval);
+
+        }
+
+        return result;
+    }
+
+    public void initForTest() {
+//
+//        try {
+////            fight();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+    }
 
 
-            eval = new EvaluatorDiscrete();
-            eval.setWeight(0.66);
-            eval.setEvaluationDouble(new ValueDiscrete("Your Dorm"), 0.66);
-            eval.setEvaluationDouble(new ValueDiscrete("Party Room"), 0.33);
-            dummyUtilitySpace.put("Location", eval);
+//    private void fight() throws IOException {
+//        List<Bid> oppBids = Arrays.asList(DummyBids.generateDummyBid1(),
+//                DummyBids.generateDummyBid2(),
+//                DummyBids.generateDummyBid3(),
+//                DummyBids.generateDummyBid4());
+//
+//        int steps = oppBids.size();
+//
+//        HSpaceElem myWeights = new HSpaceElem(myUtilitySpace);
+//
+//
+//        for (int step = 0; step < steps; step++) {
+//            Bid oppBid = oppBids.get(step);
+//            recalculateHSpace(oppBid, step);
+//            HSpaceElem opponentsWeights = hSpace.stream().max(Comparator.comparingDouble(HSpaceElem::getWeight)).get();
+//            double oppUtility = utilitiesHelper.calculateUtility(oppBid, opponentsWeights);
+//            double oppUtilityForMe = utilitiesHelper.calculateUtility(oppBid, myWeights);
+//
+//            opponentPreviousPosition = getOrInitOpponentPreviousPosition(oppUtility);
+//            Position opponentCurrentPosition = new Position(oppUtilityForMe, oppUtility);
+//
+//            Vector opponentVector = new Vector(opponentPreviousPosition, opponentCurrentPosition);
+//            Vector myDesiredVector = Vector.getMirroredVector(opponentVector);
+//
+//            Position myDesiredPosition = myPreviousPosition.add(myDesiredVector);
+//
+//
+//            System.out.println("\n=============== NEXT STEP ===============\n");
+//        }
+//
+//        System.out.println('x');
+//
+//    }
 
-//            eval = new EvaluatorDiscrete();
-//            eval.setWeight(0.4);
-//            eval.setEvaluationDouble(new ValueDiscrete("Beer"), 0.8);
-//            eval.setEvaluationDouble(new ValueDiscrete("Wine"), 0.2);
-//            utilitySpace.put("Drinks", eval);
-        } catch (Exception e) {
-            e.printStackTrace();
+    private Position getOrInitOpponentPreviousPosition(double oppUtility) {
+        if (opponentPreviousPosition == null) {
+            opponentPreviousPosition = new Position(0.0, oppUtility);
+        }
+        return opponentPreviousPosition;
+
+    }
+
+
+    private void recalculateHSpace(Bid oppBid, int step) {
+        Map<Integer, Double> pBHMap = utilitiesHelper.calculatePhbMap(oppBid, hSpace, step);
+        double denominator = utilitiesHelper.calculateDenominator(hSpace, pBHMap);
+        for (int i = 0; i < hSpace.size(); i++) {
+            HSpaceElem hSpaceElem = hSpace.get(i);
+            double newPhb = utilitiesHelper.calculatePhb(hSpace, i, pBHMap, denominator);
+            hSpaceElem.setWeight(newPhb);
         }
     }
+
 
     /**
      * Each round this method gets called and ask you to accept or offer. The
@@ -164,14 +146,72 @@ public class Group5 extends AbstractNegotiationParty {
      */
     @Override
     public Action chooseAction(List<Class<? extends Action>> validActions) {
+        try {
+
+            recalculateHSpace(lastReceivedBid, step);
+            HSpaceElem opponentsWeights = hSpace.stream().max(Comparator.comparingDouble(HSpaceElem::getWeight)).get();
+            double oppUtility = utilitiesHelper.calculateUtility(lastReceivedBid, opponentsWeights);
+            double oppUtilityForMe = myUtilitySpace.getUtility(lastReceivedBid);
+
+            opponentPreviousPosition = getOrInitOpponentPreviousPosition(oppUtility);
+            Position opponentCurrentPosition = new Position(oppUtilityForMe, oppUtility);
+
+            Vector opponentVector = new Vector(opponentPreviousPosition, opponentCurrentPosition);
+            Vector myDesiredVector = Vector.getMirroredVector(opponentVector);
+
+            Position myDesiredPosition = myPreviousPosition.add(myDesiredVector);
+
+            Bid myClosestBid = findClosestBid(myPossibleBids, opponentsWeights, myDesiredPosition);
+
+            step++;
+
+
+            return new Offer(getPartyId(), myClosestBid);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return new Offer(getPartyId(), generateRandomBid());
 
         // with 50% chance, counter offer
         // if we are the first party, also offer.
-        if (lastReceivedBid == null || !validActions.contains(Accept.class) || Math.random() > 0.1) {
-            return new Offer(getPartyId(), generateRandomBid());
-        } else {
-            return new Accept(getPartyId(), lastReceivedBid);
+//        if (lastReceivedBid == null || !validActions.contains(Accept.class) || Math.random() > 0.5) {
+//            return new Offer(getPartyId(), generateRandomBid());
+//        } else {
+//            return new Accept(getPartyId(), lastReceivedBid);
+//        }
+    }
+
+    private Bid findClosestBid(Map<Bid, Double> myPossibleBids, HSpaceElem opponentsWeights, Position myDesiredPosition) throws Exception {
+        double minDistance = 100000;
+        Bid bestBid = null;
+
+//        AdditiveUtilitySpace oppUtilitySpace = HSpaceElem.getAdditiveUtilitySpace(info.getUtilitySpace().getDomain(), opponentsWeights);
+        for (Map.Entry<Bid, Double> myBidEntry : myPossibleBids.entrySet()) {
+            Bid myBid = myBidEntry.getKey();
+            double myBidForOpponent = utilitiesHelper.calculateUtility(myBid, opponentsWeights);
+            double myBidForMe = myBidEntry.getValue();
+
+            double distance = getDistance(myDesiredPosition, new Position(myBidForMe, myBidForOpponent));
+            if (distance < minDistance) {
+                minDistance = distance;
+                bestBid = myBid;
+            }
         }
+
+        if (bestBid == null) {
+            throw new Exception("Error while getting closest bid");
+        }
+
+        return bestBid;
+    }
+
+    private double getDistance(Position myDesiredPosition, Position position) {
+        double x = Math.pow(myDesiredPosition.getMyUtility() - position.getMyUtility(), 2);
+        double y = Math.pow(myDesiredPosition.getHisUtility() - position.getHisUtility(), 2);
+
+        return Math.sqrt(x + y);
     }
 
     /**

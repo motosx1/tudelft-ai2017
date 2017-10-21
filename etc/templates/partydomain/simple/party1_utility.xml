@@ -8,10 +8,6 @@
                   description="Hire a standard party room. Enough room, no outdoor problems. It costs more, though."
                   value="Party Room" cost="400.0" evaluation="2">
             </item>
-            <item index="3"
-                  description="Hire a standard party room. Enough room, no outdoor problems. It costs more, though."
-                  value="Party Tent" cost="400.0" evaluation="3">
-            </item>
         </issue>
         <issue index="2" name="Invitations" vtype="discrete" type="discrete" etype="discrete">
             <item index="1" description="Write the address on pieces of paper and hand those out." value="Plain"
@@ -22,10 +18,9 @@
                   value="Photo" cost="75.0" evaluation="2">
             </item>
         </issue>
-        <weight index="1" value="0.33">
+        <weight index="1" value="0.66">
         </weight>
-        <weight index="2" value="0.66">
+        <weight index="2" value="0.33">
         </weight>
-
     </objective>
 </utility_space> 

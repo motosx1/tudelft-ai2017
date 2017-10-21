@@ -22,6 +22,12 @@ public class CriterionFeatures {
         this.features = features;
     }
 
+    public CriterionFeatures(String criterion, Map<ValueDiscrete, Double> features, double criterionWeight) {
+        this.criterion = criterion;
+        this.features = features;
+        this.weight = criterionWeight;
+    }
+
     public CriterionFeatures(CriterionFeatures criterionFeatures) {
         this.criterion = criterionFeatures.getCriterion();
         this.features = new HashMap<>(criterionFeatures.getFeatures());

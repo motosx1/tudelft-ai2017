@@ -3,12 +3,12 @@ package src.ai2017;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SetPermutations<E> {
+class SetPermutations<E> {
 
     private final List<E> input;
     private final List<List<E>> result;
 
-    public static <E> List<List<E>> getSetPermutations(List<E> input) {
+    static <E> List<List<E>> getSetPermutations(List<E> input) {
         SetPermutations<E> setPermutations = new SetPermutations<>(input);
         return setPermutations.build();
     }

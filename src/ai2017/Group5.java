@@ -24,9 +24,12 @@ public class Group5 extends AbstractNegotiationParty {
     private Map<AgentID, Bid> lastReceivedBids = new HashMap<>();
     private UtilitiesHelper utilitiesHelper = new UtilitiesHelper();
     private AdditiveUtilitySpace myUtilitySpace = null;
-    private List<HSpaceElem> hSpace = new ArrayList<>();
+    private HashMap<AgentID, List<HSpaceElem>> hSpace = null;
     private Map<Bid, Double> myPossibleBids = new HashMap<>();
+    private AgentID lastOpponent;
     private int step = 0;
+    private SpacePreparationHelper spacePreparationHelper = new SpacePreparationHelper();
+    private Map<String, EvaluatorDiscrete> oppUtilitySpace = new HashMap<>();
 
     private Position myPreviousPosition = null;
     private Position opponentPreviousPosition = null;
@@ -39,9 +42,8 @@ public class Group5 extends AbstractNegotiationParty {
         this.info = info;
         myUtilitySpace = (AdditiveUtilitySpace) info.getUtilitySpace();
         step = 0;
-        SpacePreparationHelper spacePreparationHelper = new SpacePreparationHelper();
-        Map<String, EvaluatorDiscrete> oppUtilitySpace = prepareOpponentUtilitySpace(info.getUtilitySpace());
-        hSpace = spacePreparationHelper.prepareHSpace(oppUtilitySpace);
+        oppUtilitySpace = prepareOpponentUtilitySpace(info.getUtilitySpace());
+//        hSpace = spacePreparationHelper.prepareHSpace(oppUtilitySpace);
         myPossibleBids = spacePreparationHelper.generateMyPossibleBids(myUtilitySpace);
 //        myPreviousPosition = new Position(utilitiesHelper.getMaxUtility(myPossibleBids), 0.0);
 
@@ -82,12 +84,23 @@ public class Group5 extends AbstractNegotiationParty {
     }
 
 
-    private void recalculateHSpace(Bid oppBid, int step) {
-        Map<Integer, Double> pBHMap = utilitiesHelper.calculatePhbMap(oppBid, hSpace, step);
-        double denominator = utilitiesHelper.calculateDenominator(hSpace, pBHMap);
-        for (int i = 0; i < hSpace.size(); i++) {
-            HSpaceElem hSpaceElem = hSpace.get(i);
-            double newPhb = utilitiesHelper.calculatePhb(hSpace, i, pBHMap, denominator);
+    private void recalculateHSpace(AgentID agentId, Bid oppBid, int step) {
+        if (hSpace == null || hSpace.isEmpty()) {
+            hSpace = new HashMap<>();
+            hSpace.put(agentId, new ArrayList<>());
+        }
+
+        if (hSpace.get(agentId) == null || hSpace.get(agentId).isEmpty()) {
+            hSpace.put(agentId, spacePreparationHelper.prepareHSpace(oppUtilitySpace));
+        }
+
+        List<HSpaceElem> hSpaceForAgents = hSpace.get(agentId);
+
+        Map<Integer, Double> pBHMap = utilitiesHelper.calculatePhbMap(oppBid, hSpaceForAgents, step);
+        double denominator = utilitiesHelper.calculateDenominator(hSpaceForAgents, pBHMap);
+        for (int i = 0; i < hSpaceForAgents.size(); i++) {
+            HSpaceElem hSpaceElem = hSpaceForAgents.get(i);
+            double newPhb = utilitiesHelper.calculatePhb(hSpaceForAgents, i, pBHMap, denominator);
             hSpaceElem.setWeight(newPhb);
         }
     }
@@ -109,51 +122,56 @@ public class Group5 extends AbstractNegotiationParty {
                 return new Offer(getPartyId(), myUtilitySpace.getMaxUtilityBid());
             }
 
+            Map<AgentID, HSpaceElem> opponentsWeightsMap = new HashMap<>();
 
             for (Map.Entry<AgentID, Bid> lastBidEntry : lastReceivedBids.entrySet()) {
                 AgentID agentId = lastBidEntry.getKey();
-                String opponentName = agentId.getName();
 
                 Bid lastOpponentBid = lastBidEntry.getValue();
 
-                recalculateHSpace(lastOpponentBid, step);
-                HSpaceElem opponentsWeights = hSpace.stream().max(Comparator.comparingDouble(HSpaceElem::getWeight)).get();
-                double oppUtility = utilitiesHelper.calculateUtility(lastOpponentBid, opponentsWeights);
-                double oppUtilityForMe = myUtilitySpace.getUtility(lastOpponentBid);
-
-
-                Position opponentCurrentPosition = new Position(oppUtilityForMe, oppUtility);
-                opponentPreviousPosition = getOrInitOpponentPreviousPosition(opponentCurrentPosition);
-
-                Vector opponentVector = new Vector(opponentPreviousPosition, opponentCurrentPosition);
-                Vector myDesiredVector = Vector.getMirroredVector(opponentVector);
-
-
-                Action returnOffer;
-                Bid myBid;
-                if (isMyFirstBid()) {
-                    myBid = myUtilitySpace.getMaxUtilityBid();
-                    returnOffer = new Offer(getPartyId(), myBid);
-                } else {
-                    if(shouldAccept(lastOpponentBid)){
-                        return new Accept(getPartyId(), lastOpponentBid);
-                    } else {
-
-                        Position myDesiredPosition = myPreviousPosition.add(myDesiredVector);
-                        myBid = findClosestBid(myPossibleBids, opponentsWeights, myDesiredPosition);
-                        returnOffer = new Offer(getPartyId(), myBid);
-
-                    }
-                }
-
-
-                opponentPreviousPosition = opponentCurrentPosition;
-                myPreviousPosition = new Position(myUtilitySpace.getUtility(myBid), utilitiesHelper.calculateUtility(myBid, opponentsWeights));
-
-                step++;
-
-                return returnOffer;
+                recalculateHSpace(agentId, lastOpponentBid, step);
+                HSpaceElem opponentsWeights = hSpace.get(agentId).stream().max(Comparator.comparingDouble(HSpaceElem::getWeight)).get();
+                opponentsWeightsMap.put(agentId, opponentsWeights);
             }
+
+
+            Bid lastOpponentBid = lastReceivedBids.get(lastOpponent);
+            HSpaceElem meanOpponentsWeights = utilitiesHelper.getMeanWeights(info.getUtilitySpace(), opponentsWeightsMap);
+
+            double oppUtility = utilitiesHelper.calculateUtility(lastOpponentBid, meanOpponentsWeights);
+            double oppUtilityForMe = myUtilitySpace.getUtility(lastOpponentBid);
+
+            Position opponentCurrentPosition = new Position(oppUtilityForMe, oppUtility);
+            opponentPreviousPosition = getOrInitOpponentPreviousPosition(opponentCurrentPosition);
+
+            Vector opponentVector = new Vector(opponentPreviousPosition, opponentCurrentPosition);
+
+            Vector myDesiredVector = Vector.getMirroredVector(opponentVector);
+
+            Action returnOffer;
+            Bid myBid;
+            if (isMyFirstBid()) {
+                myBid = myUtilitySpace.getMaxUtilityBid();
+                returnOffer = new Offer(getPartyId(), myBid);
+            } else {
+                if (shouldAccept(lastOpponentBid)) {
+                    return new Accept(getPartyId(), lastReceivedBids.get(lastOpponent));
+                } else {
+
+                    Position myDesiredPosition = myPreviousPosition.add(myDesiredVector);
+                    myBid = findClosestBid(myPossibleBids, meanOpponentsWeights, myDesiredPosition);
+                    returnOffer = new Offer(getPartyId(), myBid);
+
+                }
+            }
+
+
+            opponentPreviousPosition = opponentCurrentPosition;
+            myPreviousPosition = new Position(myUtilitySpace.getUtility(myBid), utilitiesHelper.calculateUtility(myBid, meanOpponentsWeights));
+
+            step++;
+
+            return returnOffer;
 
 
         } catch (Exception e) {
@@ -170,6 +188,8 @@ public class Group5 extends AbstractNegotiationParty {
 //            return new Accept(getPartyId(), lastReceivedBids);
 //        }
     }
+
+
 
     private boolean shouldAccept(Bid lastOpponentBid) {
         return myUtilitySpace.getUtility(lastOpponentBid) >= myPreviousPosition.getMyUtility();
@@ -223,6 +243,7 @@ public class Group5 extends AbstractNegotiationParty {
         super.receiveMessage(sender, action);
         if (action instanceof Offer) {
             lastReceivedBids.put(sender, ((Offer) action).getBid());
+            lastOpponent = sender;
         }
     }
 

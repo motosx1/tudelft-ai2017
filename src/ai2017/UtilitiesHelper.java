@@ -1,9 +1,13 @@
 package src.ai2017;
 
+import negotiator.AgentID;
 import negotiator.Bid;
 import negotiator.issue.Issue;
+import negotiator.issue.IssueDiscrete;
 import negotiator.issue.Value;
-import negotiator.utility.EvaluatorDiscrete;
+import negotiator.issue.ValueDiscrete;
+import negotiator.utility.AbstractUtilitySpace;
+import negotiator.utility.AdditiveUtilitySpace;
 
 import java.util.Comparator;
 import java.util.HashMap;
@@ -100,4 +104,68 @@ class UtilitiesHelper {
     Double getMaxUtility(Map<Bid, Double> myPossibleBids) {
         return myPossibleBids.entrySet().stream().max(Comparator.comparingDouble(Map.Entry::getValue)).get().getValue();
     }
+
+
+    HSpaceElem getMeanWeights(AbstractUtilitySpace myUtilitySpace, Map<AgentID, HSpaceElem> opponentsWeightsMap) {
+        HSpaceElem meanHSpace = new HSpaceElem((AdditiveUtilitySpace) myUtilitySpace);
+
+        meanHSpace.setWeight(opponentsWeightsMap.entrySet().stream()
+                .mapToDouble(a -> a.getValue().getWeight())
+                .average().getAsDouble());
+
+        for (Issue issue : myUtilitySpace.getDomain().getIssues()) {
+            String issueName = issue.getName();
+            List<ValueDiscrete> values = ((IssueDiscrete) issue).getValues();
+
+            setCriterionMean(issueName, opponentsWeightsMap, meanHSpace);
+            for (ValueDiscrete value : values) {
+                setFeatureMean(issueName, value, opponentsWeightsMap, meanHSpace);
+            }
+
+        }
+
+
+        return meanHSpace;
+    }
+
+    private void setFeatureMean(String issueName, ValueDiscrete value, Map<AgentID, HSpaceElem> opponentsWeightsMap, HSpaceElem meanHSpace) {
+        double averageWeightOfFeatures = 0;
+        for (Map.Entry<AgentID, HSpaceElem> entry : opponentsWeightsMap.entrySet()) {
+            HSpaceElem hSpaceElem = entry.getValue();
+
+            averageWeightOfFeatures += hSpaceElem.getCriterionFeatures().stream()
+                    .filter(criterionFeatures -> criterionFeatures.getCriterion().equalsIgnoreCase(issueName))
+                    .map(CriterionFeatures::getFeatures)
+                    .mapToDouble(map -> map.get(value))
+                    .average().getAsDouble();
+        }
+
+        Map<ValueDiscrete, Double> meanFeatures = meanHSpace.getCriterionFeatures().stream()
+                .filter(entry1 -> entry1.getCriterion().equalsIgnoreCase(issueName))
+                .map(CriterionFeatures::getFeatures)
+                .findFirst().get();
+
+        meanFeatures.put(value, averageWeightOfFeatures / opponentsWeightsMap.size());
+
+    }
+
+    private void setCriterionMean(String issueName, Map<AgentID, HSpaceElem> opponentsWeightsMap, HSpaceElem meanHSpace) {
+        double averageWeightOfCriterion = 0;
+        for (Map.Entry<AgentID, HSpaceElem> entry : opponentsWeightsMap.entrySet()) {
+            HSpaceElem hSpaceElem = entry.getValue();
+
+            averageWeightOfCriterion += hSpaceElem.getCriterionFeatures().stream()
+                    .filter(criterionFeatures -> criterionFeatures.getCriterion().equalsIgnoreCase(issueName))
+                    .findFirst().get().getWeight();
+
+        }
+
+        averageWeightOfCriterion = averageWeightOfCriterion / opponentsWeightsMap.size();
+
+        CriterionFeatures criterion = meanHSpace.getCriterionFeatures().stream().filter(entry1 -> entry1.getCriterion().equalsIgnoreCase(issueName)).findFirst().get();
+        criterion.setWeight(averageWeightOfCriterion);
+
+
+    }
+
 }

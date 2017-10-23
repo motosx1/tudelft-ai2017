@@ -1,7 +1,5 @@
 package src.ai2017;
 
-import negotiator.Domain;
-import negotiator.issue.IssueDiscrete;
 import negotiator.issue.Objective;
 import negotiator.issue.ValueDiscrete;
 import negotiator.utility.AdditiveUtilitySpace;
@@ -9,7 +7,6 @@ import negotiator.utility.Evaluator;
 import negotiator.utility.EvaluatorDiscrete;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static org.apache.commons.math.util.MathUtils.round;
 
@@ -17,13 +14,17 @@ import static org.apache.commons.math.util.MathUtils.round;
  * Created by bartosz on 17.10.2017.
  */
 public class HSpaceElem {
-    private List<CriterionFeatures> criterionFeatures;
+    private List<CriterionFeatures> criterionFeatures = new ArrayList<>();
     private double weight;
+
+    public HSpaceElem() {
+    }
 
     public HSpaceElem(List<CriterionFeatures> criterionFeatures) {
         this.criterionFeatures = criterionFeatures;
     }
 
+    // Creates clean HSpace, without weights - AdditiveUtilitySpace agrument should be changed to Domain
     public HSpaceElem(AdditiveUtilitySpace myUtilitySpace) {
         Set<Map.Entry<Objective, Evaluator>> evaluators = myUtilitySpace.getEvaluators();
         try {
@@ -32,7 +33,6 @@ public class HSpaceElem {
                 String criterionName = entry.getKey().getName();
                 EvaluatorDiscrete evaluator = (EvaluatorDiscrete) entry.getValue();
 
-                double criterionWeight = evaluator.getWeight();
                 Set<ValueDiscrete> features = evaluator.getValues();
                 Map<ValueDiscrete, Double> hSpaceElemFeatures = new HashMap<>();
                 for (ValueDiscrete featureDiscrete : features) {
@@ -40,11 +40,19 @@ public class HSpaceElem {
                     hSpaceElemFeatures.put(featureDiscrete, featureWeight);
                 }
 
-                CriterionFeatures criterionFeatures = new CriterionFeatures(criterionName, hSpaceElemFeatures, criterionWeight);
+                CriterionFeatures criterionFeatures = new CriterionFeatures(criterionName, hSpaceElemFeatures);
+                cleanWeights(criterionFeatures);
                 this.criterionFeatures.add(criterionFeatures);
             }
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    private void cleanWeights(CriterionFeatures criterionFeatures) {
+        criterionFeatures.setWeight(0.0);
+        for (Map.Entry<ValueDiscrete, Double> entry : criterionFeatures.getFeatures().entrySet()) {
+            entry.setValue(0.0);
         }
     }
 

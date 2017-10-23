@@ -71,7 +71,7 @@ class SpacePreparationHelper {
         // assign weights to features
         for (List<ValueDiscrete> permutation : featuresPermutations) {
             Map<ValueDiscrete, Double> featureWeightMap = new HashMap<>();
-            int n = featuresPermutations.size();
+            int n = permutation.size();
             double sn = (1 - Math.pow(a, n)) / (1 - a);
             double cwn = 1 / sn;
 

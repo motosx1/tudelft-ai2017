@@ -3,8 +3,10 @@ package src.ai2017;
 import negotiator.AgentID;
 import negotiator.Bid;
 import negotiator.Domain;
+import negotiator.actions.Accept;
 import negotiator.actions.Action;
 import negotiator.actions.Offer;
+import negotiator.issue.Issue;
 import negotiator.issue.IssueDiscrete;
 import negotiator.issue.ValueDiscrete;
 import negotiator.parties.AbstractNegotiationParty;
@@ -19,7 +21,7 @@ import java.util.*;
  * This is your negotiation party.
  */
 public class Group5 extends AbstractNegotiationParty {
-    private Bid lastReceivedBid = null;
+    private Map<AgentID, Bid> lastReceivedBids = new HashMap<>();
     private UtilitiesHelper utilitiesHelper = new UtilitiesHelper();
     private AdditiveUtilitySpace myUtilitySpace = null;
     private List<HSpaceElem> hSpace = new ArrayList<>();
@@ -41,7 +43,7 @@ public class Group5 extends AbstractNegotiationParty {
         Map<String, EvaluatorDiscrete> oppUtilitySpace = prepareOpponentUtilitySpace(info.getUtilitySpace());
         hSpace = spacePreparationHelper.prepareHSpace(oppUtilitySpace);
         myPossibleBids = spacePreparationHelper.generateMyPossibleBids(myUtilitySpace);
-        myPreviousPosition = new Position(utilitiesHelper.getMaxUtility(myPossibleBids), 0.0);
+//        myPreviousPosition = new Position(utilitiesHelper.getMaxUtility(myPossibleBids), 0.0);
 
 
         System.out.println("Discount Factor is " + info.getUtilitySpace().getDiscountFactor());
@@ -51,9 +53,9 @@ public class Group5 extends AbstractNegotiationParty {
     private Map<String, EvaluatorDiscrete> prepareOpponentUtilitySpace(AbstractUtilitySpace utilitySpace) {
         Domain domain = utilitySpace.getDomain();
         Map<String, EvaluatorDiscrete> result = new HashMap<>();
-        for (int i = 0; i < domain.getIssues().size(); i++) {
-            String criterionName = domain.getIssues().get(i).getName();
-            IssueDiscrete issueDiscrete = (IssueDiscrete) domain.getObjectives().get(i + 1);
+        for (Issue issue : domain.getIssues()) {
+            String criterionName = issue.getName();
+            IssueDiscrete issueDiscrete = (IssueDiscrete) issue;
 
             EvaluatorDiscrete eval = new EvaluatorDiscrete();
             try {
@@ -66,59 +68,14 @@ public class Group5 extends AbstractNegotiationParty {
             }
 
             result.put(criterionName, eval);
-
         }
 
         return result;
     }
 
-    public void initForTest() {
-//
-//        try {
-////            fight();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-    }
-
-
-//    private void fight() throws IOException {
-//        List<Bid> oppBids = Arrays.asList(DummyBids.generateDummyBid1(),
-//                DummyBids.generateDummyBid2(),
-//                DummyBids.generateDummyBid3(),
-//                DummyBids.generateDummyBid4());
-//
-//        int steps = oppBids.size();
-//
-//        HSpaceElem myWeights = new HSpaceElem(myUtilitySpace);
-//
-//
-//        for (int step = 0; step < steps; step++) {
-//            Bid oppBid = oppBids.get(step);
-//            recalculateHSpace(oppBid, step);
-//            HSpaceElem opponentsWeights = hSpace.stream().max(Comparator.comparingDouble(HSpaceElem::getWeight)).get();
-//            double oppUtility = utilitiesHelper.calculateUtility(oppBid, opponentsWeights);
-//            double oppUtilityForMe = utilitiesHelper.calculateUtility(oppBid, myWeights);
-//
-//            opponentPreviousPosition = getOrInitOpponentPreviousPosition(oppUtility);
-//            Position opponentCurrentPosition = new Position(oppUtilityForMe, oppUtility);
-//
-//            Vector opponentVector = new Vector(opponentPreviousPosition, opponentCurrentPosition);
-//            Vector myDesiredVector = Vector.getMirroredVector(opponentVector);
-//
-//            Position myDesiredPosition = myPreviousPosition.add(myDesiredVector);
-//
-//
-//            System.out.println("\n=============== NEXT STEP ===============\n");
-//        }
-//
-//        System.out.println('x');
-//
-//    }
-
-    private Position getOrInitOpponentPreviousPosition(double oppUtility) {
+    private Position getOrInitOpponentPreviousPosition(Position oppUtility) {
         if (opponentPreviousPosition == null) {
-            opponentPreviousPosition = new Position(0.0, oppUtility);
+            opponentPreviousPosition = oppUtility;
         }
         return opponentPreviousPosition;
 
@@ -147,26 +104,57 @@ public class Group5 extends AbstractNegotiationParty {
     @Override
     public Action chooseAction(List<Class<? extends Action>> validActions) {
         try {
-
-            recalculateHSpace(lastReceivedBid, step);
-            HSpaceElem opponentsWeights = hSpace.stream().max(Comparator.comparingDouble(HSpaceElem::getWeight)).get();
-            double oppUtility = utilitiesHelper.calculateUtility(lastReceivedBid, opponentsWeights);
-            double oppUtilityForMe = myUtilitySpace.getUtility(lastReceivedBid);
-
-            opponentPreviousPosition = getOrInitOpponentPreviousPosition(oppUtility);
-            Position opponentCurrentPosition = new Position(oppUtilityForMe, oppUtility);
-
-            Vector opponentVector = new Vector(opponentPreviousPosition, opponentCurrentPosition);
-            Vector myDesiredVector = Vector.getMirroredVector(opponentVector);
-
-            Position myDesiredPosition = myPreviousPosition.add(myDesiredVector);
-
-            Bid myClosestBid = findClosestBid(myPossibleBids, opponentsWeights, myDesiredPosition);
-
-            step++;
+            // if we do the first move
+            if (lastReceivedBids == null || lastReceivedBids.isEmpty()) {
+                return new Offer(getPartyId(), myUtilitySpace.getMaxUtilityBid());
+            }
 
 
-            return new Offer(getPartyId(), myClosestBid);
+            for (Map.Entry<AgentID, Bid> lastBidEntry : lastReceivedBids.entrySet()) {
+                AgentID agentId = lastBidEntry.getKey();
+                String opponentName = agentId.getName();
+
+                Bid lastOpponentBid = lastBidEntry.getValue();
+
+                recalculateHSpace(lastOpponentBid, step);
+                HSpaceElem opponentsWeights = hSpace.stream().max(Comparator.comparingDouble(HSpaceElem::getWeight)).get();
+                double oppUtility = utilitiesHelper.calculateUtility(lastOpponentBid, opponentsWeights);
+                double oppUtilityForMe = myUtilitySpace.getUtility(lastOpponentBid);
+
+
+                Position opponentCurrentPosition = new Position(oppUtilityForMe, oppUtility);
+                opponentPreviousPosition = getOrInitOpponentPreviousPosition(opponentCurrentPosition);
+
+                Vector opponentVector = new Vector(opponentPreviousPosition, opponentCurrentPosition);
+                Vector myDesiredVector = Vector.getMirroredVector(opponentVector);
+
+
+                Action returnOffer;
+                Bid myBid;
+                if (isMyFirstBid()) {
+                    myBid = myUtilitySpace.getMaxUtilityBid();
+                    returnOffer = new Offer(getPartyId(), myBid);
+                } else {
+                    if(shouldAccept(lastOpponentBid)){
+                        return new Accept(getPartyId(), lastOpponentBid);
+                    } else {
+
+                        Position myDesiredPosition = myPreviousPosition.add(myDesiredVector);
+                        myBid = findClosestBid(myPossibleBids, opponentsWeights, myDesiredPosition);
+                        returnOffer = new Offer(getPartyId(), myBid);
+
+                    }
+                }
+
+
+                opponentPreviousPosition = opponentCurrentPosition;
+                myPreviousPosition = new Position(myUtilitySpace.getUtility(myBid), utilitiesHelper.calculateUtility(myBid, opponentsWeights));
+
+                step++;
+
+                return returnOffer;
+            }
+
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -176,11 +164,19 @@ public class Group5 extends AbstractNegotiationParty {
 
         // with 50% chance, counter offer
         // if we are the first party, also offer.
-//        if (lastReceivedBid == null || !validActions.contains(Accept.class) || Math.random() > 0.5) {
+//        if (lastReceivedBids == null || !validActions.contains(Accept.class) || Math.random() > 0.5) {
 //            return new Offer(getPartyId(), generateRandomBid());
 //        } else {
-//            return new Accept(getPartyId(), lastReceivedBid);
+//            return new Accept(getPartyId(), lastReceivedBids);
 //        }
+    }
+
+    private boolean shouldAccept(Bid lastOpponentBid) {
+        return myUtilitySpace.getUtility(lastOpponentBid) >= myPreviousPosition.getMyUtility();
+    }
+
+    private boolean isMyFirstBid() {
+        return myPreviousPosition == null;
     }
 
     private Bid findClosestBid(Map<Bid, Double> myPossibleBids, HSpaceElem opponentsWeights, Position myDesiredPosition) throws Exception {
@@ -226,7 +222,7 @@ public class Group5 extends AbstractNegotiationParty {
     public void receiveMessage(AgentID sender, Action action) {
         super.receiveMessage(sender, action);
         if (action instanceof Offer) {
-            lastReceivedBid = ((Offer) action).getBid();
+            lastReceivedBids.put(sender, ((Offer) action).getBid());
         }
     }
 

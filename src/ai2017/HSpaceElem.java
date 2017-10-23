@@ -1,6 +1,7 @@
 package src.ai2017;
 
 import negotiator.Domain;
+import negotiator.issue.IssueDiscrete;
 import negotiator.issue.Objective;
 import negotiator.issue.ValueDiscrete;
 import negotiator.utility.AdditiveUtilitySpace;
@@ -8,6 +9,7 @@ import negotiator.utility.Evaluator;
 import negotiator.utility.EvaluatorDiscrete;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static org.apache.commons.math.util.MathUtils.round;
 
@@ -67,25 +69,32 @@ public class HSpaceElem {
                 '}';
     }
 
-    static AdditiveUtilitySpace getAdditiveUtilitySpace(Domain domain, HSpaceElem opponentsWeights) {
-        Map<Objective, Evaluator> evals = new HashMap<>();
-
-        for (CriterionFeatures criterionFeatures : opponentsWeights.getCriterionFeatures()) {
-            Objective criterion = new Objective(domain.getObjectivesRoot(), criterionFeatures.getCriterion());
-            EvaluatorDiscrete eval = new EvaluatorDiscrete();
-            eval.setWeight(criterionFeatures.getWeight());
-            for (Map.Entry<ValueDiscrete, Double> featureEntry : criterionFeatures.getFeatures().entrySet()) {
-                try {
-                    eval.setEvaluationDouble(featureEntry.getKey(), featureEntry.getValue());
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-
-            evals.put(criterion, eval);
-        }
-
-
-        return new AdditiveUtilitySpace(domain, evals);
-    }
+//    static AdditiveUtilitySpace getAdditiveUtilitySpace(Domain domain, HSpaceElem opponentsWeights) {
+//        Map<Objective, Evaluator> evals = new HashMap<>();
+//
+//        for (CriterionFeatures criterionFeatures : opponentsWeights.getCriterionFeatures()) {
+////            Objective criterion = new Objective(domain.getObjectivesRoot(), criterionFeatures.getCriterion()); //tu
+//            Objective correspondingObjective = domain.getObjectives().stream().filter(objective -> objective.getName().equalsIgnoreCase(criterionFeatures.getCriterion())).findFirst().get();
+////            Objective criterion = new Objective(domain.getObjectivesRoot(), criterionFeatures.getCriterion(), domain.getObjectives().indexOf(correspondingObjective)); //tu
+//
+//            EvaluatorDiscrete eval = new EvaluatorDiscrete();
+//            eval.setWeight(criterionFeatures.getWeight());
+//            for (Map.Entry<ValueDiscrete, Double> featureEntry : criterionFeatures.getFeatures().entrySet()) {
+//                try {
+//                    eval.setEvaluationDouble(featureEntry.getKey(), featureEntry.getValue());
+//                } catch (Exception e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//
+//            List<String> collect = criterionFeatures.getFeatures().entrySet().stream().map(entry -> entry.getKey().getValue()).collect(Collectors.toList());
+//            IssueDiscrete issueDiscrete = new IssueDiscrete(criterionFeatures.getCriterion(), domain.getObjectives().indexOf(correspondingObjective), collect.toArray(new String[collect.size()]));
+//
+//
+//            evals.put(issueDiscrete, eval);
+//        }
+//
+//
+//        return new AdditiveUtilitySpace(domain, evals);
+//    }
 }

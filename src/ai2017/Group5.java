@@ -16,6 +16,7 @@ import negotiator.utility.AdditiveUtilitySpace;
 import negotiator.utility.EvaluatorDiscrete;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * This is your negotiation party.
@@ -171,6 +172,8 @@ public class Group5 extends AbstractNegotiationParty {
 
             step++;
 
+            cutHSpace();
+
             return returnOffer;
 
 
@@ -189,6 +192,18 @@ public class Group5 extends AbstractNegotiationParty {
 //        }
     }
 
+    private void cutHSpace() {
+        hSpace.entrySet().forEach(entry -> {
+            int size = entry.getValue().size();
+            int cutLimit = size <= 20 ? size : size / 2;
+            List<HSpaceElem> newList = entry.getValue().stream()
+                    .sorted(Comparator.comparingDouble(HSpaceElem::getWeight))
+                    .limit(cutLimit)
+                    .collect(Collectors.toList());
+
+            entry.setValue(newList);
+        });
+    }
 
 
     private boolean shouldAccept(Bid lastOpponentBid) {

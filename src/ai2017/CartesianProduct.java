@@ -57,6 +57,6 @@ class CartesianProduct {
 
     public static void main(String[] args) {
         //we invoke the calculate method
-        System.out.println(calculate(Arrays.asList(Arrays.asList(1, 2), Arrays.asList(3, 4), Arrays.asList(5, 6))));
+//        System.out.println(calculate(Arrays.asList(Arrays.asList(1, 2), Arrays.asList(3, 4), Arrays.asList(5, 6))));
     }
 }

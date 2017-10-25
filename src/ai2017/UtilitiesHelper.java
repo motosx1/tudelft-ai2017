@@ -75,12 +75,12 @@ class UtilitiesHelper {
                     .filter(entry -> entry.getKey().equals(oppFeature)).findFirst().get().getValue();
 
 
-            System.out.println(oppCriterion + "->" + probableCriterionWeight + "; " + oppFeature + "->" + probableFeatureWeight + " = " + (probableCriterionWeight * probableFeatureWeight));
+//            System.out.println(oppCriterion + "->" + probableCriterionWeight + "; " + oppFeature + "->" + probableFeatureWeight + " = " + (probableCriterionWeight * probableFeatureWeight));
 
             utility += probableCriterionWeight * probableFeatureWeight;
         }
-        System.out.println("\tutility=" + utility);
-        System.out.println("---");
+//        System.out.println("\tutility=" + utility);
+//        System.out.println("---");
 
         return utility;
     }

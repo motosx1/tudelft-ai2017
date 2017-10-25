@@ -1,7 +1,6 @@
 package src.ai2017;
 
 import negotiator.Bid;
-import negotiator.issue.IssueDiscrete;
 import negotiator.issue.Objective;
 import negotiator.issue.Value;
 import negotiator.issue.ValueDiscrete;
@@ -15,9 +14,14 @@ import java.util.*;
  * Created by bartosz on 17.10.2017.
  */
 class SpacePreparationHelper {
-    double a = 0.5;//0.2 + Math.sin(Math.PI / 6);
+    private double a = 0.5;//0.2 + Math.sin(Math.PI / 6);
+    private List<HSpaceElem> cleanHSpace = null;
 
     List<HSpaceElem> prepareHSpace(Map<String, EvaluatorDiscrete> utilitySpace) {
+        if (cleanHSpace != null) {
+            return cleanHSpace;
+        }
+
         List<HSpaceElem> hSpace = new ArrayList<>();
 
         Map<String, List<Map<ValueDiscrete, Double>>> featuresPermutationsMap = new HashMap<>();
@@ -58,12 +62,26 @@ class SpacePreparationHelper {
 
         assignProbabilitiesToHSpace(hSpace);
 
-        System.out.println("------- hSpace ------");
-        System.out.println(hSpace);
-        System.out.println("--------------------");
 
+        cleanHSpace = new ArrayList<>(hSpace);
         return hSpace;
     }
+
+//    private List<List<Integer>> createCorrespondingIntList(List<List<CriterionFeatures>> criterionFeaturesList) {
+//        List<List<Integer>> result = new ArrayList<>();
+//
+//        for (int i = 0; i < criterionFeaturesList.size(); i++) {
+//            List<Integer> innerResult = new ArrayList<>();
+//
+//            for (int j = 0; j < criterionFeaturesList.get(i).size(); j++) {
+//                innerResult.add(j);
+//            }
+//            result.add(innerResult);
+//        }
+//
+//        return result;
+//
+//    }
 
     private List<Map<ValueDiscrete, Double>> assignWeightsToFeatures(List<List<ValueDiscrete>> featuresPermutations) {
         List<Map<ValueDiscrete, Double>> featuresPermutationsWithWeights = new ArrayList<>();

@@ -25,9 +25,9 @@
 
             </partyRepItems>
             <partyProfileItems>
-                <item url="file:etc/templates/partydomain/party1_utility.xml"/>
-                <item url="file:etc/templates/partydomain/party2_utility.xml"/>
-                <item url="file:etc/templates/partydomain/party3_utility.xml"/>
+                <item url="file:etc/templates/partydomain/party7_utility.xml"/>
+                <item url="file:etc/templates/partydomain/party8_utility.xml"/>
+                <item url="file:etc/templates/partydomain/party9_utility.xml"/>
             </partyProfileItems>
             <repeats>1</repeats>
             <numberOfPartiesPerSession>3</numberOfPartiesPerSession>

@@ -1,4 +1,4 @@
-package src.ai2017;
+package src.ai2017.group5;
 
 import negotiator.AgentID;
 import negotiator.Bid;

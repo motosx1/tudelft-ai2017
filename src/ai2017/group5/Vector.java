@@ -1,4 +1,4 @@
-package src.ai2017;
+package src.ai2017.group5;
 
 /**
  * Created by bartosz on 20.10.2017.

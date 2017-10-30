@@ -1,6 +1,6 @@
 <?xml version="1.0" ?><Session>
 <NegotiationOutcome currentTime="Thu Oct 05 18:26:00 CEST 2017" lastAction="null" domain="etc/templates/partydomain/party_domain.xml" bids="0" runtime="196.987577387" finalOutcome="-" startingAgent="-" deadline="10rounds">
-<resultsOfAgent agent="Group5@0" agentDesc="example party group 5" utilspace="etc/templates/partydomain/party1_utility.xml" agentClass="src.ai2017.Group5" finalUtility="0.0" discountedUtility="0.0" discount="1.0">
+<resultsOfAgent agent="Group5@0" agentDesc="example party group 5" utilspace="etc/templates/partydomain/party1_utility.xml" agentClass="src.ai2017.group5.Group5" finalUtility="0.0" discountedUtility="0.0" discount="1.0">
 </resultsOfAgent>
 <resultsOfAgent agent="OptimalBidderSimple@1" agentDesc="Agent OptimalBidderSimple" utilspace="etc/templates/partydomain/party2_utility.xml" agentClass="agents.OptimalBidderSimple" finalUtility="0.0" discountedUtility="0.0" discount="1.0">
 </resultsOfAgent>

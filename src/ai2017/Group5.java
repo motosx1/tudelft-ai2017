@@ -35,6 +35,8 @@ public class Group5 extends AbstractNegotiationParty {
     private Position myPreviousPosition = null;
     private Position opponentPreviousPosition = null;
     private NegotiationInfo info = null;
+    private final double BATNA_FACTOR = 0.75;
+
 
     @Override
     public void init(NegotiationInfo info) {
@@ -44,10 +46,12 @@ public class Group5 extends AbstractNegotiationParty {
         myUtilitySpace = (AdditiveUtilitySpace) info.getUtilitySpace();
         step = 0;
         oppUtilitySpace = prepareOpponentUtilitySpace(info.getUtilitySpace());
-//        hSpace = spacePreparationHelper.prepareHSpace(oppUtilitySpace);
-        myPossibleBids = spacePreparationHelper.generateMyPossibleBids(myUtilitySpace);
-//        myPreviousPosition = new Position(utilitiesHelper.getMaxUtility(myPossibleBids), 0.0);
-
+        try {
+            info.getUtilitySpace().setReservationValue(BATNA_FACTOR * myUtilitySpace.getUtility(myUtilitySpace.getMaxUtilityBid()));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        myPossibleBids = spacePreparationHelper.generateMyPossibleBids(myUtilitySpace, info.getUtilitySpace().getReservationValueUndiscounted());
 
         System.out.println("Discount Factor is " + info.getUtilitySpace().getDiscountFactor());
         System.out.println("Reservation Value is " + info.getUtilitySpace().getReservationValueUndiscounted());
@@ -92,7 +96,7 @@ public class Group5 extends AbstractNegotiationParty {
         }
 
         if (hSpace.get(agentId) == null || hSpace.get(agentId).isEmpty()) {
-            hSpace.put(agentId, spacePreparationHelper.prepareHSpace(oppUtilitySpace));
+            hSpace.put(agentId, spacePreparationHelper.prepareHSpace(oppUtilitySpace, oppBid));
         }
 
         List<HSpaceElem> hSpaceForAgents = hSpace.get(agentId);
@@ -117,7 +121,10 @@ public class Group5 extends AbstractNegotiationParty {
      */
     @Override
     public Action chooseAction(List<Class<? extends Action>> validActions) {
+        System.out.println("My turn start");
+        Bid myMaxBid = null;
         try {
+            myMaxBid = myUtilitySpace.getMaxUtilityBid();
             // if we do the first move
             if (lastReceivedBids == null || lastReceivedBids.isEmpty()) {
                 return new Offer(getPartyId(), myUtilitySpace.getMaxUtilityBid());
@@ -172,24 +179,22 @@ public class Group5 extends AbstractNegotiationParty {
 
             step++;
 
-            cutHSpace();
+//            cutHSpace();
 
+            System.out.println("My turn end");
             return returnOffer;
 
 
         } catch (Exception e) {
             e.printStackTrace();
         }
+        if (myMaxBid != null) {
+            return new Offer(getPartyId(), myMaxBid);
+        } else {
+            return new Offer(getPartyId(), generateRandomBid());
+        }
 
-        return new Offer(getPartyId(), generateRandomBid());
 
-        // with 50% chance, counter offer
-        // if we are the first party, also offer.
-//        if (lastReceivedBids == null || !validActions.contains(Accept.class) || Math.random() > 0.5) {
-//            return new Offer(getPartyId(), generateRandomBid());
-//        } else {
-//            return new Accept(getPartyId(), lastReceivedBids);
-//        }
     }
 
     private void cutHSpace() {
@@ -218,7 +223,6 @@ public class Group5 extends AbstractNegotiationParty {
         double minDistance = 100000;
         Bid bestBid = null;
 
-//        AdditiveUtilitySpace oppUtilitySpace = HSpaceElem.getAdditiveUtilitySpace(info.getUtilitySpace().getDomain(), opponentsWeights);
         for (Map.Entry<Bid, Double> myBidEntry : myPossibleBids.entrySet()) {
             Bid myBid = myBidEntry.getKey();
             double myBidForOpponent = utilitiesHelper.calculateUtility(myBid, opponentsWeights);

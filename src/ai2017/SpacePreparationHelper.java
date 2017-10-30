@@ -9,25 +9,35 @@ import negotiator.utility.Evaluator;
 import negotiator.utility.EvaluatorDiscrete;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Created by bartosz on 17.10.2017.
  */
 class SpacePreparationHelper {
     private double a = 0.5;//0.2 + Math.sin(Math.PI / 6);
-    private List<HSpaceElem> cleanHSpace = null;
 
-    List<HSpaceElem> prepareHSpace(Map<String, EvaluatorDiscrete> utilitySpace) {
-        if (cleanHSpace != null) {
-            return cleanHSpace;
-        }
+    List<HSpaceElem> prepareHSpace(Map<String, EvaluatorDiscrete> utilitySpace, Bid bestOppBid) {
 
         List<HSpaceElem> hSpace = new ArrayList<>();
 
         Map<String, List<Map<ValueDiscrete, Double>>> featuresPermutationsMap = new HashMap<>();
         for (Map.Entry<String, EvaluatorDiscrete> entry : utilitySpace.entrySet()) {
-            Set<ValueDiscrete> features = entry.getValue().getValues();
+            Set<ValueDiscrete> features = new HashSet<>(entry.getValue().getValues());
+
+            List<Value> bidValues = bestOppBid.getValues().entrySet().stream().map(Map.Entry::getValue).collect(Collectors.toList());
+
+            ValueDiscrete bestOpponentValue = (ValueDiscrete) getBestOppValue(features, bidValues);
+            //features list without best option from bid;
+            features.removeAll(bidValues);
+
+
             List<List<ValueDiscrete>> featuresPermutations = SetPermutations.getSetPermutations(new ArrayList<>(features));
+
+
+            for (List<ValueDiscrete> featuresPermutation : featuresPermutations) {
+                featuresPermutation.add(0, bestOpponentValue);
+            }
 
             List<Map<ValueDiscrete, Double>> featuresPermutationsWithWeights = assignWeightsToFeatures(featuresPermutations);
 
@@ -55,33 +65,23 @@ class SpacePreparationHelper {
 
         // assign weights to criteria
         for (CriterionFeaturesWeight criterionFeaturesWeight : criterionFeaturesWeightList) {
-            List<List<CriterionFeatures>> criterionPermutations = SetPermutations.getSetPermutations(criterionFeaturesWeight.getCriterionFeatures());
-            criterionPermutations = CriterionFeatures.fixCriterionFeaturesPermutations(criterionPermutations);
-            assignWeightsToCriteria(criterionPermutations, hSpace);
+            criterionFeaturesWeight.sortByOtherBid(bestOppBid);
+            assignWeightsToCriteria(criterionFeaturesWeight.getCriterionFeatures(), hSpace);
         }
 
         assignProbabilitiesToHSpace(hSpace);
 
 
-        cleanHSpace = new ArrayList<>(hSpace);
+//        cleanHSpace = new ArrayList<>(hSpace);
         return hSpace;
     }
 
-//    private List<List<Integer>> createCorrespondingIntList(List<List<CriterionFeatures>> criterionFeaturesList) {
-//        List<List<Integer>> result = new ArrayList<>();
-//
-//        for (int i = 0; i < criterionFeaturesList.size(); i++) {
-//            List<Integer> innerResult = new ArrayList<>();
-//
-//            for (int j = 0; j < criterionFeaturesList.get(i).size(); j++) {
-//                innerResult.add(j);
-//            }
-//            result.add(innerResult);
-//        }
-//
-//        return result;
-//
-//    }
+
+    private Value getBestOppValue(Set<ValueDiscrete> features, List<Value> bidValues) {
+        List<ValueDiscrete> allFeatures = new ArrayList<>(features);
+        allFeatures.retainAll(bidValues);
+        return allFeatures.get(0);
+    }
 
     private List<Map<ValueDiscrete, Double>> assignWeightsToFeatures(List<List<ValueDiscrete>> featuresPermutations) {
         List<Map<ValueDiscrete, Double>> featuresPermutationsWithWeights = new ArrayList<>();
@@ -103,38 +103,17 @@ class SpacePreparationHelper {
         return featuresPermutationsWithWeights;
     }
 
-    private List<Map<ValueDiscrete, Double>> assignExistingWeightsToFeatures(List<List<ValueDiscrete>> featuresPermutations) {
-        List<Map<ValueDiscrete, Double>> featuresPermutationsWithWeights = new ArrayList<>();
 
-        // assign weights to features
-        for (List<ValueDiscrete> permutation : featuresPermutations) {
-            Map<ValueDiscrete, Double> featureWeightMap = new HashMap<>();
-//            int n = featuresPermutations.size();
-//            double sn = (1 - Math.pow(a, n)) / (1 - a);
-//            double cwn = 1 / sn;
-
-            for (ValueDiscrete feature : permutation) {
-                featureWeightMap.put(feature, 1.0);
-            }
-
-            featuresPermutationsWithWeights.add(featureWeightMap);
+    private void assignWeightsToCriteria(List<CriterionFeatures> criterionPermutation, List<HSpaceElem> hSpace) {
+        int n = criterionPermutation.size();
+        double sn = (1 - Math.pow(a, n)) / (1 - a);
+        double cwn = 1 / sn;
+        for (CriterionFeatures criterionFeatures : criterionPermutation) {
+            criterionFeatures.setWeight(cwn);
+            cwn = cwn * a;
         }
-        return featuresPermutationsWithWeights;
-    }
+        hSpace.add(new HSpaceElem(criterionPermutation));
 
-
-    private void assignWeightsToCriteria(List<List<CriterionFeatures>> criterionPermutations, List<HSpaceElem> hSpace) {
-        for (List<CriterionFeatures> criterionPermutation : criterionPermutations) {
-            int n = criterionPermutation.size();
-            double sn = (1 - Math.pow(a, n)) / (1 - a);
-            double cwn = 1 / sn;
-            for (CriterionFeatures criterionFeatures : criterionPermutation) {
-                criterionFeatures.setWeight(cwn);
-                cwn = cwn * a;
-            }
-            hSpace.add(new HSpaceElem(criterionPermutation));
-
-        }
     }
 
     private void assignProbabilitiesToHSpace(List<HSpaceElem> hSpace) {
@@ -143,13 +122,13 @@ class SpacePreparationHelper {
         }
     }
 
-    Map<Bid, Double> generateMyPossibleBids(AdditiveUtilitySpace utilitySpace) {
+    Map<Bid, Double> generateMyPossibleBids(AdditiveUtilitySpace utilitySpace, double reservationValueUndiscounted) {
         List<List<ValueDiscreteDouble>> possibleCombinations = generatePossibleCombinations(utilitySpace);
 
-        return generateBids(utilitySpace, possibleCombinations);
+        return generateBids(utilitySpace, possibleCombinations, reservationValueUndiscounted);
     }
 
-    private Map<Bid, Double> generateBids(AdditiveUtilitySpace utilitySpace, List<List<ValueDiscreteDouble>> possibleCombinations) {
+    private Map<Bid, Double> generateBids(AdditiveUtilitySpace utilitySpace, List<List<ValueDiscreteDouble>> possibleCombinations, double reservationValueUndiscounted) {
         Map<Bid, Double> result = new HashMap<>();
 
         for (List<ValueDiscreteDouble> combination : possibleCombinations) {
@@ -163,7 +142,9 @@ class SpacePreparationHelper {
             }
 
             Bid bid = new Bid(utilitySpace.getDomain(), bidEntries);
-            result.put(bid, utilitySpace.getUtility(bid));
+            if (utilitySpace.getUtility(bid) > reservationValueUndiscounted) {
+                result.put(bid, utilitySpace.getUtility(bid));
+            }
         }
 
         return result;

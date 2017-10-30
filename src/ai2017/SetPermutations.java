@@ -33,12 +33,25 @@ class SetPermutations<E> {
         } else {
             for (int i = 0; i < n; i++) {
                 List<E> newPrefix = new ArrayList<>(prefix);
-                newPrefix.add(suffix.get(i));
+
+                E elemi = suffix.get(i);
+                if( !(elemi instanceof CriterionFeatures) ) {
+                    newPrefix.add(suffix.get(i));
+                } else {
+                    CriterionFeatures cf = new CriterionFeatures((CriterionFeatures)elemi);
+                    newPrefix.add((E) cf);
+                }
                 List<E> newStr = new ArrayList<>();
 
                 for (int j = 0; j < n; j++) {
                     if (j != i) {
-                        newStr.add(suffix.get(j));
+                        E elemj = suffix.get(j);
+                        if( !(elemj instanceof CriterionFeatures) ) {
+                            newStr.add(elemj);
+                        } else {
+                            CriterionFeatures cf = new CriterionFeatures((CriterionFeatures)elemj);
+                            newStr.add((E) cf);
+                        }
                     }
                 }
 

@@ -15,7 +15,6 @@ import java.util.List;
 import java.util.Map;
 
 class UtilitiesHelper {
-//    private Map<Integer, Double> history = new HashMap<>();
 
     public Map<Integer, Double> calculatePhbMap(Bid oppBid, List<HSpaceElem> hSpace, int step) {
         Map<Integer, Double> pBHMap = new HashMap<>();
@@ -74,13 +73,8 @@ class UtilitiesHelper {
             Double probableFeatureWeight = myCriterionFeaturesList.getFeatures().entrySet().stream()
                     .filter(entry -> entry.getKey().equals(oppFeature)).findFirst().get().getValue();
 
-
-//            System.out.println(oppCriterion + "->" + probableCriterionWeight + "; " + oppFeature + "->" + probableFeatureWeight + " = " + (probableCriterionWeight * probableFeatureWeight));
-
             utility += probableCriterionWeight * probableFeatureWeight;
         }
-//        System.out.println("\tutility=" + utility);
-//        System.out.println("---");
 
         return utility;
     }

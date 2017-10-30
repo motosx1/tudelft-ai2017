@@ -1,5 +1,9 @@
 package src.ai2017;
 
+import negotiator.Bid;
+import negotiator.issue.Issue;
+
+import java.util.LinkedList;
 import java.util.List;
 
 import static org.apache.commons.math.util.MathUtils.round;
@@ -54,5 +58,14 @@ public class CriterionFeaturesWeight {
         temp = Double.doubleToLongBits(weight);
         result = 31 * result + (int) (temp ^ (temp >>> 32));
         return result;
+    }
+
+    public void sortByOtherBid(Bid bestOppBid) {
+        List<CriterionFeatures> sorted = new LinkedList<>();
+        for (Issue issue : bestOppBid.getIssues()) {
+            CriterionFeatures correspondingCriterionFeature = this.criterionFeatures.stream().filter(entry -> entry.getCriterion().equalsIgnoreCase(issue.getName())).findFirst().get();
+            sorted.add(correspondingCriterionFeature);
+        }
+        criterionFeatures = sorted;
     }
 }

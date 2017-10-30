@@ -77,32 +77,4 @@ public class HSpaceElem {
                 '}';
     }
 
-//    static AdditiveUtilitySpace getAdditiveUtilitySpace(Domain domain, HSpaceElem opponentsWeights) {
-//        Map<Objective, Evaluator> evals = new HashMap<>();
-//
-//        for (CriterionFeatures criterionFeatures : opponentsWeights.getCriterionFeatures()) {
-////            Objective criterion = new Objective(domain.getObjectivesRoot(), criterionFeatures.getCriterion()); //tu
-//            Objective correspondingObjective = domain.getObjectives().stream().filter(objective -> objective.getName().equalsIgnoreCase(criterionFeatures.getCriterion())).findFirst().get();
-////            Objective criterion = new Objective(domain.getObjectivesRoot(), criterionFeatures.getCriterion(), domain.getObjectives().indexOf(correspondingObjective)); //tu
-//
-//            EvaluatorDiscrete eval = new EvaluatorDiscrete();
-//            eval.setWeight(criterionFeatures.getWeight());
-//            for (Map.Entry<ValueDiscrete, Double> featureEntry : criterionFeatures.getFeatures().entrySet()) {
-//                try {
-//                    eval.setEvaluationDouble(featureEntry.getKey(), featureEntry.getValue());
-//                } catch (Exception e) {
-//                    e.printStackTrace();
-//                }
-//            }
-//
-//            List<String> collect = criterionFeatures.getFeatures().entrySet().stream().map(entry -> entry.getKey().getValue()).collect(Collectors.toList());
-//            IssueDiscrete issueDiscrete = new IssueDiscrete(criterionFeatures.getCriterion(), domain.getObjectives().indexOf(correspondingObjective), collect.toArray(new String[collect.size()]));
-//
-//
-//            evals.put(issueDiscrete, eval);
-//        }
-//
-//
-//        return new AdditiveUtilitySpace(domain, evals);
-//    }
 }

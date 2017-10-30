@@ -1,0 +1,34 @@
+<negotiation_template number_of_sessions="1">
+    <agent class="agents.UIAgent" name="you" utility_space="party_FL_utility.xml">
+    </agent>
+    <agent class="agents.BayesianAgent" name="opponent" utility_space="party_NN_utility.xml">
+    </agent>
+    <utility_space number_of_issues="0">
+        <objective index="0" etype="objective" type="objective" description="" name="Party">
+            <issue index="1" etype="discrete" type="discrete" vtype="discrete" name="Food">
+                <item index="1" value="Chips and Nuts" description="Buy bags of chips and party nuts for all guests." cost="100">
+                </item>
+                <item index="2" value="Finger-Food" description="Diced cheese, sliced sausage, deep fried stuff. More tasty than chips and nuts, but more expensive." cost="170">
+                </item>
+                <item index="3" value="Handmade Food" cost="120" description="Custom snacks, hours d’oeuvres etc. Less expansive than finger-food, but more work.">
+                </item>
+            </issue>
+            <issue index="2" etype="discrete" type="discrete" vtype="discrete" name="Drinks">
+                <item index="1" value="Non-Alcoholic" cost="75" description="Soda’s, ice water, etc.">
+                </item>
+                <item index="2" value="Beer Only" cost="300" description="More than enough beers for everybody. It has alcohol, but is more expensive.">
+                </item>
+                <item index="3" value="Handmade Cocktails" cost="200" description="Mix your own drinks. More work, but less expensive than a trainload of beer.">
+                </item>
+            </issue>
+            <issue index="3" etype="discrete" type="discrete" vtype="discrete" name="Location">
+                <item index="1" value="Party Tent" cost="200" description="A tent on some field somewhere. Roomy, but outdoors.">
+                </item>
+                <item index="2" value="Your Dorm" cost="100" description="Give the party in your dormitory. It’s home, but there is less room.">
+                </item>
+                <item index="3" value="Party Room" cost="400" description="Hire a standard party room. Enough room, no outdoor problems. It costs more, though.">
+                </item>
+            </issue>
+        </objective>
+    </utility_space>
+</negotiation_template>

@@ -8,7 +8,6 @@ import negotiator.utility.EvaluatorDiscrete;
 
 import java.util.*;
 
-import static org.apache.commons.math.util.MathUtils.round;
 
 /**
  * Created by bartosz on 17.10.2017.
@@ -73,7 +72,7 @@ public class HSpaceElem {
     public String toString() {
         return "HSpaceElem{" +
                 "criteria=" + criterionFeatures +
-                ", w=" + round(weight, 5) +
+                ", w=" + Math.round(weight) +
                 '}';
     }
 

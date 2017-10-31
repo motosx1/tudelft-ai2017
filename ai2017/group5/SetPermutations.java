@@ -35,10 +35,10 @@ class SetPermutations<E> {
                 List<E> newPrefix = new ArrayList<>(prefix);
 
                 E elemi = suffix.get(i);
-                if( !(elemi instanceof CriterionFeatures) ) {
+                if (!(elemi instanceof CriterionFeatures)) {
                     newPrefix.add(suffix.get(i));
                 } else {
-                    CriterionFeatures cf = new CriterionFeatures((CriterionFeatures)elemi);
+                    CriterionFeatures cf = new CriterionFeatures((CriterionFeatures) elemi);
                     newPrefix.add((E) cf);
                 }
                 List<E> newStr = new ArrayList<>();
@@ -46,10 +46,10 @@ class SetPermutations<E> {
                 for (int j = 0; j < n; j++) {
                     if (j != i) {
                         E elemj = suffix.get(j);
-                        if( !(elemj instanceof CriterionFeatures) ) {
+                        if (!(elemj instanceof CriterionFeatures)) {
                             newStr.add(elemj);
                         } else {
-                            CriterionFeatures cf = new CriterionFeatures((CriterionFeatures)elemj);
+                            CriterionFeatures cf = new CriterionFeatures((CriterionFeatures) elemj);
                             newStr.add((E) cf);
                         }
                     }

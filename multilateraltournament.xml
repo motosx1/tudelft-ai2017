@@ -5,8 +5,8 @@
 
         <tournament>
             <deadline>
-                <value>20</value>
-                <type>ROUND</type>
+                <value>10</value>
+                <type>TIME</type>
             </deadline>
             <protocolItem hasMediatorProfile="false" hasMediator="false"
                           description="Each agents makes offer, counter-offer, or accepts"

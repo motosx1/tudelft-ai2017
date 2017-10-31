@@ -6,7 +6,6 @@ import negotiator.issue.Issue;
 import java.util.LinkedList;
 import java.util.List;
 
-import static org.apache.commons.math.util.MathUtils.round;
 
 /**
  * Created by bartosz on 17.10.2017.
@@ -35,8 +34,8 @@ public class CriterionFeaturesWeight {
     public String toString() {
         return
                 "criterion=" + criterionFeatures +
-                ", w=" + round(weight, 2) +
-                '}';
+                        ", w=" + Math.round(weight) +
+                        '}';
     }
 
     @Override
@@ -71,7 +70,7 @@ public class CriterionFeaturesWeight {
 
     private CriterionFeatures getCorrespondingCriterionFeatures(Issue issue) {
         for (CriterionFeatures entry : this.criterionFeatures) {
-            if(entry.getCriterion().equalsIgnoreCase(issue.getName())){
+            if (entry.getCriterion().equalsIgnoreCase(issue.getName())) {
                 return entry;
             }
         }

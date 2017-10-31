@@ -7,8 +7,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.apache.commons.math.util.MathUtils.round;
-
 /**
  * Created by bartosz on 17.10.2017.
  */
@@ -62,9 +60,9 @@ public class CriterionFeatures {
     public String toString() {
         return
                 "criterion='" + criterion + '\'' +
-                ", features=" + features +
-                ", weight=" + round(weight, 2) +
-                '}';
+                        ", features=" + features +
+                        ", weight=" + Math.round(weight) +
+                        '}';
     }
 
     public static List<List<CriterionFeatures>> fixCriterionFeaturesPermutations(List<List<CriterionFeatures>> criterionPermutations) {

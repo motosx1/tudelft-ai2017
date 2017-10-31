@@ -201,7 +201,7 @@ public class Group5 extends AbstractNegotiationParty {
         HSpaceElem maxHSpaceElem = null;
 
         for (HSpaceElem hSpaceElem : hSpace.get(agentId)) {
-            if(hSpaceElem.getWeight() > max){
+            if (hSpaceElem.getWeight() > max) {
                 max = hSpaceElem.getWeight();
                 maxHSpaceElem = hSpaceElem;
             }

@@ -19,7 +19,7 @@
                 <party classPath="negotiator.parties.RandomParty2">
                     <properties/>
                 </party>
-                <party classPath="src.ai2017.group5.Group5">
+                <party classPath="ai2017.group5.Group5">
                     <properties/>
                 </party>
 

@@ -1,4 +1,4 @@
-package src.ai2017.group5;
+package ai2017.group5;
 
 class Position {
 

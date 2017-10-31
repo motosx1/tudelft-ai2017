@@ -9,7 +9,6 @@ import negotiator.utility.Evaluator;
 import negotiator.utility.EvaluatorDiscrete;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * Created by bartosz on 17.10.2017.
@@ -24,19 +23,19 @@ class SpacePreparationHelper {
         Map<String, List<Map<ValueDiscrete, Double>>> featuresPermutationsMap = new HashMap<>();
         for (Map.Entry<String, EvaluatorDiscrete> entry : utilitySpace.entrySet()) {
             Set<ValueDiscrete> features = new HashSet<>(entry.getValue().getValues());
+            String featuresKey = entry.getKey();
 
-            List<Value> bidValues = bestOppBid.getValues().entrySet().stream().map(Map.Entry::getValue).collect(Collectors.toList());
+            int issueNumber = bestOppBid.getIssues().stream().filter(issue -> issue.getName().equalsIgnoreCase(featuresKey)).findFirst().get().getNumber();
+            Value value = bestOppBid.getValues().get(issueNumber);
 
-            ValueDiscrete bestOpponentValue = (ValueDiscrete) getBestOppValue(features, bidValues);
             //features list without best option from bid;
-            features.removeAll(bidValues);
-
+            features.remove(value);
 
             List<List<ValueDiscrete>> featuresPermutations = SetPermutations.getSetPermutations(new ArrayList<>(features));
 
 
             for (List<ValueDiscrete> featuresPermutation : featuresPermutations) {
-                featuresPermutation.add(0, bestOpponentValue);
+                featuresPermutation.add(0, (ValueDiscrete) value);
             }
 
             List<Map<ValueDiscrete, Double>> featuresPermutationsWithWeights = assignWeightsToFeatures(featuresPermutations);
@@ -72,7 +71,6 @@ class SpacePreparationHelper {
         assignProbabilitiesToHSpace(hSpace);
 
 
-//        cleanHSpace = new ArrayList<>(hSpace);
         return hSpace;
     }
 

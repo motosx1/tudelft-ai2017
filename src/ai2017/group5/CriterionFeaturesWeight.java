@@ -63,9 +63,18 @@ public class CriterionFeaturesWeight {
     public void sortByOtherBid(Bid bestOppBid) {
         List<CriterionFeatures> sorted = new LinkedList<>();
         for (Issue issue : bestOppBid.getIssues()) {
-            CriterionFeatures correspondingCriterionFeature = this.criterionFeatures.stream().filter(entry -> entry.getCriterion().equalsIgnoreCase(issue.getName())).findFirst().get();
+            CriterionFeatures correspondingCriterionFeature = getCorrespondingCriterionFeatures(issue);
             sorted.add(correspondingCriterionFeature);
         }
         criterionFeatures = sorted;
+    }
+
+    private CriterionFeatures getCorrespondingCriterionFeatures(Issue issue) {
+        for (CriterionFeatures entry : this.criterionFeatures) {
+            if(entry.getCriterion().equalsIgnoreCase(issue.getName())){
+                return entry;
+            }
+        }
+        return null;
     }
 }

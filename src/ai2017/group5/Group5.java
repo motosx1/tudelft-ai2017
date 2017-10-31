@@ -16,7 +16,6 @@ import negotiator.utility.AdditiveUtilitySpace;
 import negotiator.utility.EvaluatorDiscrete;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * This is your negotiation party.
@@ -92,7 +91,7 @@ public class Group5 extends AbstractNegotiationParty {
     private void recalculateHSpace(AgentID agentId, Bid oppBid, int step) {
         if (hSpace == null || hSpace.isEmpty()) {
             hSpace = new HashMap<>();
-            hSpace.put(agentId, new ArrayList<>());
+            hSpace.put(agentId, new ArrayList<HSpaceElem>());
         }
 
         if (hSpace.get(agentId) == null || hSpace.get(agentId).isEmpty()) {
@@ -138,7 +137,7 @@ public class Group5 extends AbstractNegotiationParty {
                 Bid lastOpponentBid = lastBidEntry.getValue();
 
                 recalculateHSpace(agentId, lastOpponentBid, step);
-                HSpaceElem opponentsWeights = hSpace.get(agentId).stream().max(Comparator.comparingDouble(HSpaceElem::getWeight)).get();
+                HSpaceElem opponentsWeights = getHSpaceElemWithBiggestWeight(agentId);
                 opponentsWeightsMap.put(agentId, opponentsWeights);
             }
 
@@ -197,18 +196,32 @@ public class Group5 extends AbstractNegotiationParty {
 
     }
 
-    private void cutHSpace() {
-        hSpace.entrySet().forEach(entry -> {
-            int size = entry.getValue().size();
-            int cutLimit = size <= 20 ? size : size / 2;
-            List<HSpaceElem> newList = entry.getValue().stream()
-                    .sorted(Comparator.comparingDouble(HSpaceElem::getWeight))
-                    .limit(cutLimit)
-                    .collect(Collectors.toList());
+    private HSpaceElem getHSpaceElemWithBiggestWeight(AgentID agentId) {
+        double max = 0;
+        HSpaceElem maxHSpaceElem = null;
 
-            entry.setValue(newList);
-        });
+        for (HSpaceElem hSpaceElem : hSpace.get(agentId)) {
+            if(hSpaceElem.getWeight() > max){
+                max = hSpaceElem.getWeight();
+                maxHSpaceElem = hSpaceElem;
+            }
+        }
+
+        return maxHSpaceElem;
     }
+
+//    private void cutHSpace() {
+//        hSpace.entrySet().forEach(entry -> {
+//            int size = entry.getValue().size();
+//            int cutLimit = size <= 20 ? size : size / 2;
+//            List<HSpaceElem> newList = entry.getValue().stream()
+//                    .sorted(Comparator.comparingDouble(HSpaceElem::getWeight))
+//                    .limit(cutLimit)
+//                    .collect(Collectors.toList());
+//
+//            entry.setValue(newList);
+//        });
+//    }
 
 
     private boolean shouldAccept(Bid lastOpponentBid) {

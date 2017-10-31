@@ -1,6 +1,7 @@
 package src.ai2017.group5;
 
 import negotiator.Bid;
+import negotiator.issue.Issue;
 import negotiator.issue.Objective;
 import negotiator.issue.Value;
 import negotiator.issue.ValueDiscrete;
@@ -25,7 +26,7 @@ class SpacePreparationHelper {
             Set<ValueDiscrete> features = new HashSet<>(entry.getValue().getValues());
             String featuresKey = entry.getKey();
 
-            int issueNumber = bestOppBid.getIssues().stream().filter(issue -> issue.getName().equalsIgnoreCase(featuresKey)).findFirst().get().getNumber();
+            int issueNumber = getIssueNumberByKey(bestOppBid, featuresKey);
             Value value = bestOppBid.getValues().get(issueNumber);
 
             //features list without best option from bid;
@@ -72,6 +73,17 @@ class SpacePreparationHelper {
 
 
         return hSpace;
+    }
+
+    private int getIssueNumberByKey(Bid bestOppBid, String featuresKey) {
+
+        for (Issue issue : bestOppBid.getIssues()) {
+            if (issue.getName().equalsIgnoreCase(featuresKey)) {
+                return issue.getNumber();
+            }
+        }
+
+        return -1;
     }
 
 

@@ -21,7 +21,7 @@ class SetPermutations<E> {
 
 
     private List<List<E>> build() {
-        permute(new ArrayList<>(), input);
+        permute(new ArrayList<E>(), input);
         return result;
     }
 

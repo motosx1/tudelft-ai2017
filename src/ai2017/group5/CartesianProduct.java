@@ -7,7 +7,7 @@ class CartesianProduct {
     static <T> List<List<T>> calculate(List<List<T>> input) {
         List<List<T>> res = new ArrayList<>();
         if (input.isEmpty()) { // if no more elements to process
-            res.add(new ArrayList<>()); // then add empty list and return
+            res.add(new ArrayList<T>()); // then add empty list and return
             return res;
         } else {
             process(input, res); // we need to calculate the cartesian product of input and store it in res variable
@@ -18,7 +18,7 @@ class CartesianProduct {
     static <T, E> List<Map<T, E>> calculateMap(List<Map<T, E>> input) {
         List<Map<T, E>> res = new ArrayList<>();
         if (input.isEmpty()) { // if no more elements to process
-            res.add(new HashMap<>()); // then add empty list and return
+            res.add(new HashMap<T, E>()); // then add empty list and return
             return res;
         } else {
             processMap(input, res); // we need to calculate the cartesian product of input and store it in res variable

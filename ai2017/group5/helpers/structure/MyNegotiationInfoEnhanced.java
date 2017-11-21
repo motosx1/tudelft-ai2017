@@ -1,6 +1,5 @@
 package ai2017.group5.helpers.structure;
 
-import ai2017.group5.SpacePreparationHelper;
 import negotiator.Bid;
 import negotiator.Domain;
 import negotiator.issue.Issue;
@@ -16,13 +15,10 @@ public class MyNegotiationInfoEnhanced {
     private int opponentsNum;
     private double reservationValue;
     private Map<Bid, Double> myPossibleBids = new HashMap<>();
-    private SpacePreparationHelper spacePreparationHelper;
     private Map<Issue, EvaluatorDiscrete> opponentsUtilitySpace = new HashMap<>();
 
 
     public MyNegotiationInfoEnhanced(AdditiveUtilitySpace myUtilitySpace) {
-        this.spacePreparationHelper = new SpacePreparationHelper();
-
         //initialize opponent utility space, based on our domain - setting all the weights to 0;
         this.opponentsUtilitySpace = prepareOpponentUtilitySpace(myUtilitySpace.getDomain());
 
@@ -51,6 +47,20 @@ public class MyNegotiationInfoEnhanced {
         return result;
     }
 
+    public Bid getMaxUtilityBid() {
+        Map.Entry<Bid, Double> maxEntry = null;
+        Bid maxBid = null;
+
+        for (Map.Entry<Bid, Double> entry : myPossibleBids.entrySet()) {
+            if (maxEntry == null || entry.getValue().compareTo(maxEntry.getValue()) > 0) {
+                maxEntry = entry;
+                maxBid = entry.getKey();
+            }
+        }
+
+        return maxBid;
+    }
+
     public Map<Issue, EvaluatorDiscrete> getOpponentsUtilitySpace() {
         return opponentsUtilitySpace;
     }
@@ -63,15 +73,9 @@ public class MyNegotiationInfoEnhanced {
         return opponentsNum;
     }
 
-    public double getReservationValue() {
-        return reservationValue;
-    }
-
-    public void setReservationValue(double reservationValue) {
-        this.reservationValue = reservationValue;
-    }
-
     public Map<Bid, Double> getMyPossibleBids() {
         return myPossibleBids;
     }
+
+
 }

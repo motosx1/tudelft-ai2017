@@ -22,61 +22,25 @@ import java.util.Map;
  */
 public class Group5 extends AbstractNegotiationParty {
     private Map<AgentID, Bid> lastReceivedBids = new HashMap<>();
-    private UtilitiesHelper utilitiesHelper = new UtilitiesHelper();
-    private AdditiveUtilitySpace myUtilitySpace = null;
-    private HashMap<AgentID, List<HSpaceElement>> hSpace = null;
     private AgentID lastOpponent;
     private int step = 0;
-    private SpacePreparationHelper spacePreparationHelper = new SpacePreparationHelper();
-
-    private Position myPreviousPosition = null;
-    private Position opponentPreviousPosition = null;
-    private NegotiationInfo info = null;
     private MyNegotiationInfoEnhanced myNegotiationInfo;
+
+    private Strategy strategy;
 
 
     @Override
     public void init(NegotiationInfo info) {
         super.init(info);
         this.step = 0;
-        this.info = info;
-        this.myUtilitySpace = (AdditiveUtilitySpace) info.getUtilitySpace();
         this.myNegotiationInfo = new MyNegotiationInfoEnhanced((AdditiveUtilitySpace) info.getUtilitySpace());
+        this.strategy = new Strategy(info, myNegotiationInfo);
 
         System.out.println("Discount Factor is " + info.getUtilitySpace().getDiscountFactor());
         System.out.println("Reservation Value is " + info.getUtilitySpace().getReservationValueUndiscounted());
     }
 
 
-    private Position getOrInitOpponentPreviousPosition(Position oppUtility) {
-        if (opponentPreviousPosition == null) {
-            opponentPreviousPosition = oppUtility;
-        }
-        return opponentPreviousPosition;
-
-    }
-
-
-    private void recalculateHSpace(AgentID agentId, Bid oppBid, int step) {
-        if (hSpace == null || hSpace.isEmpty()) {
-            hSpace = new HashMap<>();
-            hSpace.put(agentId, new ArrayList<HSpaceElement>());
-        }
-
-        if (hSpace.get(agentId) == null || hSpace.get(agentId).isEmpty()) {
-            hSpace.put(agentId, spacePreparationHelper.prepareHSpace(myNegotiationInfo.getOpponentsUtilitySpace(), oppBid));
-        }
-
-        List<HSpaceElement> hSpaceForAgents = hSpace.get(agentId);
-
-        Map<Integer, Double> pBHMap = utilitiesHelper.calculatePhbMap(oppBid, hSpaceForAgents, step);
-        double denominator = utilitiesHelper.calculateDenominator(hSpaceForAgents, pBHMap);
-        for (int i = 0; i < hSpaceForAgents.size(); i++) {
-            HSpaceElement hSpaceElement = hSpaceForAgents.get(i);
-            double newPhb = utilitiesHelper.calculatePhb(hSpaceForAgents, i, pBHMap, denominator);
-            hSpaceElement.setWeight(newPhb);
-        }
-    }
 
 
     /**
@@ -89,152 +53,19 @@ public class Group5 extends AbstractNegotiationParty {
      */
     @Override
     public Action chooseAction(List<Class<? extends Action>> validActions) {
-        Bid myMaxBid = null;
-        try {
-            myMaxBid = myUtilitySpace.getMaxUtilityBid();
-            // if we do the first move
-            if (isFirstMove()) {
-                return new Offer(getPartyId(), myUtilitySpace.getMaxUtilityBid());
-            }
-
-            Map<AgentID, HSpaceElement> opponentsWeightsMap = new HashMap<>();
-
-            for (Map.Entry<AgentID, Bid> lastBidEntry : lastReceivedBids.entrySet()) {
-                AgentID agentId = lastBidEntry.getKey();
-
-                Bid lastOpponentBid = lastBidEntry.getValue();
-
-                recalculateHSpace(agentId, lastOpponentBid, step);
-                HSpaceElement opponentsWeights = getHSpaceElemWithBiggestWeight(agentId);
-                opponentsWeightsMap.put(agentId, opponentsWeights);
-            }
-
-
-            Bid lastOpponentBid = lastReceivedBids.get(lastOpponent);
-            HSpaceElement meanOpponentsWeights = utilitiesHelper.getMeanWeights(info.getUtilitySpace(), opponentsWeightsMap);
-
-            double oppUtility = utilitiesHelper.calculateUtility(lastOpponentBid, meanOpponentsWeights);
-            double oppUtilityForMe = myUtilitySpace.getUtility(lastOpponentBid);
-
-            Position opponentCurrentPosition = new Position(oppUtilityForMe, oppUtility);
-            opponentPreviousPosition = getOrInitOpponentPreviousPosition(opponentCurrentPosition);
-
-            Vector opponentVector = new Vector(opponentPreviousPosition, opponentCurrentPosition);
-
-            Vector myDesiredVector = Vector.getMirroredVector(opponentVector);
-
-            Action returnOffer;
-            Bid myBid;
-            if (isMyFirstBid()) {
-                myBid = myUtilitySpace.getMaxUtilityBid();
-                returnOffer = new Offer(getPartyId(), myBid);
-            } else {
-                if (shouldAccept(lastOpponentBid)) {
-                    return new Accept(getPartyId(), lastReceivedBids.get(lastOpponent));
-                } else {
-
-                    Position myDesiredPosition = myPreviousPosition.add(myDesiredVector);
-                    myBid = findClosestBid(myNegotiationInfo.getMyPossibleBids(), meanOpponentsWeights, myDesiredPosition);
-                    returnOffer = new Offer(getPartyId(), myBid);
-
-                }
-            }
-
-
-            opponentPreviousPosition = opponentCurrentPosition;
-            myPreviousPosition = new Position(myUtilitySpace.getUtility(myBid), utilitiesHelper.calculateUtility(myBid, meanOpponentsWeights));
-
-            step++;
-
-//            cutHSpace();
-
-            System.out.println("My turn end");
-            return returnOffer;
-
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-
-        if (myMaxBid != null) {
-            return new Offer(getPartyId(), myMaxBid);
+        step++;
+        if (isFirstMove()) {
+            return new Offer(getPartyId(), myNegotiationInfo.getMaxUtilityBid());
         } else {
-            return new Offer(getPartyId(), generateRandomBid());
+            return this.strategy.chooseAction(lastReceivedBids,step,lastOpponent);
         }
-
-
     }
 
     private boolean isFirstMove() {
         return lastReceivedBids == null || lastReceivedBids.isEmpty();
     }
 
-    private HSpaceElement getHSpaceElemWithBiggestWeight(AgentID agentId) {
-        double max = 0;
-        HSpaceElement maxHSpaceElement = null;
 
-        for (HSpaceElement hSpaceElement : hSpace.get(agentId)) {
-            if (hSpaceElement.getWeight() > max) {
-                max = hSpaceElement.getWeight();
-                maxHSpaceElement = hSpaceElement;
-            }
-        }
-
-        return maxHSpaceElement;
-    }
-
-//    private void cutHSpace() {
-//        hSpace.entrySet().forEach(entry -> {
-//            int size = entry.getValue().size();
-//            int cutLimit = size <= 20 ? size : size / 2;
-//            List<HSpaceElement> newList = entry.getValue().stream()
-//                    .sorted(Comparator.comparingDouble(HSpaceElement::getWeight))
-//                    .limit(cutLimit)
-//                    .collect(Collectors.toList());
-//
-//            entry.setValue(newList);
-//        });
-//    }
-
-
-    private boolean shouldAccept(Bid lastOpponentBid) {
-        return myUtilitySpace.getUtility(lastOpponentBid) >= myPreviousPosition.getMyUtility();
-    }
-
-    private boolean isMyFirstBid() {
-        return myPreviousPosition == null;
-    }
-
-    private Bid findClosestBid(Map<Bid, Double> myPossibleBids, HSpaceElement opponentsWeights, Position myDesiredPosition) throws Exception {
-        double minDistance = 100000;
-        Bid bestBid = null;
-
-        for (Map.Entry<Bid, Double> myBidEntry : myPossibleBids.entrySet()) {
-            Bid myBid = myBidEntry.getKey();
-            double myBidForOpponent = utilitiesHelper.calculateUtility(myBid, opponentsWeights);
-            double myBidForMe = myBidEntry.getValue();
-
-            double distance = getDistance(myDesiredPosition, new Position(myBidForMe, myBidForOpponent));
-            if (distance < minDistance) {
-                minDistance = distance;
-                bestBid = myBid;
-            }
-        }
-
-        if (bestBid == null) {
-            throw new Exception("Error while getting closest bid");
-        }
-
-        return bestBid;
-    }
-
-    private double getDistance(Position myDesiredPosition, Position position) {
-        double x = Math.pow(myDesiredPosition.getMyUtility() - position.getMyUtility(), 2);
-        double y = Math.pow(myDesiredPosition.getHisUtility() - position.getHisUtility(), 2);
-
-        return Math.sqrt(x + y);
-    }
 
     /**
      * All offers proposed by the other parties will be received as a message.

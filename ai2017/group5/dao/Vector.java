@@ -1,13 +1,13 @@
-package ai2017.group5;
+package ai2017.group5.dao;
 
 /**
  * Created by bartosz on 20.10.2017.
  */
-class Vector {
+public class Vector {
     private Double x;
     private Double y;
 
-    Vector(Position startPosition, Position endPosition) {
+    public Vector(Position startPosition, Position endPosition) {
         this.x = endPosition.getMyUtility() - startPosition.getMyUtility();
         this.y = endPosition.getHisUtility() - startPosition.getHisUtility();
     }
@@ -18,7 +18,7 @@ class Vector {
     }
 
     @SuppressWarnings("SuspiciousNameCombination")
-    static Vector getMirroredVector(Vector opponentsVector) {
+    public static Vector getMirroredVector(Vector opponentsVector) {
         return new Vector(opponentsVector.y, opponentsVector.x);
     }
 

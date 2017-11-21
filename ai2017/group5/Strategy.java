@@ -1,6 +1,8 @@
 package ai2017.group5;
 
 import ai2017.group5.dao.HSpaceElement;
+import ai2017.group5.dao.Position;
+import ai2017.group5.dao.Vector;
 import ai2017.group5.helpers.structure.MyNegotiationInfoEnhanced;
 import ai2017.group5.helpers.structure.RandomBidHelper;
 import negotiator.AgentID;

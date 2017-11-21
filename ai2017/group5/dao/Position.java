@@ -1,16 +1,17 @@
-package ai2017.group5;
+package ai2017.group5.dao;
 
-class Position {
+
+public class Position {
 
     private Double hisUtility; //y
     private Double myUtility; //x
 
-    Position(Double myUtility, Double hisUtility) {
+    public Position(Double myUtility, Double hisUtility) {
         this.myUtility = myUtility;
         this.hisUtility = hisUtility;
     }
 
-    Double getHisUtility() {
+    public Double getHisUtility() {
         return hisUtility;
     }
 
@@ -18,7 +19,7 @@ class Position {
         this.hisUtility = hisUtility;
     }
 
-    Double getMyUtility() {
+    public Double getMyUtility() {
         return myUtility;
     }
 

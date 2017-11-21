@@ -1,10 +1,8 @@
 package ai2017.group5;
 
-import ai2017.group5.dao.HSpaceElement;
 import ai2017.group5.helpers.structure.MyNegotiationInfoEnhanced;
 import negotiator.AgentID;
 import negotiator.Bid;
-import negotiator.actions.Accept;
 import negotiator.actions.Action;
 import negotiator.actions.Inform;
 import negotiator.actions.Offer;
@@ -12,7 +10,6 @@ import negotiator.parties.AbstractNegotiationParty;
 import negotiator.parties.NegotiationInfo;
 import negotiator.utility.AdditiveUtilitySpace;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -41,8 +38,6 @@ public class Group5 extends AbstractNegotiationParty {
     }
 
 
-
-
     /**
      * Each round this method gets called and ask you to accept or offer. The
      * first party in the first round is a bit different, it can only propose an
@@ -57,14 +52,13 @@ public class Group5 extends AbstractNegotiationParty {
         if (isFirstMove()) {
             return new Offer(getPartyId(), myNegotiationInfo.getMaxUtilityBid());
         } else {
-            return this.strategy.chooseAction(lastReceivedBids,step,lastOpponent);
+            return this.strategy.chooseAction(lastReceivedBids, step, lastOpponent);
         }
     }
 
     private boolean isFirstMove() {
         return lastReceivedBids == null || lastReceivedBids.isEmpty();
     }
-
 
 
     /**

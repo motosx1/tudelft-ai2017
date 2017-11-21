@@ -1,5 +1,7 @@
-package ai2017.group5;
+package ai2017.group5.helpers.structure;
 
+import ai2017.group5.dao.ValueDiscreteDouble;
+import ai2017.group5.helpers.math.CartesianProduct;
 import negotiator.Bid;
 import negotiator.issue.Objective;
 import negotiator.issue.Value;
@@ -61,9 +63,9 @@ class MySpacePreparationHelper {
         for (List<ValueDiscreteDouble> combination : possibleCombinations) {
             HashMap<Integer, Value> bidEntries = new HashMap<>();
             for (ValueDiscreteDouble entry : combination) {
-                Objective criterion = entry.criterion;
+                Objective criterion = entry.getCriterion();
                 int index = utilitySpace.getDomain().getObjectives().indexOf(criterion);
-                bidEntries.put(index, entry.valueDiscrete);
+                bidEntries.put(index, entry.getValueDiscrete());
             }
             bids.add(new Bid(utilitySpace.getDomain(), bidEntries));
         }

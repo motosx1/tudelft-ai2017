@@ -1,17 +1,15 @@
 package ai2017.group5;
 
+import ai2017.group5.helpers.math.CartesianProduct;
 import negotiator.Bid;
 import negotiator.issue.Issue;
-import negotiator.issue.Objective;
 import negotiator.issue.Value;
 import negotiator.issue.ValueDiscrete;
-import negotiator.utility.AdditiveUtilitySpace;
-import negotiator.utility.Evaluator;
 import negotiator.utility.EvaluatorDiscrete;
 
 import java.util.*;
 
-class SpacePreparationHelper {
+public class SpacePreparationHelper {
     private double a = 0.5;//0.2 + Math.sin(Math.PI / 6);
 
     List<HSpaceElem> prepareHSpace(Map<Issue, EvaluatorDiscrete> utilitySpace, Bid bestOppBid) {

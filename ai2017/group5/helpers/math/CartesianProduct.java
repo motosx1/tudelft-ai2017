@@ -1,10 +1,10 @@
-package ai2017.group5;
+package ai2017.group5.helpers.math;
 
 import java.util.*;
 
-class CartesianProduct {
+public class CartesianProduct {
 
-    static <T> List<List<T>> calculate(List<List<T>> input) {
+    public static <T> List<List<T>> calculate(List<List<T>> input) {
         List<List<T>> res = new ArrayList<>();
         if (input.isEmpty()) { // if no more elements to process
             res.add(new ArrayList<T>()); // then add empty list and return

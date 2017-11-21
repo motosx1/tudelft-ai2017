@@ -1,6 +1,9 @@
 package ai2017.group5;
 
+import ai2017.group5.helpers.math.UtilitiesHelper;
+import negotiator.Bid;
 import negotiator.issue.Objective;
+import negotiator.issue.Value;
 import negotiator.issue.ValueDiscrete;
 import negotiator.utility.AdditiveUtilitySpace;
 import negotiator.utility.Evaluator;
@@ -11,6 +14,7 @@ import java.util.*;
 
 public class UtilitySpaceSimple {
     private List<CriterionFeatures> criterionFeatures = new ArrayList<>();
+    private final UtilitiesHelper utilitiesHelper = new UtilitiesHelper();
     private double weight;
 
 
@@ -50,6 +54,27 @@ public class UtilitySpaceSimple {
         }
     }
 
+
+    //ćheck the access methods, should be a simpler weight to get the values
+    public double getUtility(Bid oppBid) {
+        Map<String, Value> discreteOppValues = utilitiesHelper.getDiscreteBidMap(oppBid);
+
+        double utility = 0;
+        for (Map.Entry<String, Value> oppBidDiscrete : discreteOppValues.entrySet()) {
+            String oppCriterion = oppBidDiscrete.getKey();
+            Value oppFeature = oppBidDiscrete.getValue();
+
+            // criterion weight * feature weight + ....
+            CriterionFeatures myCriterionFeaturesList = utilitiesHelper.getCriterionFeaturesByCriterionName(criterionFeatures, oppCriterion);
+
+            double probableCriterionWeight = myCriterionFeaturesList != null ? myCriterionFeaturesList.getWeight() : 0.0;
+            double probableFeatureWeight = utilitiesHelper.getFeatureWeight(oppFeature, myCriterionFeaturesList);
+
+            utility += probableCriterionWeight * probableFeatureWeight;
+        }
+
+        return utility;
+    }
 
     public List<CriterionFeatures> getCriterionFeatures() {
         return criterionFeatures;

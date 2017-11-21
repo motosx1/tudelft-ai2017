@@ -38,11 +38,11 @@ class Strategy {
 
     Action chooseAction(Map<AgentID, Bid> lastReceivedBids, int step, AgentID lastOpponent) {
         try {
-            // create average opponent utility
-            UtilitySpaceSimple meanOpponentsUtilitySpaceSimple = getMeanOpponentsHSpaceElement(lastReceivedBids, step);
+            // create average opponent utility space
+            UtilitySpaceSimple averageOpponentUtilitySpace = getAverageOpponentUtilitySpace(lastReceivedBids, step);
 
             Bid lastOpponentBid = lastReceivedBids.get(lastOpponent);
-            double oppUtility = utilitiesHelper.calculateUtility(lastOpponentBid, meanOpponentsUtilitySpaceSimple);
+            double oppUtility = averageOpponentUtilitySpace.getUtility(lastOpponentBid);
             double oppUtilityForMe = myUtilitySpace.getUtility(lastOpponentBid);
 
             Position opponentCurrentPosition = new Position(oppUtilityForMe, oppUtility);
@@ -63,7 +63,7 @@ class Strategy {
                 } else {
 
                     Position myDesiredPosition = myPreviousPosition.add(myDesiredVector);
-                    myBid = findClosestBid(myNegotiationInfo.getMyPossibleBids(), meanOpponentsUtilitySpaceSimple, myDesiredPosition);
+                    myBid = findClosestBid(myNegotiationInfo.getMyPossibleBids(), averageOpponentUtilitySpace, myDesiredPosition);
                     returnOffer = new Offer(myPartyId, myBid);
 
                 }
@@ -71,7 +71,7 @@ class Strategy {
 
 
             opponentPreviousPosition = opponentCurrentPosition;
-            myPreviousPosition = new Position(myUtilitySpace.getUtility(myBid), utilitiesHelper.calculateUtility(myBid, meanOpponentsUtilitySpaceSimple));
+            myPreviousPosition = new Position(myUtilitySpace.getUtility(myBid), averageOpponentUtilitySpace.getUtility(myBid));
 
 
             return returnOffer;
@@ -91,7 +91,7 @@ class Strategy {
 
     }
 
-    private UtilitySpaceSimple getMeanOpponentsHSpaceElement(Map<AgentID, Bid> lastReceivedBids, int step) {
+    private UtilitySpaceSimple getAverageOpponentUtilitySpace(Map<AgentID, Bid> lastReceivedBids, int step) {
         Map<AgentID, UtilitySpaceSimple> opponentsWeightsMap = new HashMap<>();
 
         for (Map.Entry<AgentID, Bid> lastBidEntry : lastReceivedBids.entrySet()) {
@@ -116,13 +116,13 @@ class Strategy {
         return myPreviousPosition == null;
     }
 
-    private Bid findClosestBid(Map<Bid, Double> myPossibleBids, UtilitySpaceSimple opponentsWeights, Position myDesiredPosition) throws Exception {
+    private Bid findClosestBid(Map<Bid, Double> myPossibleBids, UtilitySpaceSimple opponentUtilitySimple, Position myDesiredPosition) throws Exception {
         double minDistance = 100000;
         Bid bestBid = null;
 
         for (Map.Entry<Bid, Double> myBidEntry : myPossibleBids.entrySet()) {
             Bid myBid = myBidEntry.getKey();
-            double myBidForOpponent = utilitiesHelper.calculateUtility(myBid, opponentsWeights);
+            double myBidForOpponent = opponentUtilitySimple.getUtility(myBid);
             double myBidForMe = myBidEntry.getValue();
 
             double distance = getDistance(myDesiredPosition, new Position(myBidForMe, myBidForOpponent));

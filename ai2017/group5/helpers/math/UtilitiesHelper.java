@@ -47,36 +47,17 @@ public class UtilitiesHelper {
 
     }
 
-    private double calculatePbh(Bid oppBid, UtilitySpaceSimple hSpaceEntry, int step) {
+    private double calculatePbh(Bid oppBid, UtilitySpaceSimple utilitySpaceSimple, int step) {
         double sigma = 0.3;
         double c = 1 / (sigma * Math.sqrt(2 * Math.PI));
 
-        double index = Math.pow(calculateUtility(oppBid, hSpaceEntry) - utilityB(step), 2) / (2 * Math.pow(sigma, 2));
+        double index = Math.pow(utilitySpaceSimple.getUtility(oppBid) - utilityB(step), 2) / (2 * Math.pow(sigma, 2));
 
         return c * Math.exp(-index);
     }
 
-    public double calculateUtility(Bid oppBid, UtilitySpaceSimple hSpaceEntry) {
-        Map<String, Value> discreteOppValues = getDiscreteBidMap(oppBid);
 
-        double utility = 0;
-        for (Map.Entry<String, Value> oppBidDiscrete : discreteOppValues.entrySet()) {
-            String oppCriterion = oppBidDiscrete.getKey();
-            Value oppFeature = oppBidDiscrete.getValue();
-
-            // criterion weight * feature weight + ....
-            CriterionFeatures myCriterionFeaturesList = getCriterionFeaturesByCriterionName(hSpaceEntry, oppCriterion);
-
-            double probableCriterionWeight = myCriterionFeaturesList != null ? myCriterionFeaturesList.getWeight() : 0.0;
-            double probableFeatureWeight = getFeatureWeight(oppFeature, myCriterionFeaturesList);
-
-            utility += probableCriterionWeight * probableFeatureWeight;
-        }
-
-        return utility;
-    }
-
-    private double getFeatureWeight(Value oppFeature, CriterionFeatures myCriterionFeaturesList) {
+    public double getFeatureWeight(Value oppFeature, CriterionFeatures myCriterionFeaturesList) {
         for (Map.Entry<ValueDiscrete, Double> entry : myCriterionFeaturesList.getFeatures().entrySet()) {
             if (entry.getKey().equals(oppFeature)) {
                 return entry.getValue();
@@ -86,8 +67,8 @@ public class UtilitiesHelper {
         return 0.0;
     }
 
-    private CriterionFeatures getCriterionFeaturesByCriterionName(UtilitySpaceSimple hSpaceEntry, String oppCriterion) {
-        for (CriterionFeatures entry : hSpaceEntry.getCriterionFeatures()) {
+    public CriterionFeatures getCriterionFeaturesByCriterionName(List<CriterionFeatures> criterionFeaturesList , String oppCriterion) {
+        for (CriterionFeatures entry : criterionFeaturesList) {
             if (oppCriterion.equalsIgnoreCase(entry.getCriterion())) {
                 return entry;
             }
@@ -96,7 +77,7 @@ public class UtilitiesHelper {
         return null;
     }
 
-    private Map<String, Value> getDiscreteBidMap(Bid oppBid) {
+    public Map<String, Value> getDiscreteBidMap(Bid oppBid) {
         Map<String, Value> discreteOppValues = new HashMap<>();
 
         for (Map.Entry<Integer, Value> oppValue : oppBid.getValues().entrySet()) {

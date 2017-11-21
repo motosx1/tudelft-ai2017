@@ -1,5 +1,6 @@
-package ai2017.group5.helpers.structure;
+package ai2017.group5.helpers;
 
+import ai2017.group5.helpers.hspace.MySpacePreparationHelper;
 import negotiator.Bid;
 import negotiator.Domain;
 import negotiator.issue.Issue;
@@ -13,14 +14,10 @@ import java.util.Map;
 
 public class MyNegotiationInfoEnhanced {
     private int opponentsNum;
-    private double reservationValue;
     private Map<Bid, Double> myPossibleBids = new HashMap<>();
-    private Map<Issue, EvaluatorDiscrete> opponentsUtilitySpace = new HashMap<>();
 
 
     public MyNegotiationInfoEnhanced(AdditiveUtilitySpace myUtilitySpace) {
-        //initialize opponent utility space, based on our domain - setting all the weights to 0;
-        this.opponentsUtilitySpace = prepareOpponentUtilitySpace(myUtilitySpace.getDomain());
 
         //initialize my all possible bids, with the calculated utility
         MySpacePreparationHelper mySpacePreparationHelper = new MySpacePreparationHelper();
@@ -28,24 +25,6 @@ public class MyNegotiationInfoEnhanced {
 
     }
 
-    private Map<Issue, EvaluatorDiscrete> prepareOpponentUtilitySpace(Domain domain) {
-        Map<Issue, EvaluatorDiscrete> result = new HashMap<>();
-        for (Issue issue : domain.getIssues()) {
-            IssueDiscrete issueDiscrete = (IssueDiscrete) issue;
-            EvaluatorDiscrete eval = new EvaluatorDiscrete();
-            try {
-                for (ValueDiscrete valueDiscrete : issueDiscrete.getValues()) {
-                    eval.setEvaluationDouble(valueDiscrete, 0);
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
-            result.put(issue, eval);
-        }
-
-        return result;
-    }
 
     public Bid getMaxUtilityBid() {
         Map.Entry<Bid, Double> maxEntry = null;
@@ -59,10 +38,6 @@ public class MyNegotiationInfoEnhanced {
         }
 
         return maxBid;
-    }
-
-    public Map<Issue, EvaluatorDiscrete> getOpponentsUtilitySpace() {
-        return opponentsUtilitySpace;
     }
 
     public void setOpponentsNum(int opponentsNum) {

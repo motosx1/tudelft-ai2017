@@ -1,6 +1,6 @@
 package ai2017.group5;
 
-import ai2017.group5.helpers.structure.MyNegotiationInfoEnhanced;
+import ai2017.group5.helpers.MyNegotiationInfoEnhanced;
 import negotiator.AgentID;
 import negotiator.Bid;
 import negotiator.actions.Action;

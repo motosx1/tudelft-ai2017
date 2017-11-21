@@ -1,6 +1,7 @@
-package ai2017.group5;
+package ai2017.group5.helpers.math;
 
-import ai2017.group5.dao.HSpaceElement;
+import ai2017.group5.CriterionFeatures;
+import ai2017.group5.UtilitySpaceSimple;
 import negotiator.AgentID;
 import negotiator.Bid;
 import negotiator.issue.Issue;
@@ -14,28 +15,28 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-class UtilitiesHelper {
+public class UtilitiesHelper {
 
-    public Map<Integer, Double> calculatePhbMap(Bid oppBid, List<HSpaceElement> hSpace, int step) {
+    public Map<Integer, Double> calculatePhbMap(Bid oppBid, List<UtilitySpaceSimple> hSpace, int step) {
         Map<Integer, Double> pBHMap = new HashMap<>();
 
         for (int i = 0; i < hSpace.size(); i++) {
-            HSpaceElement hSpaceEntry = hSpace.get(i);
+            UtilitySpaceSimple hSpaceEntry = hSpace.get(i);
             pBHMap.put(i, calculatePbh(oppBid, hSpaceEntry, step));
         }
 
         return pBHMap;
     }
 
-    double calculatePhb(List<HSpaceElement> hSpace, int elementIndex, Map<Integer, Double> pBHMap, double denominator) {
-        HSpaceElement hSpaceEntry = hSpace.get(elementIndex);
+    public double calculatePhb(List<UtilitySpaceSimple> hSpace, int elementIndex, Map<Integer, Double> pBHMap, double denominator) {
+        UtilitySpaceSimple hSpaceEntry = hSpace.get(elementIndex);
         Double phj = hSpaceEntry.getWeight();
 
         double numerator = phj * pBHMap.get(elementIndex);
         return numerator / denominator;
     }
 
-    public double calculateDenominator(List<HSpaceElement> hSpace, Map<Integer, Double> pBHMap) {
+    public double calculateDenominator(List<UtilitySpaceSimple> hSpace, Map<Integer, Double> pBHMap) {
         double result = 0;
 
         for (int i = 0; i < hSpace.size(); i++) {
@@ -46,7 +47,7 @@ class UtilitiesHelper {
 
     }
 
-    private double calculatePbh(Bid oppBid, HSpaceElement hSpaceEntry, int step) {
+    private double calculatePbh(Bid oppBid, UtilitySpaceSimple hSpaceEntry, int step) {
         double sigma = 0.3;
         double c = 1 / (sigma * Math.sqrt(2 * Math.PI));
 
@@ -55,7 +56,7 @@ class UtilitiesHelper {
         return c * Math.exp(-index);
     }
 
-    double calculateUtility(Bid oppBid, HSpaceElement hSpaceEntry) {
+    public double calculateUtility(Bid oppBid, UtilitySpaceSimple hSpaceEntry) {
         Map<String, Value> discreteOppValues = getDiscreteBidMap(oppBid);
 
         double utility = 0;
@@ -85,7 +86,7 @@ class UtilitiesHelper {
         return 0.0;
     }
 
-    private CriterionFeatures getCriterionFeaturesByCriterionName(HSpaceElement hSpaceEntry, String oppCriterion) {
+    private CriterionFeatures getCriterionFeaturesByCriterionName(UtilitySpaceSimple hSpaceEntry, String oppCriterion) {
         for (CriterionFeatures entry : hSpaceEntry.getCriterionFeatures()) {
             if (oppCriterion.equalsIgnoreCase(entry.getCriterion())) {
                 return entry;
@@ -112,8 +113,8 @@ class UtilitiesHelper {
     }
 
 
-    HSpaceElement getMeanWeights(AbstractUtilitySpace myUtilitySpace, Map<AgentID, HSpaceElement> opponentsWeightsMap) {
-        HSpaceElement meanHSpace = new HSpaceElement((AdditiveUtilitySpace) myUtilitySpace);
+    public UtilitySpaceSimple getMeanWeights(AbstractUtilitySpace myUtilitySpace, Map<AgentID, UtilitySpaceSimple> opponentsWeightsMap) {
+        UtilitySpaceSimple meanHSpace = new UtilitySpaceSimple((AdditiveUtilitySpace) myUtilitySpace);
 
         meanHSpace.setWeight(getAverageWeight(opponentsWeightsMap));
 
@@ -132,9 +133,9 @@ class UtilitiesHelper {
         return meanHSpace;
     }
 
-    private double getAverageWeight(Map<AgentID, HSpaceElement> opponentsWeightsMap) {
+    private double getAverageWeight(Map<AgentID, UtilitySpaceSimple> opponentsWeightsMap) {
         double sum = 0;
-        for (Map.Entry<AgentID, HSpaceElement> entry : opponentsWeightsMap.entrySet()) {
+        for (Map.Entry<AgentID, UtilitySpaceSimple> entry : opponentsWeightsMap.entrySet()) {
             sum += entry.getValue().getWeight();
         }
         double size = opponentsWeightsMap.entrySet().size();
@@ -142,12 +143,12 @@ class UtilitiesHelper {
         return sum / size;
     }
 
-    private void setFeatureMean(String issueName, ValueDiscrete value, Map<AgentID, HSpaceElement> opponentsWeightsMap, HSpaceElement meanHSpace) {
+    private void setFeatureMean(String issueName, ValueDiscrete value, Map<AgentID, UtilitySpaceSimple> opponentsWeightsMap, UtilitySpaceSimple meanHSpace) {
         double averageWeightOfFeatures = 0;
-        for (Map.Entry<AgentID, HSpaceElement> entry : opponentsWeightsMap.entrySet()) {
-            HSpaceElement hSpaceElement = entry.getValue();
+        for (Map.Entry<AgentID, UtilitySpaceSimple> entry : opponentsWeightsMap.entrySet()) {
+            UtilitySpaceSimple utilitySpaceSimple = entry.getValue();
 
-            averageWeightOfFeatures += getAverageWeightOfFeatures(issueName, value, hSpaceElement);
+            averageWeightOfFeatures += getAverageWeightOfFeatures(issueName, value, utilitySpaceSimple);
         }
 
         Map<ValueDiscrete, Double> meanFeatures = getFeaturesByName(issueName, meanHSpace);
@@ -158,7 +159,7 @@ class UtilitiesHelper {
 
     }
 
-    private Map<ValueDiscrete, Double> getFeaturesByName(String issueName, HSpaceElement meanHSpace) {
+    private Map<ValueDiscrete, Double> getFeaturesByName(String issueName, UtilitySpaceSimple meanHSpace) {
         for (CriterionFeatures entry : meanHSpace.getCriterionFeatures()) {
             if (entry.getCriterion().equalsIgnoreCase(issueName)) {
                 return entry.getFeatures();
@@ -168,10 +169,10 @@ class UtilitiesHelper {
         return null;
     }
 
-    private double getAverageWeightOfFeatures(String issueName, ValueDiscrete value, HSpaceElement hSpaceElement) {
+    private double getAverageWeightOfFeatures(String issueName, ValueDiscrete value, UtilitySpaceSimple utilitySpaceSimple) {
         double sum = 0;
         double elems = 0;
-        for (CriterionFeatures criterionFeatures : hSpaceElement.getCriterionFeatures()) {
+        for (CriterionFeatures criterionFeatures : utilitySpaceSimple.getCriterionFeatures()) {
             if (criterionFeatures.getCriterion().equalsIgnoreCase(issueName)) {
                 sum += criterionFeatures.getFeatures().get(value);
                 elems++;
@@ -181,12 +182,12 @@ class UtilitiesHelper {
         return sum / elems;
     }
 
-    private void setCriterionMean(String issueName, Map<AgentID, HSpaceElement> opponentsWeightsMap, HSpaceElement meanHSpace) {
+    private void setCriterionMean(String issueName, Map<AgentID, UtilitySpaceSimple> opponentsWeightsMap, UtilitySpaceSimple meanHSpace) {
         double averageWeightOfCriterion = 0;
-        for (Map.Entry<AgentID, HSpaceElement> entry : opponentsWeightsMap.entrySet()) {
-            HSpaceElement hSpaceElement = entry.getValue();
+        for (Map.Entry<AgentID, UtilitySpaceSimple> entry : opponentsWeightsMap.entrySet()) {
+            UtilitySpaceSimple utilitySpaceSimple = entry.getValue();
 
-            CriterionFeatures criterionByName = getCriterionByName(issueName, hSpaceElement);
+            CriterionFeatures criterionByName = getCriterionByName(issueName, utilitySpaceSimple);
             averageWeightOfCriterion += criterionByName != null ? criterionByName.getWeight() : 0;
 
         }
@@ -201,8 +202,8 @@ class UtilitiesHelper {
 
     }
 
-    private CriterionFeatures getCriterionByName(String issueName, HSpaceElement hSpaceElement) {
-        for (CriterionFeatures criterionFeatures : hSpaceElement.getCriterionFeatures()) {
+    private CriterionFeatures getCriterionByName(String issueName, UtilitySpaceSimple utilitySpaceSimple) {
+        for (CriterionFeatures criterionFeatures : utilitySpaceSimple.getCriterionFeatures()) {
             if (criterionFeatures.getCriterion().equalsIgnoreCase(issueName)) {
                 return criterionFeatures;
             }

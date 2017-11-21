@@ -1,4 +1,4 @@
-package ai2017.group5.helpers.structure;
+package ai2017.group5.helpers.hspace;
 
 import ai2017.group5.dao.ValueDiscreteDouble;
 import ai2017.group5.helpers.math.CartesianProduct;
@@ -12,7 +12,7 @@ import negotiator.utility.EvaluatorDiscrete;
 
 import java.util.*;
 
-class MySpacePreparationHelper {
+public class MySpacePreparationHelper {
 
 
     /**
@@ -22,7 +22,7 @@ class MySpacePreparationHelper {
      * @param utilitySpace my utility space
      * @return Map of my all possible bids with the calculated utility for each of them
      */
-    Map<Bid, Double> generateMyPossibleBids(AdditiveUtilitySpace utilitySpace) {
+    public Map<Bid, Double> generateMyPossibleBids(AdditiveUtilitySpace utilitySpace) {
         List<Bid> possibleBidCombinations = generatePossibleBidCombinations(utilitySpace);
 
         return assignUtilities(possibleBidCombinations, utilitySpace);

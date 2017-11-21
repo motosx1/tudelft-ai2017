@@ -1,4 +1,4 @@
-package ai2017.group5.helpers.structure;
+package ai2017.group5.helpers;
 
 import negotiator.Bid;
 import negotiator.issue.*;

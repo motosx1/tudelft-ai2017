@@ -1,24 +1,78 @@
-package ai2017.group5;
+package ai2017.group5.helpers.hspace;
 
-import ai2017.group5.dao.HSpaceElement;
+import ai2017.group5.CriterionFeatures;
+import ai2017.group5.CriterionFeaturesWeight;
+import ai2017.group5.helpers.math.UtilitiesHelper;
+import ai2017.group5.UtilitySpaceSimple;
 import ai2017.group5.helpers.math.CartesianProduct;
+import ai2017.group5.helpers.math.SetPermutations;
+import negotiator.AgentID;
 import negotiator.Bid;
+import negotiator.Domain;
 import negotiator.issue.Issue;
+import negotiator.issue.IssueDiscrete;
 import negotiator.issue.Value;
 import negotiator.issue.ValueDiscrete;
 import negotiator.utility.EvaluatorDiscrete;
 
 import java.util.*;
 
-public class SpacePreparationHelper {
-    private double a = 0.5;//0.2 + Math.sin(Math.PI / 6);
+public class OpponentSpace {
+    private final UtilitiesHelper utilitiesHelper = new UtilitiesHelper();
+    private final Map<AgentID, List<UtilitySpaceSimple>> hSpace = new HashMap<>();
+    private final Map<Issue, EvaluatorDiscrete> opponentsUtilitySpace;
+    private double a = 0.5; //0.2 + Math.sin(Math.PI / 6);
 
-    List<HSpaceElement> prepareHSpace(Map<Issue, EvaluatorDiscrete> utilitySpace, Bid bestOppBid) {
+    public OpponentSpace(Domain domain) {
+        //initialize opponent utility space, based on our domain - setting all the weights to 0;
+        this.opponentsUtilitySpace = prepareOpponentUtilitySpace(domain);
+    }
 
-        List<HSpaceElement> hSpace = new ArrayList<>();
+    private Map<Issue, EvaluatorDiscrete> prepareOpponentUtilitySpace(Domain domain) {
+        Map<Issue, EvaluatorDiscrete> result = new HashMap<>();
+        for (Issue issue : domain.getIssues()) {
+            IssueDiscrete issueDiscrete = (IssueDiscrete) issue;
+            EvaluatorDiscrete eval = new EvaluatorDiscrete();
+            try {
+                for (ValueDiscrete valueDiscrete : issueDiscrete.getValues()) {
+                    eval.setEvaluationDouble(valueDiscrete, 0);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            result.put(issue, eval);
+        }
+
+        return result;
+    }
+
+    public void updateHSpace(AgentID agentId, Bid oppBid, int step) {
+        if (hSpace.isEmpty()) {
+            hSpace.put(agentId, new ArrayList<UtilitySpaceSimple>());
+        }
+
+        if (hSpace.get(agentId) == null || hSpace.get(agentId).isEmpty()) {
+            hSpace.put(agentId, prepareHSpace(oppBid));
+        }
+
+        List<UtilitySpaceSimple> hSpaceForAgents = hSpace.get(agentId);
+
+        Map<Integer, Double> pBHMap = utilitiesHelper.calculatePhbMap(oppBid, hSpaceForAgents, step);
+        double denominator = utilitiesHelper.calculateDenominator(hSpaceForAgents, pBHMap);
+        for (int i = 0; i < hSpaceForAgents.size(); i++) {
+            UtilitySpaceSimple utilitySpaceSimple = hSpaceForAgents.get(i);
+            double newPhb = utilitiesHelper.calculatePhb(hSpaceForAgents, i, pBHMap, denominator);
+            utilitySpaceSimple.setWeight(newPhb);
+        }
+    }
+
+    private List<UtilitySpaceSimple> prepareHSpace(Bid bestOppBid) {
+
+        List<UtilitySpaceSimple> hSpace = new ArrayList<>();
 
         Map<String, List<Map<ValueDiscrete, Double>>> featuresPermutationsMap = new HashMap<>();
-        for (Map.Entry<Issue, EvaluatorDiscrete> entry : utilitySpace.entrySet()) {
+        for (Map.Entry<Issue, EvaluatorDiscrete> entry : opponentsUtilitySpace.entrySet()) {
             Set<ValueDiscrete> features = new HashSet<>(entry.getValue().getValues());
             Issue featuresKey = entry.getKey();
 
@@ -83,7 +137,7 @@ public class SpacePreparationHelper {
     }
 
 
-    private Value getBestOppValue(Set<ValueDiscrete> features, List<Value> bidValues) {
+    public Value getBestOppValue(Set<ValueDiscrete> features, List<Value> bidValues) {
         List<ValueDiscrete> allFeatures = new ArrayList<>(features);
         allFeatures.retainAll(bidValues);
         return allFeatures.get(0);
@@ -110,7 +164,7 @@ public class SpacePreparationHelper {
     }
 
 
-    private void assignWeightsToCriteria(List<CriterionFeatures> criterionPermutation, List<HSpaceElement> hSpace) {
+    private void assignWeightsToCriteria(List<CriterionFeatures> criterionPermutation, List<UtilitySpaceSimple> hSpace) {
         int n = criterionPermutation.size();
         double sn = (1 - Math.pow(a, n)) / (1 - a);
         double cwn = 1 / sn;
@@ -118,14 +172,28 @@ public class SpacePreparationHelper {
             criterionFeatures.setWeight(cwn);
             cwn = cwn * a;
         }
-        hSpace.add(new HSpaceElement(criterionPermutation));
+        hSpace.add(new UtilitySpaceSimple(criterionPermutation));
 
     }
 
-    private void assignProbabilitiesToHSpace(List<HSpaceElement> hSpace) {
-        for (HSpaceElement hSpaceElement : hSpace) {
-            hSpaceElement.setWeight(1 / (double) hSpace.size());
+    private void assignProbabilitiesToHSpace(List<UtilitySpaceSimple> hSpace) {
+        for (UtilitySpaceSimple utilitySpaceSimple : hSpace) {
+            utilitySpaceSimple.setWeight(1 / (double) hSpace.size());
         }
+    }
+
+    public UtilitySpaceSimple getHSpaceElementWithBiggestWeight(AgentID agentId) {
+        double max = 0;
+        UtilitySpaceSimple maxUtilitySpaceSimple = null;
+
+        for (UtilitySpaceSimple utilitySpaceSimple : hSpace.get(agentId)) {
+            if (utilitySpaceSimple.getWeight() > max) {
+                max = utilitySpaceSimple.getWeight();
+                maxUtilitySpaceSimple = utilitySpaceSimple;
+            }
+        }
+
+        return maxUtilitySpaceSimple;
     }
 
 }

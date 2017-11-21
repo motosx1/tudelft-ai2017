@@ -1,14 +1,16 @@
-package ai2017.group5;
+package ai2017.group5.helpers.math;
+
+import ai2017.group5.CriterionFeatures;
 
 import java.util.ArrayList;
 import java.util.List;
 
-class SetPermutations<E> {
+public class SetPermutations<E> {
 
     private final List<E> input;
     private final List<List<E>> result;
 
-    static <E> List<List<E>> getSetPermutations(List<E> input) {
+    public static <E> List<List<E>> getSetPermutations(List<E> input) {
         SetPermutations<E> setPermutations = new SetPermutations<>(input);
         return setPermutations.build();
     }

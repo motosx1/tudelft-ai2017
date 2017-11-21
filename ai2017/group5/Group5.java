@@ -5,6 +5,7 @@ import negotiator.Bid;
 import negotiator.Domain;
 import negotiator.actions.Accept;
 import negotiator.actions.Action;
+import negotiator.actions.Inform;
 import negotiator.actions.Offer;
 import negotiator.issue.Issue;
 import negotiator.issue.IssueDiscrete;
@@ -15,7 +16,10 @@ import negotiator.utility.AbstractUtilitySpace;
 import negotiator.utility.AdditiveUtilitySpace;
 import negotiator.utility.EvaluatorDiscrete;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * This is your negotiation party.
@@ -35,6 +39,7 @@ public class Group5 extends AbstractNegotiationParty {
     private Position opponentPreviousPosition = null;
     private NegotiationInfo info = null;
     private final double BATNA_FACTOR = 0.75;
+    private MyNegotiationInfo negotiationInfo;
 
 
     @Override
@@ -272,9 +277,14 @@ public class Group5 extends AbstractNegotiationParty {
     @Override
     public void receiveMessage(AgentID sender, Action action) {
         super.receiveMessage(sender, action);
-        if (action instanceof Offer) {
-            lastReceivedBids.put(sender, ((Offer) action).getBid());
-            lastOpponent = sender;
+        if (action != null) {
+            if (action instanceof Inform && "NumberOfAgents".equals(((Inform) action).getName()) && ((Inform) action).getValue() instanceof Integer) {
+                Integer opponentsNum = (Integer) ((Inform) action).getValue();
+                this.negotiationInfo.setOpponentsNum(opponentsNum);
+            } else if (action instanceof Offer) {
+                lastReceivedBids.put(sender, ((Offer) action).getBid());
+                lastOpponent = sender;
+            }
         }
     }
 

@@ -2,19 +2,13 @@ package ai2017.group5;
 
 import negotiator.AgentID;
 import negotiator.Bid;
-import negotiator.Domain;
 import negotiator.actions.Accept;
 import negotiator.actions.Action;
 import negotiator.actions.Inform;
 import negotiator.actions.Offer;
-import negotiator.issue.Issue;
-import negotiator.issue.IssueDiscrete;
-import negotiator.issue.ValueDiscrete;
 import negotiator.parties.AbstractNegotiationParty;
 import negotiator.parties.NegotiationInfo;
-import negotiator.utility.AbstractUtilitySpace;
 import negotiator.utility.AdditiveUtilitySpace;
-import negotiator.utility.EvaluatorDiscrete;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -29,60 +23,28 @@ public class Group5 extends AbstractNegotiationParty {
     private UtilitiesHelper utilitiesHelper = new UtilitiesHelper();
     private AdditiveUtilitySpace myUtilitySpace = null;
     private HashMap<AgentID, List<HSpaceElem>> hSpace = null;
-    private Map<Bid, Double> myPossibleBids = new HashMap<>();
     private AgentID lastOpponent;
     private int step = 0;
     private SpacePreparationHelper spacePreparationHelper = new SpacePreparationHelper();
-    private Map<String, EvaluatorDiscrete> oppUtilitySpace = new HashMap<>();
 
     private Position myPreviousPosition = null;
     private Position opponentPreviousPosition = null;
     private NegotiationInfo info = null;
-    private final double BATNA_FACTOR = 0.75;
-    private MyNegotiationInfo negotiationInfo;
+    private MyNegotiationInfoEnhanced myNegotiationInfo;
 
 
     @Override
     public void init(NegotiationInfo info) {
-
         super.init(info);
+        this.step = 0;
         this.info = info;
-        myUtilitySpace = (AdditiveUtilitySpace) info.getUtilitySpace();
-        step = 0;
-        oppUtilitySpace = prepareOpponentUtilitySpace(info.getUtilitySpace());
-        try {
-            info.getUtilitySpace().setReservationValue(BATNA_FACTOR * myUtilitySpace.getUtility(myUtilitySpace.getMaxUtilityBid()));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        myPossibleBids = spacePreparationHelper.generateMyPossibleBids(myUtilitySpace, info.getUtilitySpace().getReservationValueUndiscounted());
+        this.myUtilitySpace = (AdditiveUtilitySpace) info.getUtilitySpace();
+        this.myNegotiationInfo = new MyNegotiationInfoEnhanced((AdditiveUtilitySpace) info.getUtilitySpace());
 
         System.out.println("Discount Factor is " + info.getUtilitySpace().getDiscountFactor());
         System.out.println("Reservation Value is " + info.getUtilitySpace().getReservationValueUndiscounted());
     }
 
-    private Map<String, EvaluatorDiscrete> prepareOpponentUtilitySpace(AbstractUtilitySpace utilitySpace) {
-        Domain domain = utilitySpace.getDomain();
-        Map<String, EvaluatorDiscrete> result = new HashMap<>();
-        for (Issue issue : domain.getIssues()) {
-            String criterionName = issue.getName();
-            IssueDiscrete issueDiscrete = (IssueDiscrete) issue;
-
-            EvaluatorDiscrete eval = new EvaluatorDiscrete();
-            try {
-
-                for (ValueDiscrete valueDiscrete : issueDiscrete.getValues()) {
-                    eval.setEvaluationDouble(valueDiscrete, 0);
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
-            result.put(criterionName, eval);
-        }
-
-        return result;
-    }
 
     private Position getOrInitOpponentPreviousPosition(Position oppUtility) {
         if (opponentPreviousPosition == null) {
@@ -100,7 +62,7 @@ public class Group5 extends AbstractNegotiationParty {
         }
 
         if (hSpace.get(agentId) == null || hSpace.get(agentId).isEmpty()) {
-            hSpace.put(agentId, spacePreparationHelper.prepareHSpace(oppUtilitySpace, oppBid));
+            hSpace.put(agentId, spacePreparationHelper.prepareHSpace(myNegotiationInfo.getOpponentsUtilitySpace(), oppBid));
         }
 
         List<HSpaceElem> hSpaceForAgents = hSpace.get(agentId);
@@ -170,7 +132,7 @@ public class Group5 extends AbstractNegotiationParty {
                 } else {
 
                     Position myDesiredPosition = myPreviousPosition.add(myDesiredVector);
-                    myBid = findClosestBid(myPossibleBids, meanOpponentsWeights, myDesiredPosition);
+                    myBid = findClosestBid(myNegotiationInfo.getMyPossibleBids(), meanOpponentsWeights, myDesiredPosition);
                     returnOffer = new Offer(getPartyId(), myBid);
 
                 }
@@ -280,7 +242,7 @@ public class Group5 extends AbstractNegotiationParty {
         if (action != null) {
             if (action instanceof Inform && "NumberOfAgents".equals(((Inform) action).getName()) && ((Inform) action).getValue() instanceof Integer) {
                 Integer opponentsNum = (Integer) ((Inform) action).getValue();
-                this.negotiationInfo.setOpponentsNum(opponentsNum);
+                this.myNegotiationInfo.setOpponentsNum(opponentsNum);
             } else if (action instanceof Offer) {
                 lastReceivedBids.put(sender, ((Offer) action).getBid());
                 lastOpponent = sender;

@@ -11,22 +11,19 @@ import negotiator.utility.EvaluatorDiscrete;
 
 import java.util.*;
 
-/**
- * Created by bartosz on 17.10.2017.
- */
 class SpacePreparationHelper {
     private double a = 0.5;//0.2 + Math.sin(Math.PI / 6);
 
-    List<HSpaceElem> prepareHSpace(Map<String, EvaluatorDiscrete> utilitySpace, Bid bestOppBid) {
+    List<HSpaceElem> prepareHSpace(Map<Issue, EvaluatorDiscrete> utilitySpace, Bid bestOppBid) {
 
         List<HSpaceElem> hSpace = new ArrayList<>();
 
         Map<String, List<Map<ValueDiscrete, Double>>> featuresPermutationsMap = new HashMap<>();
-        for (Map.Entry<String, EvaluatorDiscrete> entry : utilitySpace.entrySet()) {
+        for (Map.Entry<Issue, EvaluatorDiscrete> entry : utilitySpace.entrySet()) {
             Set<ValueDiscrete> features = new HashSet<>(entry.getValue().getValues());
-            String featuresKey = entry.getKey();
+            Issue featuresKey = entry.getKey();
 
-            int issueNumber = getIssueNumberByKey(bestOppBid, featuresKey);
+            int issueNumber = getIssueNumberByKey(bestOppBid, featuresKey.getName());
             Value value = bestOppBid.getValues().get(issueNumber);
 
             //features list without best option from bid;
@@ -41,7 +38,7 @@ class SpacePreparationHelper {
 
             List<Map<ValueDiscrete, Double>> featuresPermutationsWithWeights = assignWeightsToFeatures(featuresPermutations);
 
-            featuresPermutationsMap.put(entry.getKey(), featuresPermutationsWithWeights);
+            featuresPermutationsMap.put(entry.getKey().getName(), featuresPermutationsWithWeights);
         }
 
         List<List<CriterionFeatures>> criterionFeaturesList = new ArrayList<>();
@@ -132,69 +129,4 @@ class SpacePreparationHelper {
         }
     }
 
-    Map<Bid, Double> generateMyPossibleBids(AdditiveUtilitySpace utilitySpace, double reservationValueUndiscounted) {
-        List<List<ValueDiscreteDouble>> possibleCombinations = generatePossibleCombinations(utilitySpace);
-
-        return generateBids(utilitySpace, possibleCombinations, reservationValueUndiscounted);
-    }
-
-    private Map<Bid, Double> generateBids(AdditiveUtilitySpace utilitySpace, List<List<ValueDiscreteDouble>> possibleCombinations, double reservationValueUndiscounted) {
-        Map<Bid, Double> result = new HashMap<>();
-
-        for (List<ValueDiscreteDouble> combination : possibleCombinations) {
-            HashMap<Integer, Value> bidEntries = new HashMap<>();
-
-            for (ValueDiscreteDouble entry : combination) {
-                Objective criterion = entry.criterion;
-                int index = utilitySpace.getDomain().getObjectives().indexOf(criterion);
-
-                bidEntries.put(index, entry.valueDiscrete);
-            }
-
-            Bid bid = new Bid(utilitySpace.getDomain(), bidEntries);
-            if (utilitySpace.getUtility(bid) > reservationValueUndiscounted) {
-                result.put(bid, utilitySpace.getUtility(bid));
-            }
-        }
-
-        return result;
-    }
-
-    private List<List<ValueDiscreteDouble>> generatePossibleCombinations(AdditiveUtilitySpace utilitySpace) {
-        List<List<ValueDiscreteDouble>> featuresList = new ArrayList<>();
-
-        try {
-            for (Map.Entry<Objective, Evaluator> entry : utilitySpace.getEvaluators()) {
-                EvaluatorDiscrete evaluator = (EvaluatorDiscrete) entry.getValue();
-
-                Set<ValueDiscrete> features = evaluator.getValues();
-                List<ValueDiscreteDouble> hSpaceElemFeatures = new ArrayList<>();
-                for (ValueDiscrete featureDiscrete : features) {
-                    Double featureWeight = evaluator.getEvaluation(featureDiscrete);
-                    hSpaceElemFeatures.add(new ValueDiscreteDouble(entry.getKey(), featureDiscrete, featureWeight));
-                }
-
-                featuresList.add(hSpaceElemFeatures);
-
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return CartesianProduct.calculate(featuresList);
-
-
-    }
-
-    class ValueDiscreteDouble {
-        Objective criterion;
-        ValueDiscrete valueDiscrete;
-        Double weight;
-
-        public ValueDiscreteDouble(Objective criterion, ValueDiscrete valueDiscrete, Double weight) {
-            this.criterion = criterion;
-            this.valueDiscrete = valueDiscrete;
-            this.weight = weight;
-        }
-    }
 }

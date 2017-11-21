@@ -16,8 +16,6 @@ public class HSpaceElem {
     private List<CriterionFeatures> criterionFeatures = new ArrayList<>();
     private double weight;
 
-    public HSpaceElem() {
-    }
 
     public HSpaceElem(List<CriterionFeatures> criterionFeatures) {
         this.criterionFeatures = criterionFeatures;

@@ -1,5 +1,9 @@
 package ai2017.group5.dao;
 
+import ai2017.group5.helpers.MoveType;
+
+import static ai2017.group5.helpers.MoveType.*;
+
 /**
  * Created by bartosz on 20.10.2017.
  */
@@ -20,6 +24,18 @@ public class Vector {
     @SuppressWarnings("SuspiciousNameCombination")
     public static Vector getMirroredVector(Vector opponentsVector) {
         return new Vector(opponentsVector.y, opponentsVector.x);
+    }
+
+    public MoveType getMoveType() {
+        if (x < 0 && y < 0) {
+            return UNFORTUNATE;
+        } else if (x < 0 && y > 0) {
+            return SELFISH;
+        } else if (x >= 0 && y <= 0) {
+            return CONCESSION;
+        } else {
+            return FORTUNATE;
+        }
     }
 
     public Double getX() {

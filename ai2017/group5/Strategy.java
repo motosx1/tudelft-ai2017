@@ -2,6 +2,7 @@ package ai2017.group5;
 
 import ai2017.group5.dao.Position;
 import ai2017.group5.dao.Vector;
+import ai2017.group5.helpers.MoveType;
 import ai2017.group5.helpers.MyNegotiationInfoEnhanced;
 import ai2017.group5.helpers.RandomBidHelper;
 import ai2017.group5.helpers.hspace.OpponentSpace;
@@ -49,6 +50,7 @@ class Strategy {
             opponentPreviousPosition = getOpponentPreviousPosition(opponentCurrentPosition);
 
             Vector opponentVector = new Vector(opponentPreviousPosition, opponentCurrentPosition);
+            MoveType moveType = opponentVector.getMoveType();
             Vector myDesiredVector = Vector.getMirroredVector(opponentVector);
 
             Action returnOffer;

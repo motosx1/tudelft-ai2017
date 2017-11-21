@@ -1,5 +1,6 @@
-package ai2017.group5;
+package ai2017.group5.dao;
 
+import ai2017.group5.CriterionFeatures;
 import negotiator.issue.Objective;
 import negotiator.issue.ValueDiscrete;
 import negotiator.utility.AdditiveUtilitySpace;
@@ -12,17 +13,17 @@ import java.util.*;
 /**
  * Created by bartosz on 17.10.2017.
  */
-public class HSpaceElem {
+public class HSpaceElement {
     private List<CriterionFeatures> criterionFeatures = new ArrayList<>();
     private double weight;
 
 
-    public HSpaceElem(List<CriterionFeatures> criterionFeatures) {
+    public HSpaceElement(List<CriterionFeatures> criterionFeatures) {
         this.criterionFeatures = criterionFeatures;
     }
 
-    // Creates clean HSpace, without weights - AdditiveUtilitySpace agrument should be changed to Domain
-    public HSpaceElem(AdditiveUtilitySpace myUtilitySpace) {
+    // Creates clean HSpace, without weights - AdditiveUtilitySpace argument should be changed to Domain
+    public HSpaceElement(AdditiveUtilitySpace myUtilitySpace) {
         Set<Map.Entry<Objective, Evaluator>> evaluators = myUtilitySpace.getEvaluators();
         try {
             this.criterionFeatures = new ArrayList<>();
@@ -68,7 +69,7 @@ public class HSpaceElem {
 
     @Override
     public String toString() {
-        return "HSpaceElem{" +
+        return "HSpaceElement{" +
                 "criteria=" + criterionFeatures +
                 ", w=" + Math.round(weight) +
                 '}';

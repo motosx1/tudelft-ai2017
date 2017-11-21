@@ -1,5 +1,6 @@
 package ai2017.group5;
 
+import ai2017.group5.dao.HSpaceElement;
 import ai2017.group5.helpers.structure.MyNegotiationInfoEnhanced;
 import negotiator.AgentID;
 import negotiator.Bid;
@@ -23,7 +24,7 @@ public class Group5 extends AbstractNegotiationParty {
     private Map<AgentID, Bid> lastReceivedBids = new HashMap<>();
     private UtilitiesHelper utilitiesHelper = new UtilitiesHelper();
     private AdditiveUtilitySpace myUtilitySpace = null;
-    private HashMap<AgentID, List<HSpaceElem>> hSpace = null;
+    private HashMap<AgentID, List<HSpaceElement>> hSpace = null;
     private AgentID lastOpponent;
     private int step = 0;
     private SpacePreparationHelper spacePreparationHelper = new SpacePreparationHelper();
@@ -59,21 +60,21 @@ public class Group5 extends AbstractNegotiationParty {
     private void recalculateHSpace(AgentID agentId, Bid oppBid, int step) {
         if (hSpace == null || hSpace.isEmpty()) {
             hSpace = new HashMap<>();
-            hSpace.put(agentId, new ArrayList<HSpaceElem>());
+            hSpace.put(agentId, new ArrayList<HSpaceElement>());
         }
 
         if (hSpace.get(agentId) == null || hSpace.get(agentId).isEmpty()) {
             hSpace.put(agentId, spacePreparationHelper.prepareHSpace(myNegotiationInfo.getOpponentsUtilitySpace(), oppBid));
         }
 
-        List<HSpaceElem> hSpaceForAgents = hSpace.get(agentId);
+        List<HSpaceElement> hSpaceForAgents = hSpace.get(agentId);
 
         Map<Integer, Double> pBHMap = utilitiesHelper.calculatePhbMap(oppBid, hSpaceForAgents, step);
         double denominator = utilitiesHelper.calculateDenominator(hSpaceForAgents, pBHMap);
         for (int i = 0; i < hSpaceForAgents.size(); i++) {
-            HSpaceElem hSpaceElem = hSpaceForAgents.get(i);
+            HSpaceElement hSpaceElement = hSpaceForAgents.get(i);
             double newPhb = utilitiesHelper.calculatePhb(hSpaceForAgents, i, pBHMap, denominator);
-            hSpaceElem.setWeight(newPhb);
+            hSpaceElement.setWeight(newPhb);
         }
     }
 
@@ -92,11 +93,11 @@ public class Group5 extends AbstractNegotiationParty {
         try {
             myMaxBid = myUtilitySpace.getMaxUtilityBid();
             // if we do the first move
-            if (lastReceivedBids == null || lastReceivedBids.isEmpty()) {
+            if (isFirstMove()) {
                 return new Offer(getPartyId(), myUtilitySpace.getMaxUtilityBid());
             }
 
-            Map<AgentID, HSpaceElem> opponentsWeightsMap = new HashMap<>();
+            Map<AgentID, HSpaceElement> opponentsWeightsMap = new HashMap<>();
 
             for (Map.Entry<AgentID, Bid> lastBidEntry : lastReceivedBids.entrySet()) {
                 AgentID agentId = lastBidEntry.getKey();
@@ -104,13 +105,13 @@ public class Group5 extends AbstractNegotiationParty {
                 Bid lastOpponentBid = lastBidEntry.getValue();
 
                 recalculateHSpace(agentId, lastOpponentBid, step);
-                HSpaceElem opponentsWeights = getHSpaceElemWithBiggestWeight(agentId);
+                HSpaceElement opponentsWeights = getHSpaceElemWithBiggestWeight(agentId);
                 opponentsWeightsMap.put(agentId, opponentsWeights);
             }
 
 
             Bid lastOpponentBid = lastReceivedBids.get(lastOpponent);
-            HSpaceElem meanOpponentsWeights = utilitiesHelper.getMeanWeights(info.getUtilitySpace(), opponentsWeightsMap);
+            HSpaceElement meanOpponentsWeights = utilitiesHelper.getMeanWeights(info.getUtilitySpace(), opponentsWeightsMap);
 
             double oppUtility = utilitiesHelper.calculateUtility(lastOpponentBid, meanOpponentsWeights);
             double oppUtilityForMe = myUtilitySpace.getUtility(lastOpponentBid);
@@ -154,6 +155,8 @@ public class Group5 extends AbstractNegotiationParty {
         } catch (Exception e) {
             e.printStackTrace();
         }
+
+
         if (myMaxBid != null) {
             return new Offer(getPartyId(), myMaxBid);
         } else {
@@ -163,26 +166,30 @@ public class Group5 extends AbstractNegotiationParty {
 
     }
 
-    private HSpaceElem getHSpaceElemWithBiggestWeight(AgentID agentId) {
-        double max = 0;
-        HSpaceElem maxHSpaceElem = null;
+    private boolean isFirstMove() {
+        return lastReceivedBids == null || lastReceivedBids.isEmpty();
+    }
 
-        for (HSpaceElem hSpaceElem : hSpace.get(agentId)) {
-            if (hSpaceElem.getWeight() > max) {
-                max = hSpaceElem.getWeight();
-                maxHSpaceElem = hSpaceElem;
+    private HSpaceElement getHSpaceElemWithBiggestWeight(AgentID agentId) {
+        double max = 0;
+        HSpaceElement maxHSpaceElement = null;
+
+        for (HSpaceElement hSpaceElement : hSpace.get(agentId)) {
+            if (hSpaceElement.getWeight() > max) {
+                max = hSpaceElement.getWeight();
+                maxHSpaceElement = hSpaceElement;
             }
         }
 
-        return maxHSpaceElem;
+        return maxHSpaceElement;
     }
 
 //    private void cutHSpace() {
 //        hSpace.entrySet().forEach(entry -> {
 //            int size = entry.getValue().size();
 //            int cutLimit = size <= 20 ? size : size / 2;
-//            List<HSpaceElem> newList = entry.getValue().stream()
-//                    .sorted(Comparator.comparingDouble(HSpaceElem::getWeight))
+//            List<HSpaceElement> newList = entry.getValue().stream()
+//                    .sorted(Comparator.comparingDouble(HSpaceElement::getWeight))
 //                    .limit(cutLimit)
 //                    .collect(Collectors.toList());
 //
@@ -199,7 +206,7 @@ public class Group5 extends AbstractNegotiationParty {
         return myPreviousPosition == null;
     }
 
-    private Bid findClosestBid(Map<Bid, Double> myPossibleBids, HSpaceElem opponentsWeights, Position myDesiredPosition) throws Exception {
+    private Bid findClosestBid(Map<Bid, Double> myPossibleBids, HSpaceElement opponentsWeights, Position myDesiredPosition) throws Exception {
         double minDistance = 100000;
         Bid bestBid = null;
 

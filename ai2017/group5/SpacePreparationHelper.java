@@ -1,5 +1,6 @@
 package ai2017.group5;
 
+import ai2017.group5.dao.HSpaceElement;
 import ai2017.group5.helpers.math.CartesianProduct;
 import negotiator.Bid;
 import negotiator.issue.Issue;
@@ -12,9 +13,9 @@ import java.util.*;
 public class SpacePreparationHelper {
     private double a = 0.5;//0.2 + Math.sin(Math.PI / 6);
 
-    List<HSpaceElem> prepareHSpace(Map<Issue, EvaluatorDiscrete> utilitySpace, Bid bestOppBid) {
+    List<HSpaceElement> prepareHSpace(Map<Issue, EvaluatorDiscrete> utilitySpace, Bid bestOppBid) {
 
-        List<HSpaceElem> hSpace = new ArrayList<>();
+        List<HSpaceElement> hSpace = new ArrayList<>();
 
         Map<String, List<Map<ValueDiscrete, Double>>> featuresPermutationsMap = new HashMap<>();
         for (Map.Entry<Issue, EvaluatorDiscrete> entry : utilitySpace.entrySet()) {
@@ -109,7 +110,7 @@ public class SpacePreparationHelper {
     }
 
 
-    private void assignWeightsToCriteria(List<CriterionFeatures> criterionPermutation, List<HSpaceElem> hSpace) {
+    private void assignWeightsToCriteria(List<CriterionFeatures> criterionPermutation, List<HSpaceElement> hSpace) {
         int n = criterionPermutation.size();
         double sn = (1 - Math.pow(a, n)) / (1 - a);
         double cwn = 1 / sn;
@@ -117,13 +118,13 @@ public class SpacePreparationHelper {
             criterionFeatures.setWeight(cwn);
             cwn = cwn * a;
         }
-        hSpace.add(new HSpaceElem(criterionPermutation));
+        hSpace.add(new HSpaceElement(criterionPermutation));
 
     }
 
-    private void assignProbabilitiesToHSpace(List<HSpaceElem> hSpace) {
-        for (HSpaceElem hSpaceElem : hSpace) {
-            hSpaceElem.setWeight(1 / (double) hSpace.size());
+    private void assignProbabilitiesToHSpace(List<HSpaceElement> hSpace) {
+        for (HSpaceElement hSpaceElement : hSpace) {
+            hSpaceElement.setWeight(1 / (double) hSpace.size());
         }
     }
 

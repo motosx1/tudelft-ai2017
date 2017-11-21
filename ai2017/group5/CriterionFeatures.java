@@ -61,7 +61,7 @@ public class CriterionFeatures {
         return
                 "criterion='" + criterion + '\'' +
                         ", features=" + features +
-                        ", weight=" + Math.round(weight) +
+                        ", weight=" + weight +
                         '}';
     }
 

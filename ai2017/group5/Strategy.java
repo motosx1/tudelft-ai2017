@@ -46,10 +46,9 @@ class Strategy {
             double oppUtilityForMe = myUtilitySpace.getUtility(lastOpponentBid);
 
             Position opponentCurrentPosition = new Position(oppUtilityForMe, oppUtility);
-            opponentPreviousPosition = getOrInitOpponentPreviousPosition(opponentCurrentPosition);
+            opponentPreviousPosition = getOpponentPreviousPosition(opponentCurrentPosition);
 
             Vector opponentVector = new Vector(opponentPreviousPosition, opponentCurrentPosition);
-
             Vector myDesiredVector = Vector.getMirroredVector(opponentVector);
 
             Action returnOffer;
@@ -146,7 +145,7 @@ class Strategy {
         return Math.sqrt(x + y);
     }
 
-    private Position getOrInitOpponentPreviousPosition(Position oppUtility) {
+    private Position getOpponentPreviousPosition(Position oppUtility) {
         if (opponentPreviousPosition == null) {
             opponentPreviousPosition = oppUtility;
         }

@@ -92,7 +92,7 @@ public class UtilitySpaceSimple {
     public String toString() {
         return "UtilitySpaceSimple{" +
                 "criteria=" + criterionFeatures +
-                ", w=" + Math.round(weight) +
+                ", w=" + weight +
                 '}';
     }
 

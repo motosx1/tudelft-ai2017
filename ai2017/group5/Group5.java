@@ -120,7 +120,6 @@ public class Group5 extends AbstractNegotiationParty {
      */
     @Override
     public Action chooseAction(List<Class<? extends Action>> validActions) {
-        System.out.println("My turn start");
         Bid myMaxBid = null;
         try {
             myMaxBid = myUtilitySpace.getMaxUtilityBid();

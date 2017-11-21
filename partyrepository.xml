@@ -363,7 +363,7 @@
             <partyRepItem classPath="negotiator.parties.FeedbackHillClimber">
                 <properties/>
             </partyRepItem>
-            <partyRepItem classPath="C:\workspace\java\tu\genius\out\production\genius\src\ai2017\Group5.class">
+            <partyRepItem classPath="C:\workspace\java\tu\genius\out\production\genius\ai2017\Group5.class">
                 <properties/>
             </partyRepItem>
         </partyRepItems>

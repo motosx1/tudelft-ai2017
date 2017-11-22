@@ -49,8 +49,14 @@ class Strategy {
             Position opponentCurrentPosition = new Position(oppUtilityForMe, oppUtility);
             opponentPreviousPosition = getOpponentPreviousPosition(opponentCurrentPosition);
 
+            // create a vector based on a move made
             Vector opponentVector = new Vector(opponentPreviousPosition, opponentCurrentPosition);
+
+            // classify the opponent move
             MoveType moveType = opponentVector.getMoveType();
+
+            // create a vector, corresponding to my next move, based on the opponent move type
+//            Vector myDesiredVector = Vector.getResponseVector(opponentVector, moveType);
             Vector myDesiredVector = Vector.getMirroredVector(opponentVector);
 
             Action returnOffer;

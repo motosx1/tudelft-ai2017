@@ -26,6 +26,11 @@ public class Vector {
         return new Vector(opponentsVector.y, opponentsVector.x);
     }
 
+    @SuppressWarnings("SuspiciousNameCombination")
+    public static Vector getSameVector(Vector opponentsVector) {
+        return new Vector(opponentsVector.y, opponentsVector.x);
+    }
+
     public MoveType getMoveType() {
         if (x < 0 && y < 0) {
             return UNFORTUNATE;

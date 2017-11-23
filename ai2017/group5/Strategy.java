@@ -59,8 +59,7 @@ class Strategy {
         MoveType moveType = opponentVector.getMoveType();
 
         // create a vector, corresponding to my next move, based on the opponent move type
-//            Vector myDesiredVector = Vector.getResponseVector(opponentVector, moveType);
-        Vector myDesiredVector = Vector.getMirroredVector(opponentVector);
+        Vector myDesiredVector = getDesiredVector(opponentVector, moveType);
 
         Action returnOffer;
         Bid myBid;
@@ -89,24 +88,24 @@ class Strategy {
 
     }
 
+    private Vector getDesiredVector(Vector opponentVector, MoveType moveType) {
+        Vector myDesiredVector;
+        if (moveType == MoveType.SELFISH || moveType.equals(MoveType.CONCESSION)) {
+            myDesiredVector = Vector.getMirroredVector(opponentVector);
+        } else { //if( moveType == MoveType.FORTUNATE || moveType == MoveType.UNFORTUNATE){
+            myDesiredVector = Vector.getSameVector(opponentVector);
+        }
+        return myDesiredVector;
+    }
+
     private void updateOpponentUtilitySpace(BidHistory bidHistory, TimeLineInfo timeline) {
 
         for (Map.Entry<AgentID, Map<Double, Bid>> bidHistoryEntry : bidHistory.getBidHistory().entrySet()) {
             AgentID opponentId = bidHistoryEntry.getKey();
             Map<Double, Bid> lastOpponentBids = bidHistoryEntry.getValue();
 
-
             opponentSpace.updateHSpace(opponentId, lastOpponentBids, timeline);
-
         }
-
-//
-//        for (Map.Entry<AgentID, Bid> lastBidEntry : lastReceivedBids.entrySet()) {
-//            AgentID opponentId = lastBidEntry.getKey();
-//            Bid lastOpponentBid = lastBidEntry.getValue();
-//
-//            opponentSpace.updateHSpace(opponentId, lastOpponentBid, step);
-//        }
     }
 
     private UtilitySpaceSimple getAverageOpponentUtilitySpace(Map<AgentID, Bid> lastReceivedBids) throws Exception {

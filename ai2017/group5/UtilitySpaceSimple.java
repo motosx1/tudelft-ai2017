@@ -23,9 +23,8 @@ public class UtilitySpaceSimple {
     }
 
     // Creates clean HSpace, without weights - AdditiveUtilitySpace argument should be changed to Domain
-    public UtilitySpaceSimple(AdditiveUtilitySpace myUtilitySpace) {
+    public UtilitySpaceSimple(AdditiveUtilitySpace myUtilitySpace) throws Exception {
         Set<Map.Entry<Objective, Evaluator>> evaluators = myUtilitySpace.getEvaluators();
-        try {
             this.criterionFeatures = new ArrayList<>();
             for (Map.Entry<Objective, Evaluator> entry : evaluators) {
                 String criterionName = entry.getKey().getName();
@@ -42,9 +41,6 @@ public class UtilitySpaceSimple {
                 cleanWeights(criterionFeatures);
                 this.criterionFeatures.add(criterionFeatures);
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 
     private void cleanWeights(CriterionFeatures criterionFeatures) {
@@ -96,4 +92,24 @@ public class UtilitySpaceSimple {
                 '}';
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        UtilitySpaceSimple that = (UtilitySpaceSimple) o;
+
+        if (Double.compare(that.weight, weight) != 0) return false;
+        return criterionFeatures != null ? criterionFeatures.equals(that.criterionFeatures) : that.criterionFeatures == null;
+    }
+
+    @Override
+    public int hashCode() {
+        int result;
+        long temp;
+        result = criterionFeatures != null ? criterionFeatures.hashCode() : 0;
+        temp = Double.doubleToLongBits(weight);
+        result = 31 * result + (int) (temp ^ (temp >>> 32));
+        return result;
+    }
 }

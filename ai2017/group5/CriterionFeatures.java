@@ -79,4 +79,26 @@ public class CriterionFeatures {
         return result;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        CriterionFeatures that = (CriterionFeatures) o;
+
+        if (Double.compare(that.weight, weight) != 0) return false;
+        if (criterion != null ? !criterion.equals(that.criterion) : that.criterion != null) return false;
+        return features != null ? features.equals(that.features) : that.features == null;
+    }
+
+    @Override
+    public int hashCode() {
+        int result;
+        long temp;
+        result = criterion != null ? criterion.hashCode() : 0;
+        result = 31 * result + (features != null ? features.hashCode() : 0);
+        temp = Double.doubleToLongBits(weight);
+        result = 31 * result + (int) (temp ^ (temp >>> 32));
+        return result;
+    }
 }

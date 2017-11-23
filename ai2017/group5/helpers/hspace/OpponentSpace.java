@@ -2,10 +2,10 @@ package ai2017.group5.helpers.hspace;
 
 import ai2017.group5.CriterionFeatures;
 import ai2017.group5.CriterionFeaturesWeight;
-import ai2017.group5.helpers.math.UtilitiesHelper;
 import ai2017.group5.UtilitySpaceSimple;
 import ai2017.group5.helpers.math.CartesianProduct;
 import ai2017.group5.helpers.math.SetPermutations;
+import ai2017.group5.helpers.math.UtilitiesHelper;
 import negotiator.AgentID;
 import negotiator.Bid;
 import negotiator.Domain;
@@ -13,6 +13,7 @@ import negotiator.issue.Issue;
 import negotiator.issue.IssueDiscrete;
 import negotiator.issue.Value;
 import negotiator.issue.ValueDiscrete;
+import negotiator.timeline.TimeLineInfo;
 import negotiator.utility.EvaluatorDiscrete;
 
 import java.util.*;
@@ -20,17 +21,89 @@ import java.util.*;
 public class OpponentSpace {
     private final UtilitiesHelper utilitiesHelper = new UtilitiesHelper();
     private final Map<AgentID, List<UtilitySpaceSimple>> opponentUtilitySpaceMap = new HashMap<>();
+    private final Map<AgentID, Integer> opponentRecalculateTimesNumber = new HashMap<>();
     private final Domain domain;
-    private double a = 0.5; //0.2 + Math.sin(Math.PI / 6);
+    private final double a = 0.5; //0.2 + Math.sin(Math.PI / 6);
+    private final int SNIFFING_MAX_NUMBER = 3;
+    private final int SNIFFING_MAX_NEGO_TIME = 6;
+
 
     public OpponentSpace(Domain domain) {
         this.domain = domain;
     }
 
-    public void updateHSpace(AgentID agentId, Bid oppBid, int step) {
-        initializeUtilitySpace(agentId, oppBid);
-        List<UtilitySpaceSimple> plausibleUtilitySpacesForTheAgent = opponentUtilitySpaceMap.get(agentId);
-        updateIssueWeights(oppBid, step, plausibleUtilitySpacesForTheAgent);
+    /**
+     * check if in the past the bid was given, if not
+     * create hSpace based on this bid
+     * combine with existing hSpace,
+     * recalculate the hSpace from the beginning
+     *
+     * @param agentId             agentId
+     * @param lastOpponentBidsMap lastOpponentBidsMap
+     * @param timeline            timeline
+     */
+    public void updateHSpace(AgentID agentId, Map<Double, Bid> lastOpponentBidsMap, TimeLineInfo timeline) {
+        if (opponentRecalculateTimesNumber.get(agentId) == null) {
+            opponentRecalculateTimesNumber.put(agentId, 0);
+        }
+
+        List<Bid> lastOpponentBidsList = new ArrayList<>(lastOpponentBidsMap.values());
+        Bid newestBid = lastOpponentBidsList.get(lastOpponentBidsList.size() - 1);
+        List<Bid> oldBids = lastOpponentBidsList.subList(0, lastOpponentBidsList.size() - 1);
+
+        initializeUtilitySpace(agentId, newestBid);
+
+        if (wasAlreadyPlaced(newestBid, oldBids) || lastOpponentBidsList.size() == 1 || !isSniffingTime(agentId, timeline)) {
+            List<UtilitySpaceSimple> plausibleExistingUtilitySpacesForTheAgent = opponentUtilitySpaceMap.get(agentId);
+            updateIssueWeights(newestBid, (int) timeline.getCurrentTime(), plausibleExistingUtilitySpacesForTheAgent);
+        } else {
+
+            // increment number of newly placed bids
+            opponentRecalculateTimesNumber.put(agentId, opponentRecalculateTimesNumber.get(agentId) + 1);
+
+            //get old utility space
+            List<UtilitySpaceSimple> plausibleExistingUtilitySpacesForTheAgent = opponentUtilitySpaceMap.get(agentId);
+
+            //create new utility space based on the newest bid
+            List<UtilitySpaceSimple> newHSpaceExistingUtilitySpacesForTheAgent = prepareHSpace(newestBid);
+
+            //combine old and new space
+            List<UtilitySpaceSimple> combinedUtilitySpace = combine(plausibleExistingUtilitySpacesForTheAgent, newHSpaceExistingUtilitySpacesForTheAgent);
+            opponentUtilitySpaceMap.put(agentId, combinedUtilitySpace);
+
+            recalculateWeights(lastOpponentBidsMap, opponentUtilitySpaceMap.get(agentId));
+
+        }
+
+    }
+
+    private boolean isSniffingTime(AgentID agentId, TimeLineInfo timeline) {
+        return opponentRecalculateTimesNumber.get(agentId) < SNIFFING_MAX_NUMBER && timeline.getCurrentTime() < SNIFFING_MAX_NEGO_TIME;
+    }
+
+
+    private List<UtilitySpaceSimple> combine(List<UtilitySpaceSimple> oldSpace, List<UtilitySpaceSimple> newSpace) {
+        //clean weights
+        for (UtilitySpaceSimple utilitySpaceSimple : oldSpace) {
+            utilitySpaceSimple.setWeight(0.0);
+        }
+
+        List<UtilitySpaceSimple> resultList = new ArrayList<>(oldSpace);
+
+        // if entry from new utility space is not in old utility space, then add
+        for (UtilitySpaceSimple newUtilitySpaceEntry : newSpace) {
+            newUtilitySpaceEntry.setWeight(0.0);
+
+            if (oldSpace.indexOf(newUtilitySpaceEntry) == -1) {
+                resultList.add(newUtilitySpaceEntry);
+            }
+        }
+
+        return oldSpace;
+    }
+
+    private boolean wasAlreadyPlaced(Bid newestBid, List<Bid> oldBids) {
+        return oldBids.indexOf(newestBid) != -1;
     }
 
     private void initializeUtilitySpace(AgentID agentId, Bid oppBid) {
@@ -46,8 +119,8 @@ public class OpponentSpace {
     /**
      * updates probabilities of given utility spaces after every received bid
      *
-     * @param oppBid new opponent bid
-     * @param step current step
+     * @param oppBid                            new opponent bid
+     * @param step                              current step
      * @param plausibleUtilitySpacesForTheAgent plausible Utility Spaces For The Agent
      */
     private void updateIssueWeights(Bid oppBid, int step, List<UtilitySpaceSimple> plausibleUtilitySpacesForTheAgent) {
@@ -58,6 +131,32 @@ public class OpponentSpace {
             double newPhb = utilitiesHelper.calculatePhb(plausibleUtilitySpacesForTheAgent, i, pBHMap, denominator);
             utilitySpaceSimple.setWeight(newPhb);
         }
+    }
+
+    /**
+     * Recalculate bid from scratch
+     * @param bidsHistory bids with the timestamp
+     * @param plausibleUtilitySpacesForTheAgent clean utility space to be updated
+     */
+    private void recalculateWeights(Map<Double, Bid> bidsHistory, List<UtilitySpaceSimple> plausibleUtilitySpacesForTheAgent) {
+
+        for (UtilitySpaceSimple utilitySpaceSimple : plausibleUtilitySpacesForTheAgent) {
+            utilitySpaceSimple.setWeight(1 / (double) plausibleUtilitySpacesForTheAgent.size());
+        }
+
+        TreeMap<Double, Bid> bidsHistorySorted = new TreeMap<>(bidsHistory);
+
+        for (Map.Entry<Double, Bid> entry : bidsHistorySorted.entrySet()) {
+            Map<Integer, Double> pBHMap = utilitiesHelper.calculatePhbMap(entry.getValue(), plausibleUtilitySpacesForTheAgent, entry.getKey());
+            double denominator = utilitiesHelper.calculateDenominator(plausibleUtilitySpacesForTheAgent, pBHMap);
+            for (int i = 0; i < plausibleUtilitySpacesForTheAgent.size(); i++) {
+                UtilitySpaceSimple utilitySpaceSimple = plausibleUtilitySpacesForTheAgent.get(i);
+                double newPhb = utilitiesHelper.calculatePhb(plausibleUtilitySpacesForTheAgent, i, pBHMap, denominator);
+                utilitySpaceSimple.setWeight(newPhb);
+            }
+        }
+
+
     }
 
     private List<UtilitySpaceSimple> prepareHSpace(Bid bestOppBid) {
@@ -134,6 +233,7 @@ public class OpponentSpace {
 
     }
 
+
     private Map<Issue, EvaluatorDiscrete> prepareOpponentUtilitySpace(Domain domain) {
         Map<Issue, EvaluatorDiscrete> result = new HashMap<>();
         for (Issue issue : domain.getIssues()) {
@@ -153,7 +253,6 @@ public class OpponentSpace {
         return result;
     }
 
-
     private int getIssueNumberByKey(Bid bestOppBid, String featuresKey) {
 
         for (Issue issue : bestOppBid.getIssues()) {
@@ -165,12 +264,12 @@ public class OpponentSpace {
         return -1;
     }
 
+
     public Value getBestOppValue(Set<ValueDiscrete> features, List<Value> bidValues) {
         List<ValueDiscrete> allFeatures = new ArrayList<>(features);
         allFeatures.retainAll(bidValues);
         return allFeatures.get(0);
     }
-
 
     private List<Map<ValueDiscrete, Double>> assignWeightsToFeatures(List<List<ValueDiscrete>> featuresPermutations) {
         List<Map<ValueDiscrete, Double>> featuresPermutationsWithWeights = new ArrayList<>();

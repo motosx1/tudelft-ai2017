@@ -12,7 +12,7 @@
                 </item>
                 <item index="3" value="Handmade Food" cost="120" description="Custom snacks, hours d’oeuvres etc. Less expansive than finger-food, but more work.">
                 </item>
-                <item index="4" value="Catering" cost="250" description="Outsource the food, if you will. The least work, the
+                <item index="4" value="FoodCatering" cost="250" description="Outsource the food, if you will. The least work, the
 highest cost.">
                 </item>
             </issue>

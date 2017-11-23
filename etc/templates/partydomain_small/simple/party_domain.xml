@@ -21,7 +21,12 @@
                       description="Take a nice picture of something, or buy one in the store, and write on the back of that. More expensive, but prettier.">
                 </item>
             </issue>
-
+            <issue index="3" etype="discrete" type="discrete" vtype="discrete" name="Food">
+                <item index="1" value="Chips and Nuts" description="Buy bags of chips and party nuts for all guests." cost="100">
+                </item>
+                <item index="2" value="Finger-Food" description="Diced cheese, sliced sausage, deep fried stuff. More tasty than chips and nuts, but more expensive." cost="170">
+                </item>
+            </issue>
         </objective>
     </utility_space>
 </negotiation_template> 

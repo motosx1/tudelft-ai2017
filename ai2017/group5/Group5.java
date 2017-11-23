@@ -1,8 +1,11 @@
 package ai2017.group5;
 
+import ai2017.group5.helpers.BidHistory;
 import ai2017.group5.helpers.MyNegotiationInfoEnhanced;
+import ai2017.group5.helpers.RandomBidHelper;
 import negotiator.AgentID;
 import negotiator.Bid;
+import negotiator.actions.Accept;
 import negotiator.actions.Action;
 import negotiator.actions.Inform;
 import negotiator.actions.Offer;
@@ -19,17 +22,20 @@ import java.util.Map;
  */
 public class Group5 extends AbstractNegotiationParty {
     private Map<AgentID, Bid> lastReceivedBids = new HashMap<>();
+    private BidHistory bidHistory = new BidHistory();
     private AgentID lastOpponent;
     private int step = 0;
     private MyNegotiationInfoEnhanced myNegotiationInfo;
 
     private Strategy strategy;
+    private NegotiationInfo info;
 
 
     @Override
     public void init(NegotiationInfo info) {
         super.init(info);
         this.step = 0;
+        this.info = info;
         this.myNegotiationInfo = new MyNegotiationInfoEnhanced((AdditiveUtilitySpace) info.getUtilitySpace());
         this.strategy = new Strategy(info, myNegotiationInfo);
 
@@ -49,10 +55,25 @@ public class Group5 extends AbstractNegotiationParty {
     @Override
     public Action chooseAction(List<Class<? extends Action>> validActions) {
         step++;
+        timeline.getTotalTime();
         if (isFirstMove()) {
             return new Offer(getPartyId(), myNegotiationInfo.getMaxUtilityBid());
         } else {
-            return this.strategy.chooseAction(lastReceivedBids, step, lastOpponent);
+            try {
+                return this.strategy.chooseAction(lastReceivedBids, bidHistory, timeline, lastOpponent);
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+
+            Bid maxUtilityBid = myNegotiationInfo.getMaxUtilityBid();
+            if (maxUtilityBid != null) {
+                return new Offer(getPartyId(), maxUtilityBid);
+            } else {
+                return new Offer(getPartyId(), RandomBidHelper.generateRandomBid(info));
+            }
+
         }
     }
 
@@ -78,7 +99,12 @@ public class Group5 extends AbstractNegotiationParty {
                 this.myNegotiationInfo.setOpponentsNum(opponentsNum);
             } else if (action instanceof Offer) {
                 lastReceivedBids.put(sender, ((Offer) action).getBid());
+                bidHistory.putBid(sender, ((Offer) action).getBid(), timeline.getCurrentTime());
                 lastOpponent = sender;
+            } else if (action instanceof Accept) {
+                lastReceivedBids.put(sender, ((Accept) action).getBid());
+                bidHistory.putBid(sender, ((Accept) action).getBid(), timeline.getCurrentTime());
+//                lastOpponent = sender;
             }
         }
     }

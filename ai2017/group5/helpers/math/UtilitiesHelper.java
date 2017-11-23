@@ -17,7 +17,7 @@ import java.util.Map;
 
 public class UtilitiesHelper {
 
-    public Map<Integer, Double> calculatePhbMap(Bid oppBid, List<UtilitySpaceSimple> hSpace, int step) {
+    public Map<Integer, Double> calculatePhbMap(Bid oppBid, List<UtilitySpaceSimple> hSpace, double step) {
         Map<Integer, Double> pBHMap = new HashMap<>();
 
         for (int i = 0; i < hSpace.size(); i++) {
@@ -47,7 +47,7 @@ public class UtilitiesHelper {
 
     }
 
-    private double calculatePbh(Bid oppBid, UtilitySpaceSimple utilitySpaceSimple, int step) {
+    private double calculatePbh(Bid oppBid, UtilitySpaceSimple utilitySpaceSimple, double step) {
         double sigma = 0.3;
         double c = 1 / (sigma * Math.sqrt(2 * Math.PI));
 
@@ -89,12 +89,12 @@ public class UtilitiesHelper {
     }
 
 
-    private double utilityB(int step) {
+    private double utilityB(double step) {
         return 1 - 0.05 * step;  //TODO change to consider time horizon
     }
 
 
-    public UtilitySpaceSimple getMeanWeights(AbstractUtilitySpace myUtilitySpace, Map<AgentID, UtilitySpaceSimple> opponentsWeightsMap) {
+    public UtilitySpaceSimple getMeanWeights(AbstractUtilitySpace myUtilitySpace, Map<AgentID, UtilitySpaceSimple> opponentsWeightsMap) throws Exception {
         UtilitySpaceSimple meanHSpace = new UtilitySpaceSimple((AdditiveUtilitySpace) myUtilitySpace);
 
         meanHSpace.setWeight(getAverageWeight(opponentsWeightsMap));

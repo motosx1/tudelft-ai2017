@@ -2,9 +2,9 @@ package ai2017.group5;
 
 import ai2017.group5.dao.Position;
 import ai2017.group5.dao.Vector;
+import ai2017.group5.helpers.BidHistory;
 import ai2017.group5.helpers.MoveType;
 import ai2017.group5.helpers.MyNegotiationInfoEnhanced;
-import ai2017.group5.helpers.RandomBidHelper;
 import ai2017.group5.helpers.hspace.OpponentSpace;
 import ai2017.group5.helpers.math.UtilitiesHelper;
 import negotiator.AgentID;
@@ -13,6 +13,7 @@ import negotiator.actions.Accept;
 import negotiator.actions.Action;
 import negotiator.actions.Offer;
 import negotiator.parties.NegotiationInfo;
+import negotiator.timeline.TimeLineInfo;
 import negotiator.utility.AdditiveUtilitySpace;
 
 import java.util.HashMap;
@@ -37,75 +38,83 @@ class Strategy {
     }
 
 
-    Action chooseAction(Map<AgentID, Bid> lastReceivedBids, int step, AgentID lastOpponent) {
-        try {
-            // create average opponent utility space
-            UtilitySpaceSimple averageOpponentUtilitySpace = getAverageOpponentUtilitySpace(lastReceivedBids, step);
+    Action chooseAction(Map<AgentID, Bid> lastReceivedBids, BidHistory bidHistory, TimeLineInfo timeline, AgentID lastOpponent) throws Exception {
 
-            Bid lastOpponentBid = lastReceivedBids.get(lastOpponent);
-            double oppUtility = averageOpponentUtilitySpace.getUtility(lastOpponentBid);
-            double oppUtilityForMe = myUtilitySpace.getUtility(lastOpponentBid);
+        updateOpponentUtilitySpace(bidHistory, timeline);
 
-            Position opponentCurrentPosition = new Position(oppUtilityForMe, oppUtility);
-            opponentPreviousPosition = getOpponentPreviousPosition(opponentCurrentPosition);
+        // create average opponent utility space
+        UtilitySpaceSimple averageOpponentUtilitySpace = getAverageOpponentUtilitySpace(lastReceivedBids);
 
-            // create a vector based on a move made
-            Vector opponentVector = new Vector(opponentPreviousPosition, opponentCurrentPosition);
+        Bid lastOpponentBid = lastReceivedBids.get(lastOpponent);
+        double oppUtility = averageOpponentUtilitySpace.getUtility(lastOpponentBid);
+        double oppUtilityForMe = myUtilitySpace.getUtility(lastOpponentBid);
 
-            // classify the opponent move
-            MoveType moveType = opponentVector.getMoveType();
+        Position opponentCurrentPosition = new Position(oppUtilityForMe, oppUtility);
+        opponentPreviousPosition = getOpponentPreviousPosition(opponentCurrentPosition);
 
-            // create a vector, corresponding to my next move, based on the opponent move type
+        // create a vector based on a move made
+        Vector opponentVector = new Vector(opponentPreviousPosition, opponentCurrentPosition);
+
+        // classify the opponent move
+        MoveType moveType = opponentVector.getMoveType();
+
+        // create a vector, corresponding to my next move, based on the opponent move type
 //            Vector myDesiredVector = Vector.getResponseVector(opponentVector, moveType);
-            Vector myDesiredVector = Vector.getMirroredVector(opponentVector);
+        Vector myDesiredVector = Vector.getMirroredVector(opponentVector);
 
-            Action returnOffer;
-            Bid myBid;
-            if (isMyFirstBid()) {
-                myBid = myUtilitySpace.getMaxUtilityBid();
-                returnOffer = new Offer(myPartyId, myBid);
-            } else {
-                if (shouldAccept(lastOpponentBid)) {
-                    return new Accept(myPartyId, lastReceivedBids.get(lastOpponent));
-                } else {
-
-                    Position myDesiredPosition = myPreviousPosition.add(myDesiredVector);
-                    myBid = findClosestBid(myNegotiationInfo.getMyPossibleBids(), averageOpponentUtilitySpace, myDesiredPosition);
-                    returnOffer = new Offer(myPartyId, myBid);
-
-                }
-            }
-
-
-            opponentPreviousPosition = opponentCurrentPosition;
-            myPreviousPosition = new Position(myUtilitySpace.getUtility(myBid), averageOpponentUtilitySpace.getUtility(myBid));
-
-
-            return returnOffer;
-
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-
-        Bid maxUtilityBid = myNegotiationInfo.getMaxUtilityBid();
-        if (maxUtilityBid != null) {
-            return new Offer(myPartyId, maxUtilityBid);
+        Action returnOffer;
+        Bid myBid;
+        if (isMyFirstBid()) {
+            myBid = myUtilitySpace.getMaxUtilityBid();
+            returnOffer = new Offer(myPartyId, myBid);
         } else {
-            return new Offer(myPartyId, RandomBidHelper.generateRandomBid(info));
+            if (shouldAccept(lastOpponentBid)) {
+                return new Accept(myPartyId, lastReceivedBids.get(lastOpponent));
+            } else {
+
+                Position myDesiredPosition = myPreviousPosition.add(myDesiredVector);
+                myBid = findClosestBid(myNegotiationInfo.getMyPossibleBids(), averageOpponentUtilitySpace, myDesiredPosition);
+                returnOffer = new Offer(myPartyId, myBid);
+
+            }
         }
+
+
+        opponentPreviousPosition = opponentCurrentPosition;
+        myPreviousPosition = new Position(myUtilitySpace.getUtility(myBid), averageOpponentUtilitySpace.getUtility(myBid));
+
+
+        return returnOffer;
+
 
     }
 
-    private UtilitySpaceSimple getAverageOpponentUtilitySpace(Map<AgentID, Bid> lastReceivedBids, int step) {
+    private void updateOpponentUtilitySpace(BidHistory bidHistory, TimeLineInfo timeline) {
+
+        for (Map.Entry<AgentID, Map<Double, Bid>> bidHistoryEntry : bidHistory.getBidHistory().entrySet()) {
+            AgentID opponentId = bidHistoryEntry.getKey();
+            Map<Double, Bid> lastOpponentBids = bidHistoryEntry.getValue();
+
+
+            opponentSpace.updateHSpace(opponentId, lastOpponentBids, timeline);
+
+        }
+
+//
+//        for (Map.Entry<AgentID, Bid> lastBidEntry : lastReceivedBids.entrySet()) {
+//            AgentID opponentId = lastBidEntry.getKey();
+//            Bid lastOpponentBid = lastBidEntry.getValue();
+//
+//            opponentSpace.updateHSpace(opponentId, lastOpponentBid, step);
+//        }
+    }
+
+    private UtilitySpaceSimple getAverageOpponentUtilitySpace(Map<AgentID, Bid> lastReceivedBids) throws Exception {
         Map<AgentID, UtilitySpaceSimple> opponentsWeightsMap = new HashMap<>();
 
         for (Map.Entry<AgentID, Bid> lastBidEntry : lastReceivedBids.entrySet()) {
             AgentID opponentId = lastBidEntry.getKey();
-            Bid lastOpponentBid = lastBidEntry.getValue();
 
-            opponentSpace.updateHSpace(opponentId, lastOpponentBid, step);
             UtilitySpaceSimple opponentsWeights = opponentSpace.getHSpaceElementWithBiggestWeight(opponentId);
             opponentsWeightsMap.put(opponentId, opponentsWeights);
         }

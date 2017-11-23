@@ -24,12 +24,15 @@ public class OpponentSpace {
     private final Map<AgentID, Integer> opponentRecalculateTimesNumber = new HashMap<>();
     private final Domain domain;
     private final double a = 0.5; //0.2 + Math.sin(Math.PI / 6);
-    private final int SNIFFING_MAX_NUMBER = 3;
-    private final int SNIFFING_MAX_NEGO_TIME = 6;
+    private final int SNIFFING_MAX_NUMBER;
+    private final int SNIFFING_MAX_NEGO_TIME;
 
 
-    public OpponentSpace(Domain domain) {
+    public OpponentSpace(Domain domain, double totalTime) {
         this.domain = domain;
+
+        this.SNIFFING_MAX_NEGO_TIME = (int)(0.25 * totalTime);
+        this.SNIFFING_MAX_NUMBER = 5;
     }
 
     /**

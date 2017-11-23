@@ -29,12 +29,12 @@ class Strategy {
     private Position opponentPreviousPosition = null;
     private Position myPreviousPosition = null;
 
-    Strategy(NegotiationInfo info, MyNegotiationInfoEnhanced myNegotiationInfo) {
+    Strategy(NegotiationInfo info, MyNegotiationInfoEnhanced myNegotiationInfo, double totalTime) {
         this.info = info;
         this.myUtilitySpace = (AdditiveUtilitySpace) info.getUtilitySpace();
         this.myPartyId = info.getAgentID();
         this.myNegotiationInfo = myNegotiationInfo;
-        this.opponentSpace = new OpponentSpace(info.getUtilitySpace().getDomain());
+        this.opponentSpace = new OpponentSpace(info.getUtilitySpace().getDomain(), totalTime);
     }
 
 

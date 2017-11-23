@@ -37,7 +37,7 @@ public class Group5 extends AbstractNegotiationParty {
         this.step = 0;
         this.info = info;
         this.myNegotiationInfo = new MyNegotiationInfoEnhanced((AdditiveUtilitySpace) info.getUtilitySpace());
-        this.strategy = new Strategy(info, myNegotiationInfo);
+        this.strategy = new Strategy(info, myNegotiationInfo, this.timeline.getTotalTime());
 
         System.out.println("Discount Factor is " + info.getUtilitySpace().getDiscountFactor());
         System.out.println("Reservation Value is " + info.getUtilitySpace().getReservationValueUndiscounted());

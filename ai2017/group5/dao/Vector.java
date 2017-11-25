@@ -26,9 +26,8 @@ public class Vector {
         return new Vector(opponentsVector.y, opponentsVector.x);
     }
 
-    @SuppressWarnings("SuspiciousNameCombination")
     public static Vector getSameVector(Vector opponentsVector) {
-        return new Vector(opponentsVector.y, opponentsVector.x);
+        return new Vector(opponentsVector.x, opponentsVector.y);
     }
 
     public MoveType getMoveType() {
@@ -49,5 +48,11 @@ public class Vector {
 
     public Double getY() {
         return y;
+    }
+
+    public Vector divideBy(double divideBy) {
+        this.x = this.x / divideBy;
+        this.y = this.y / divideBy;
+        return this;
     }
 }

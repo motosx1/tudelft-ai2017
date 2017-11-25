@@ -3,6 +3,15 @@
     <items>
         <agentRepItems/>
         <partyRepItems>
+            <partyRepItem classPath="agents.anac.y2015.Mercury.Mercury">
+                <properties/>
+            </partyRepItem>
+            <partyRepItem classPath="agents.anac.y2015.Atlas3.Atlas3">
+                <properties/>
+            </partyRepItem>
+            <partyRepItem classPath="C:\workspace\java\tu\genius\out\production\genius\ai2017\group5\Group5.class">
+                <properties/>
+            </partyRepItem>
             <partyRepItem classPath="negotiator.parties.RandomParty">
                 <properties/>
             </partyRepItem>
@@ -81,12 +90,7 @@
             <partyRepItem classPath="agents.anac.y2015.AresParty.AresParty">
                 <properties/>
             </partyRepItem>
-            <partyRepItem classPath="agents.anac.y2015.Mercury.Mercury">
-                <properties/>
-            </partyRepItem>
-            <partyRepItem classPath="agents.anac.y2015.Atlas3.Atlas3">
-                <properties/>
-            </partyRepItem>
+
             <partyRepItem classPath="agents.anac.y2015.agenth.AgentH">
                 <properties/>
             </partyRepItem>
@@ -361,9 +365,6 @@
                 </properties>
             </partyRepItem>
             <partyRepItem classPath="negotiator.parties.FeedbackHillClimber">
-                <properties/>
-            </partyRepItem>
-            <partyRepItem classPath="C:\workspace\java\tu\genius\out\production\genius\ai2017\group5\Group5.class">
                 <properties/>
             </partyRepItem>
         </partyRepItems>

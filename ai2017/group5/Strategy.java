@@ -58,8 +58,9 @@ class Strategy {
         // classify the opponent move
         MoveType moveType = opponentVector.getMoveType();
 
-        // create a vector, corresponding to my next move, based on the opponent move type
-        Vector myDesiredVector = getDesiredVector(opponentVector, moveType);
+        // create a vector, corresponding to my next move, based on the opponent move type,
+        // and passed time (the longer we play, the better we know the opponent model, so our vector can be longer)
+        Vector myDesiredVector = getDesiredVector(opponentVector, moveType, timeline);
 
         Action returnOffer;
         Bid myBid;
@@ -88,12 +89,12 @@ class Strategy {
 
     }
 
-    private Vector getDesiredVector(Vector opponentVector, MoveType moveType) {
+    private Vector getDesiredVector(Vector opponentVector, MoveType moveType, TimeLineInfo timeline) {
         Vector myDesiredVector;
         if (moveType == MoveType.SELFISH || moveType.equals(MoveType.CONCESSION)) {
-            myDesiredVector = Vector.getMirroredVector(opponentVector);
+            myDesiredVector = Vector.getMirroredVector(opponentVector).divideBy(2);
         } else { //if( moveType == MoveType.FORTUNATE || moveType == MoveType.UNFORTUNATE){
-            myDesiredVector = Vector.getSameVector(opponentVector);
+            myDesiredVector = Vector.getSameVector(opponentVector).divideBy(2);
         }
         return myDesiredVector;
     }

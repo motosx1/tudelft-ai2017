@@ -5,7 +5,7 @@
 
         <tournament>
             <deadline>
-                <value>20</value>
+                <value>60</value>
                 <type>ROUND</type>
             </deadline>
             <protocolItem hasMediatorProfile="false" hasMediator="false"

@@ -5,8 +5,8 @@
 
         <tournament>
             <deadline>
-                <value>20</value>
-                <type>ROUND</type>
+                <value>60</value>
+                <type>TIME</type>
             </deadline>
             <protocolItem hasMediatorProfile="false" hasMediator="false"
                           description="Each agents makes offer, counter-offer, or accepts"
@@ -16,7 +16,7 @@
                 <party classPath="agents.anac.y2015.Atlas3.Atlas3">
                     <properties/>
                 </party>
-                <party classPath="negotiator.parties.RandomParty2">
+                <party classPath="agents.anac.y2015.AgentW.AgentW">
                     <properties/>
                 </party>
                 <party classPath="ai2017.group5.Group5">

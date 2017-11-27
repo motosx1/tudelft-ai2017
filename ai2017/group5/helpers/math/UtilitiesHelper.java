@@ -2,6 +2,7 @@ package ai2017.group5.helpers.math;
 
 import ai2017.group5.CriterionFeatures;
 import ai2017.group5.UtilitySpaceSimple;
+import ai2017.group5.dao.UtilityProbabilityObject;
 import negotiator.AgentID;
 import negotiator.Bid;
 import negotiator.issue.Issue;
@@ -94,40 +95,50 @@ public class UtilitiesHelper {
     }
 
 
-    public UtilitySpaceSimple getMeanWeights(AbstractUtilitySpace myUtilitySpace, Map<AgentID, UtilitySpaceSimple> opponentsWeightsMap) throws Exception {
-        UtilitySpaceSimple meanHSpace = new UtilitySpaceSimple((AdditiveUtilitySpace) myUtilitySpace);
+    public UtilityProbabilityObject getMeanWeights(AbstractUtilitySpace myUtilitySpace, Map<AgentID, UtilityProbabilityObject> opponentsWeightsMap) throws Exception {
+        UtilityProbabilityObject meanHSpaceWithProbability = new UtilityProbabilityObject(new UtilitySpaceSimple((AdditiveUtilitySpace) myUtilitySpace),0);
 
-        meanHSpace.setWeight(getAverageWeight(opponentsWeightsMap));
+        meanHSpaceWithProbability.getUtilitySpace().setWeight(getAverageWeight(opponentsWeightsMap));
+        meanHSpaceWithProbability.setProbability(getAverageProbability(opponentsWeightsMap));
 
         for (Issue issue : myUtilitySpace.getDomain().getIssues()) {
             String issueName = issue.getName();
             List<ValueDiscrete> values = ((IssueDiscrete) issue).getValues();
 
-            setCriterionMean(issueName, opponentsWeightsMap, meanHSpace);
+            setCriterionMean(issueName, opponentsWeightsMap, meanHSpaceWithProbability.getUtilitySpace());
             for (ValueDiscrete value : values) {
-                setFeatureMean(issueName, value, opponentsWeightsMap, meanHSpace);
+                setFeatureMean(issueName, value, opponentsWeightsMap, meanHSpaceWithProbability.getUtilitySpace());
             }
 
         }
 
 
-        return meanHSpace;
+        return meanHSpaceWithProbability;
     }
 
-    private double getAverageWeight(Map<AgentID, UtilitySpaceSimple> opponentsWeightsMap) {
+    private double getAverageProbability(Map<AgentID, UtilityProbabilityObject> opponentsWeightsMap) {
         double sum = 0;
-        for (Map.Entry<AgentID, UtilitySpaceSimple> entry : opponentsWeightsMap.entrySet()) {
-            sum += entry.getValue().getWeight();
+        for (Map.Entry<AgentID, UtilityProbabilityObject> entry : opponentsWeightsMap.entrySet()) {
+            sum += entry.getValue().getProbability();
+        }
+
+        return sum/opponentsWeightsMap.size();
+    }
+
+    private double getAverageWeight(Map<AgentID, UtilityProbabilityObject> opponentsWeightsMap) {
+        double sum = 0;
+        for (Map.Entry<AgentID, UtilityProbabilityObject> entry : opponentsWeightsMap.entrySet()) {
+            sum += entry.getValue().getUtilitySpace().getWeight();
         }
         double size = opponentsWeightsMap.entrySet().size();
 
         return sum / size;
     }
 
-    private void setFeatureMean(String issueName, ValueDiscrete value, Map<AgentID, UtilitySpaceSimple> opponentsWeightsMap, UtilitySpaceSimple meanHSpace) {
+    private void setFeatureMean(String issueName, ValueDiscrete value, Map<AgentID, UtilityProbabilityObject> opponentsWeightsMap, UtilitySpaceSimple meanHSpace) {
         double averageWeightOfFeatures = 0;
-        for (Map.Entry<AgentID, UtilitySpaceSimple> entry : opponentsWeightsMap.entrySet()) {
-            UtilitySpaceSimple utilitySpaceSimple = entry.getValue();
+        for (Map.Entry<AgentID, UtilityProbabilityObject> entry : opponentsWeightsMap.entrySet()) {
+            UtilitySpaceSimple utilitySpaceSimple = entry.getValue().getUtilitySpace();
 
             averageWeightOfFeatures += getAverageWeightOfFeatures(issueName, value, utilitySpaceSimple);
         }
@@ -163,10 +174,10 @@ public class UtilitiesHelper {
         return sum / elems;
     }
 
-    private void setCriterionMean(String issueName, Map<AgentID, UtilitySpaceSimple> opponentsWeightsMap, UtilitySpaceSimple meanHSpace) {
+    private void setCriterionMean(String issueName, Map<AgentID, UtilityProbabilityObject> opponentsWeightsMap, UtilitySpaceSimple meanHSpace) {
         double averageWeightOfCriterion = 0;
-        for (Map.Entry<AgentID, UtilitySpaceSimple> entry : opponentsWeightsMap.entrySet()) {
-            UtilitySpaceSimple utilitySpaceSimple = entry.getValue();
+        for (Map.Entry<AgentID, UtilityProbabilityObject> entry : opponentsWeightsMap.entrySet()) {
+            UtilitySpaceSimple utilitySpaceSimple = entry.getValue().getUtilitySpace();
 
             CriterionFeatures criterionByName = getCriterionByName(issueName, utilitySpaceSimple);
             averageWeightOfCriterion += criterionByName != null ? criterionByName.getWeight() : 0;

@@ -1,6 +1,7 @@
 package ai2017.group5;
 
 import ai2017.group5.dao.Position;
+import ai2017.group5.dao.UtilityProbabilityObject;
 import ai2017.group5.dao.Vector;
 import ai2017.group5.helpers.BidHistory;
 import ai2017.group5.helpers.MoveType;
@@ -43,10 +44,10 @@ class Strategy {
         updateOpponentUtilitySpace(bidHistory, timeline);
 
         // create average opponent utility space
-        UtilitySpaceSimple averageOpponentUtilitySpace = getAverageOpponentUtilitySpace(lastReceivedBids);
+        UtilityProbabilityObject averageOpponentUtilitySpace = getAverageOpponentUtilitySpace(lastReceivedBids);
 
         Bid lastOpponentBid = lastReceivedBids.get(lastOpponent);
-        double oppUtility = averageOpponentUtilitySpace.getUtility(lastOpponentBid);
+        double oppUtility = averageOpponentUtilitySpace.getUtilitySpace().getUtility(lastOpponentBid);
         double oppUtilityForMe = myUtilitySpace.getUtility(lastOpponentBid);
 
         Position opponentCurrentPosition = new Position(oppUtilityForMe, oppUtility);
@@ -73,7 +74,7 @@ class Strategy {
             } else {
 
                 Position myDesiredPosition = myPreviousPosition.add(myDesiredVector);
-                myBid = findClosestBid(myNegotiationInfo.getMyPossibleBids(), averageOpponentUtilitySpace, myDesiredPosition);
+                myBid = findClosestBid(myNegotiationInfo.getMyPossibleBids(), averageOpponentUtilitySpace.getUtilitySpace(), myDesiredPosition);
                 returnOffer = new Offer(myPartyId, myBid);
 
             }
@@ -81,7 +82,7 @@ class Strategy {
 
 
         opponentPreviousPosition = opponentCurrentPosition;
-        myPreviousPosition = new Position(myUtilitySpace.getUtility(myBid), averageOpponentUtilitySpace.getUtility(myBid));
+        myPreviousPosition = new Position(myUtilitySpace.getUtility(myBid), averageOpponentUtilitySpace.getUtilitySpace().getUtility(myBid));
 
 
         return returnOffer;
@@ -90,11 +91,23 @@ class Strategy {
     }
 
     private Vector getDesiredVector(Vector opponentVector, MoveType moveType, TimeLineInfo timeline) {
+        double timefactor = timeline.getCurrentTime() / timeline.getTotalTime();
+        double factor = 2;  //-\ln\left(x+0.3\right)+1.3
+//        double factor = -Math.log(timefactor + 0.3) + 1.3;  //-\ln\left(x+0.3\right)+1.3
+//        double factor = -Math.log(100 * timefactor + 0.14);
+//        double factor = Math.log(10 * timefactor + 2.8);
+//        double factor = 0.5;
+//\ln\left(10x+2.8\right)
+//        if (factor <= 1){
+//            factor = 1;
+//        }
+
+
         Vector myDesiredVector;
         if (moveType == MoveType.SELFISH || moveType.equals(MoveType.CONCESSION)) {
-            myDesiredVector = Vector.getMirroredVector(opponentVector).divideBy(2);
+            myDesiredVector = Vector.getMirroredVector(opponentVector).divideBy(factor);
         } else { //if( moveType == MoveType.FORTUNATE || moveType == MoveType.UNFORTUNATE){
-            myDesiredVector = Vector.getSameVector(opponentVector).divideBy(2);
+            myDesiredVector = Vector.getSameVector(opponentVector).divideBy(factor);
         }
         return myDesiredVector;
     }
@@ -109,14 +122,15 @@ class Strategy {
         }
     }
 
-    private UtilitySpaceSimple getAverageOpponentUtilitySpace(Map<AgentID, Bid> lastReceivedBids) throws Exception {
-        Map<AgentID, UtilitySpaceSimple> opponentsWeightsMap = new HashMap<>();
+    private UtilityProbabilityObject getAverageOpponentUtilitySpace(Map<AgentID, Bid> lastReceivedBids) throws Exception {
+        Map<AgentID, UtilityProbabilityObject> opponentsWeightsMap = new HashMap<>();
 
         for (Map.Entry<AgentID, Bid> lastBidEntry : lastReceivedBids.entrySet()) {
             AgentID opponentId = lastBidEntry.getKey();
 
-            UtilitySpaceSimple opponentsWeights = opponentSpace.getHSpaceElementWithBiggestWeight(opponentId);
-            opponentsWeightsMap.put(opponentId, opponentsWeights);
+            UtilityProbabilityObject utilityProbabilityObject = opponentSpace.getHSpaceElementWithBiggestWeight(opponentId);
+//            UtilitySpaceSimple opponentsWeights = utilityProbabilityObject.getUtilitySpace();
+            opponentsWeightsMap.put(opponentId, utilityProbabilityObject);
         }
 
 

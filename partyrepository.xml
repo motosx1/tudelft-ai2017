@@ -3,10 +3,14 @@
     <items>
         <agentRepItems/>
         <partyRepItems>
-            <partyRepItem classPath="agents.anac.y2015.Mercury.Mercury">
+            <partyRepItem classPath="agents.anac.y2015.Atlas3.Atlas3">
                 <properties/>
             </partyRepItem>
-            <partyRepItem classPath="agents.anac.y2015.Atlas3.Atlas3">
+            <partyRepItem classPath="agents.anac.y2015.AgentW.AgentW">
+                <properties/>
+            </partyRepItem>
+
+            <partyRepItem classPath="agents.anac.y2015.agentBuyogV2.AgentBuyogMain">
                 <properties/>
             </partyRepItem>
             <partyRepItem classPath="C:\workspace\java\tu\genius\out\production\genius\ai2017\group5\Group5.class">
@@ -16,6 +20,10 @@
                 <properties/>
             </partyRepItem>
             <partyRepItem classPath="negotiator.parties.RandomParty2">
+                <properties/>
+            </partyRepItem>
+
+            <partyRepItem classPath="agents.anac.y2015.Mercury.Mercury">
                 <properties/>
             </partyRepItem>
             <partyRepItem classPath="negotiator.parties.BoulwareNegotiationParty">
@@ -97,9 +105,6 @@
             <partyRepItem classPath="agents.anac.y2015.SENGOKU.SENGOKU">
                 <properties/>
             </partyRepItem>
-            <partyRepItem classPath="agents.anac.y2015.AgentW.AgentW">
-                <properties/>
-            </partyRepItem>
             <partyRepItem classPath="agents.anac.y2015.AgentX.AgentX">
                 <properties/>
             </partyRepItem>
@@ -107,9 +112,6 @@
                 <properties/>
             </partyRepItem>
             <partyRepItem classPath="agents.anac.y2015.fairy.kawaii">
-                <properties/>
-            </partyRepItem>
-            <partyRepItem classPath="agents.anac.y2015.agentBuyogV2.AgentBuyogMain">
                 <properties/>
             </partyRepItem>
             <partyRepItem classPath="agents.anac.y2015.xianfa.XianFaAgent">

@@ -3,6 +3,7 @@ package ai2017.group5.helpers.hspace;
 import ai2017.group5.CriterionFeatures;
 import ai2017.group5.CriterionFeaturesWeight;
 import ai2017.group5.UtilitySpaceSimple;
+import ai2017.group5.dao.UtilityProbabilityObject;
 import ai2017.group5.helpers.math.CartesianProduct;
 import ai2017.group5.helpers.math.SetPermutations;
 import ai2017.group5.helpers.math.UtilitiesHelper;
@@ -300,7 +301,7 @@ public class OpponentSpace {
         }
     }
 
-    public UtilitySpaceSimple getHSpaceElementWithBiggestWeight(AgentID agentId) {
+    public UtilityProbabilityObject getHSpaceElementWithBiggestWeight(AgentID agentId) {
         double max = 0;
         UtilitySpaceSimple maxUtilitySpaceSimple = null;
 
@@ -311,7 +312,7 @@ public class OpponentSpace {
             }
         }
 
-        return maxUtilitySpaceSimple;
+        return new UtilityProbabilityObject(maxUtilitySpaceSimple, max);
     }
 
 }

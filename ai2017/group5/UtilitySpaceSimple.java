@@ -65,8 +65,9 @@ public class UtilitySpaceSimple {
 
             double probableCriterionWeight = myCriterionFeaturesList != null ? myCriterionFeaturesList.getWeight() : 0.0;
             double probableFeatureWeight = utilitiesHelper.getFeatureWeight(oppFeature, myCriterionFeaturesList);
+            double probableMaxFeatureWeight = utilitiesHelper.getMaxFeatureWeight(myCriterionFeaturesList);
 
-            utility += probableCriterionWeight * probableFeatureWeight;
+            utility += probableCriterionWeight * (probableFeatureWeight/probableMaxFeatureWeight);
         }
 
         return utility;

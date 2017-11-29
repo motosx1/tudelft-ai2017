@@ -44,7 +44,12 @@ class Strategy {
         updateOpponentUtilitySpace(bidHistory, timeline);
 
         // create average opponent utility space
-        UtilityProbabilityObject averageOpponentUtilitySpace = getAverageOpponentUtilitySpace(lastReceivedBids);
+//        UtilityProbabilityObject averageOpponentUtilitySpace = getAverageOpponentUtilitySpace(lastReceivedBids);
+        UtilityProbabilityObject averageOpponentUtilitySpace = getMaxOpponentUtilitySpace(lastReceivedBids);
+
+        if (averageOpponentUtilitySpace == null) {
+            return (Action) myUtilitySpace.getMaxUtilityBid();
+        }
 
         Bid lastOpponentBid = lastReceivedBids.get(lastOpponent);
         double oppUtility = averageOpponentUtilitySpace.getUtilitySpace().getUtility(lastOpponentBid);
@@ -69,7 +74,7 @@ class Strategy {
             myBid = myUtilitySpace.getMaxUtilityBid();
             returnOffer = new Offer(myPartyId, myBid);
         } else {
-            if (shouldAccept(lastOpponentBid)) {
+            if (shouldAccept(lastOpponentBid, oppUtility, lastReceivedBids)) {
                 return new Accept(myPartyId, lastReceivedBids.get(lastOpponent));
             } else {
 
@@ -92,7 +97,7 @@ class Strategy {
 
     private Vector getDesiredVector(Vector opponentVector, MoveType moveType, TimeLineInfo timeline) {
         double timefactor = timeline.getCurrentTime() / timeline.getTotalTime();
-        double factor = 2;  //-\ln\left(x+0.3\right)+1.3
+        double factor = 1.5;  //-\ln\left(x+0.3\right)+1.3
 //        double factor = -Math.log(timefactor + 0.3) + 1.3;  //-\ln\left(x+0.3\right)+1.3
 //        double factor = -Math.log(100 * timefactor + 0.14);
 //        double factor = Math.log(10 * timefactor + 2.8);
@@ -137,9 +142,45 @@ class Strategy {
         return utilitiesHelper.getMeanWeights(myUtilitySpace, opponentsWeightsMap);
     }
 
+    private UtilityProbabilityObject getMaxOpponentUtilitySpace(Map<AgentID, Bid> lastReceivedBids) throws Exception {
+        Map<AgentID, UtilityProbabilityObject> opponentsWeightsMap = new HashMap<>();
+        Map<AgentID, Double> opponentsLastBidUtilities = new HashMap<>();
+        Double maxUtility = 0.0;
+        UtilityProbabilityObject maxUtilitySpace = null;
 
-    private boolean shouldAccept(Bid lastOpponentBid) {
-        return myUtilitySpace.getUtility(lastOpponentBid) >= myPreviousPosition.getMyUtility();
+        for (Map.Entry<AgentID, Bid> lastBidEntry : lastReceivedBids.entrySet()) {
+            AgentID opponentId = lastBidEntry.getKey();
+            Bid lastBid = lastBidEntry.getValue();
+
+            UtilityProbabilityObject utilityProbabilityObject = opponentSpace.getHSpaceElementWithBiggestWeight(opponentId);
+//            UtilitySpaceSimple opponentsWeights = utilityProbabilityObject.getUtilitySpace();
+
+            double agentsUtility = utilityProbabilityObject.getUtilitySpace().getUtility(lastBid);
+            if (maxUtility < agentsUtility) {
+                maxUtility = agentsUtility;
+                maxUtilitySpace = new UtilityProbabilityObject(utilityProbabilityObject.getUtilitySpace(), utilityProbabilityObject.getProbability());
+            }
+
+//            opponentsLastBidUtilities.put(opponentId, agentsUtility);
+//            opponentsWeightsMap.put(opponentId, utilityProbabilityObject);
+        }
+
+//        return utilitiesHelper.getMaxWeights(myUtilitySpace, opponentsWeightsMap);
+        return maxUtilitySpace;
+    }
+
+
+    private boolean shouldAccept(Bid lastOpponentBid, double oppUtility, Map<AgentID, Bid> lastReceivedBids) {
+        for (Map.Entry<AgentID, Bid> entry : lastReceivedBids.entrySet()) {
+            UtilityProbabilityObject oppSpace = opponentSpace.getHSpaceElementWithBiggestWeight(entry.getKey());
+            Bid bidToAccept = entry.getValue();
+            if (myUtilitySpace.getUtility(bidToAccept) < oppSpace.getUtilitySpace().getUtility(bidToAccept)*1.2) {
+                return false;
+            }
+        }
+        return true;
+//        return myUtilitySpace.getUtility(lastOpponentBid) >= oppUtility;
+//        return myUtilitySpace.getUtility(lastOpponentBid) >= myPreviousPosition.getMyUtility();
     }
 
     private boolean isMyFirstBid() {

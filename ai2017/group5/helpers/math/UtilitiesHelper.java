@@ -18,15 +18,15 @@ import java.util.Map;
 
 public class UtilitiesHelper {
 
-    public Map<Integer, Double> calculatePhbMap(Bid oppBid, List<UtilitySpaceSimple> hSpace, double step) {
+    public Map<Integer, Double> calculatePhbMap(Bid oppBid, List<UtilitySpaceSimple> hSpace, double step, double totalTime) {
         Map<Integer, Double> pBHMap = new HashMap<>();
 
         for (int i = 0; i < hSpace.size(); i++) {
             UtilitySpaceSimple hSpaceEntry = hSpace.get(i);
-            pBHMap.put(i, calculatePbh(oppBid, hSpaceEntry, step));
+            pBHMap.put(i, calculatePbh(oppBid, hSpaceEntry, step, totalTime));
         }
 
-        return pBHMap;
+         return pBHMap;
     }
 
     public double calculatePhb(List<UtilitySpaceSimple> hSpace, int elementIndex, Map<Integer, Double> pBHMap, double denominator) {
@@ -48,11 +48,11 @@ public class UtilitiesHelper {
 
     }
 
-    private double calculatePbh(Bid oppBid, UtilitySpaceSimple utilitySpaceSimple, double step) {
-        double sigma = 0.3;
+    private double calculatePbh(Bid oppBid, UtilitySpaceSimple utilitySpaceSimple, double step, double totalTime) {
+        double sigma = 0.1;
         double c = 1 / (sigma * Math.sqrt(2 * Math.PI));
 
-        double index = Math.pow(utilitySpaceSimple.getUtility(oppBid) - utilityB(step), 2) / (2 * Math.pow(sigma, 2));
+        double index = Math.pow(utilitySpaceSimple.getUtility(oppBid) - utilityB(step, totalTime), 2) / (2 * Math.pow(sigma, 2));
 
         return c * Math.exp(-index);
     }
@@ -68,7 +68,18 @@ public class UtilitiesHelper {
         return 0.0;
     }
 
-    public CriterionFeatures getCriterionFeaturesByCriterionName(List<CriterionFeatures> criterionFeaturesList , String oppCriterion) {
+    public double getMaxFeatureWeight( CriterionFeatures myCriterionFeaturesList) {
+        double max = 0;
+        for (Map.Entry<ValueDiscrete, Double> entry : myCriterionFeaturesList.getFeatures().entrySet()) {
+            if(max < entry.getValue()){
+                max = entry.getValue();
+            }
+        }
+
+        return max;
+    }
+
+    public CriterionFeatures getCriterionFeaturesByCriterionName(List<CriterionFeatures> criterionFeaturesList, String oppCriterion) {
         for (CriterionFeatures entry : criterionFeaturesList) {
             if (oppCriterion.equalsIgnoreCase(entry.getCriterion())) {
                 return entry;
@@ -90,13 +101,16 @@ public class UtilitiesHelper {
     }
 
 
-    private double utilityB(double step) {
-        return 1 - 0.05 * step;  //TODO change to consider time horizon
+    private double utilityB(double step, double totalTime) {
+//        double factor = step/(totalTime/20.0);
+        double factor = step;
+
+        return 1 - 0.05 * factor;  //TODO change to consider time horizon
     }
 
 
     public UtilityProbabilityObject getMeanWeights(AbstractUtilitySpace myUtilitySpace, Map<AgentID, UtilityProbabilityObject> opponentsWeightsMap) throws Exception {
-        UtilityProbabilityObject meanHSpaceWithProbability = new UtilityProbabilityObject(new UtilitySpaceSimple((AdditiveUtilitySpace) myUtilitySpace),0);
+        UtilityProbabilityObject meanHSpaceWithProbability = new UtilityProbabilityObject(new UtilitySpaceSimple((AdditiveUtilitySpace) myUtilitySpace), 0);
 
         meanHSpaceWithProbability.getUtilitySpace().setWeight(getAverageWeight(opponentsWeightsMap));
         meanHSpaceWithProbability.setProbability(getAverageProbability(opponentsWeightsMap));
@@ -116,13 +130,34 @@ public class UtilitiesHelper {
         return meanHSpaceWithProbability;
     }
 
+    public UtilityProbabilityObject getMaxWeights(AbstractUtilitySpace myUtilitySpace, Map<AgentID, UtilityProbabilityObject> opponentsWeightsMap) throws Exception {
+        UtilityProbabilityObject maxHSpaceWithProbability = new UtilityProbabilityObject(new UtilitySpaceSimple((AdditiveUtilitySpace) myUtilitySpace), 0);
+
+        maxHSpaceWithProbability.getUtilitySpace().setWeight(getMaxWeight(opponentsWeightsMap));
+        maxHSpaceWithProbability.setProbability(getAverageProbability(opponentsWeightsMap));
+
+        for (Issue issue : myUtilitySpace.getDomain().getIssues()) {
+            String issueName = issue.getName();
+            List<ValueDiscrete> values = ((IssueDiscrete) issue).getValues();
+
+            setCriterionMax(issueName, opponentsWeightsMap, maxHSpaceWithProbability.getUtilitySpace());
+            for (ValueDiscrete value : values) {
+                setFeatureMax(issueName, value, opponentsWeightsMap, maxHSpaceWithProbability.getUtilitySpace());
+            }
+
+        }
+
+
+        return maxHSpaceWithProbability;
+    }
+
     private double getAverageProbability(Map<AgentID, UtilityProbabilityObject> opponentsWeightsMap) {
         double sum = 0;
         for (Map.Entry<AgentID, UtilityProbabilityObject> entry : opponentsWeightsMap.entrySet()) {
             sum += entry.getValue().getProbability();
         }
 
-        return sum/opponentsWeightsMap.size();
+        return sum / opponentsWeightsMap.size();
     }
 
     private double getAverageWeight(Map<AgentID, UtilityProbabilityObject> opponentsWeightsMap) {
@@ -133,6 +168,17 @@ public class UtilitiesHelper {
         double size = opponentsWeightsMap.entrySet().size();
 
         return sum / size;
+    }
+
+    private double getMaxWeight(Map<AgentID, UtilityProbabilityObject> opponentsWeightsMap) {
+        double max = 0;
+        for (Map.Entry<AgentID, UtilityProbabilityObject> entry : opponentsWeightsMap.entrySet()) {
+            if (max < entry.getValue().getUtilitySpace().getWeight())
+                max = entry.getValue().getUtilitySpace().getWeight();
+        }
+//        double size = opponentsWeightsMap.entrySet().size();
+
+        return max;
     }
 
     private void setFeatureMean(String issueName, ValueDiscrete value, Map<AgentID, UtilityProbabilityObject> opponentsWeightsMap, UtilitySpaceSimple meanHSpace) {
@@ -147,6 +193,24 @@ public class UtilitiesHelper {
 
         if (meanFeatures != null) {
             meanFeatures.put(value, averageWeightOfFeatures / opponentsWeightsMap.size());
+        }
+
+    }
+
+
+    private void setFeatureMax(String issueName, ValueDiscrete value, Map<AgentID, UtilityProbabilityObject> opponentsWeightsMap, UtilitySpaceSimple meanHSpace) {
+        double maxWeightOfFeatures = 0;
+        for (Map.Entry<AgentID, UtilityProbabilityObject> entry : opponentsWeightsMap.entrySet()) {
+            UtilitySpaceSimple utilitySpaceSimple = entry.getValue().getUtilitySpace();
+            if (maxWeightOfFeatures < getMaxWeightOfFeatures(issueName, value, utilitySpaceSimple)) {
+                maxWeightOfFeatures = getMaxWeightOfFeatures(issueName, value, utilitySpaceSimple);
+            }
+        }
+
+        Map<ValueDiscrete, Double> meanFeatures = getFeaturesByName(issueName, meanHSpace);
+
+        if (meanFeatures != null) {
+            meanFeatures.put(value, maxWeightOfFeatures);
         }
 
     }
@@ -174,6 +238,21 @@ public class UtilitiesHelper {
         return sum / elems;
     }
 
+    private double getMaxWeightOfFeatures(String issueName, ValueDiscrete value, UtilitySpaceSimple utilitySpaceSimple) {
+        double max = 0;
+        double elems = 0;
+        for (CriterionFeatures criterionFeatures : utilitySpaceSimple.getCriterionFeatures()) {
+            if (criterionFeatures.getCriterion().equalsIgnoreCase(issueName)) {
+                if (max < criterionFeatures.getFeatures().get(value)) {
+                    max = criterionFeatures.getFeatures().get(value);
+                }
+                elems++;
+            }
+        }
+
+        return max;
+    }
+
     private void setCriterionMean(String issueName, Map<AgentID, UtilityProbabilityObject> opponentsWeightsMap, UtilitySpaceSimple meanHSpace) {
         double averageWeightOfCriterion = 0;
         for (Map.Entry<AgentID, UtilityProbabilityObject> entry : opponentsWeightsMap.entrySet()) {
@@ -189,6 +268,30 @@ public class UtilitiesHelper {
         CriterionFeatures criterion = getCriterionByName(issueName, meanHSpace);
         if (criterion != null) {
             criterion.setWeight(averageWeightOfCriterion);
+        }
+
+
+    }
+
+    private void setCriterionMax(String issueName, Map<AgentID, UtilityProbabilityObject> opponentsWeightsMap, UtilitySpaceSimple meanHSpace) {
+        double maxWeightOfCriterion = 0;
+        for (Map.Entry<AgentID, UtilityProbabilityObject> entry : opponentsWeightsMap.entrySet()) {
+            UtilitySpaceSimple utilitySpaceSimple = entry.getValue().getUtilitySpace();
+
+            CriterionFeatures criterionByName = getCriterionByName(issueName, utilitySpaceSimple);
+//            averageWeightOfCriterion += criterionByName != null ? criterionByName.getWeight() : 0;
+
+            if (criterionByName != null && maxWeightOfCriterion < criterionByName.getWeight()) {
+                maxWeightOfCriterion = criterionByName.getWeight();
+            }
+
+        }
+
+//        averageWeightOfCriterion = averageWeightOfCriterion / opponentsWeightsMap.size();
+
+        CriterionFeatures criterion = getCriterionByName(issueName, meanHSpace);
+        if (criterion != null) {
+            criterion.setWeight(maxWeightOfCriterion);
         }
 
 

@@ -57,9 +57,9 @@ public class OpponentSpace {
 
         initializeUtilitySpace(agentId, newestBid);
 
-        if (wasAlreadyPlaced(newestBid, oldBids) || lastOpponentBidsList.size() == 1 || !isSniffingTime(agentId, timeline)) {
+        if (true || wasAlreadyPlaced(newestBid, oldBids) || lastOpponentBidsList.size() == 1 || !isSniffingTime(agentId, timeline)) {
             List<UtilitySpaceSimple> plausibleExistingUtilitySpacesForTheAgent = opponentUtilitySpaceMap.get(agentId);
-            updateIssueWeights(newestBid, (int) timeline.getCurrentTime(), plausibleExistingUtilitySpacesForTheAgent);
+            updateIssueWeights(newestBid, timeline.getCurrentTime(), timeline.getTotalTime(), plausibleExistingUtilitySpacesForTheAgent);
         } else {
 
             // increment number of newly placed bids
@@ -75,7 +75,7 @@ public class OpponentSpace {
             List<UtilitySpaceSimple> combinedUtilitySpace = combine(plausibleExistingUtilitySpacesForTheAgent, newHSpaceExistingUtilitySpacesForTheAgent);
             opponentUtilitySpaceMap.put(agentId, combinedUtilitySpace);
 
-            recalculateWeights(lastOpponentBidsMap, opponentUtilitySpaceMap.get(agentId));
+            recalculateWeights(lastOpponentBidsMap, opponentUtilitySpaceMap.get(agentId), timeline.getTotalTime());
 
         }
 
@@ -122,13 +122,13 @@ public class OpponentSpace {
 
     /**
      * updates probabilities of given utility spaces after every received bid
-     *
      * @param oppBid                            new opponent bid
      * @param step                              current step
+     * @param totalTime
      * @param plausibleUtilitySpacesForTheAgent plausible Utility Spaces For The Agent
      */
-    private void updateIssueWeights(Bid oppBid, int step, List<UtilitySpaceSimple> plausibleUtilitySpacesForTheAgent) {
-        Map<Integer, Double> pBHMap = utilitiesHelper.calculatePhbMap(oppBid, plausibleUtilitySpacesForTheAgent, step);
+    private void updateIssueWeights(Bid oppBid, double step, double totalTime, List<UtilitySpaceSimple> plausibleUtilitySpacesForTheAgent) {
+        Map<Integer, Double> pBHMap = utilitiesHelper.calculatePhbMap(oppBid, plausibleUtilitySpacesForTheAgent, step, totalTime);
         double denominator = utilitiesHelper.calculateDenominator(plausibleUtilitySpacesForTheAgent, pBHMap);
         for (int i = 0; i < plausibleUtilitySpacesForTheAgent.size(); i++) {
             UtilitySpaceSimple utilitySpaceSimple = plausibleUtilitySpacesForTheAgent.get(i);
@@ -141,8 +141,9 @@ public class OpponentSpace {
      * Recalculate bid from scratch
      * @param bidsHistory bids with the timestamp
      * @param plausibleUtilitySpacesForTheAgent clean utility space to be updated
+     * @param totalTime
      */
-    private void recalculateWeights(Map<Double, Bid> bidsHistory, List<UtilitySpaceSimple> plausibleUtilitySpacesForTheAgent) {
+    private void recalculateWeights(Map<Double, Bid> bidsHistory, List<UtilitySpaceSimple> plausibleUtilitySpacesForTheAgent, double totalTime) {
 
         for (UtilitySpaceSimple utilitySpaceSimple : plausibleUtilitySpacesForTheAgent) {
             utilitySpaceSimple.setWeight(1 / (double) plausibleUtilitySpacesForTheAgent.size());
@@ -151,7 +152,7 @@ public class OpponentSpace {
         TreeMap<Double, Bid> bidsHistorySorted = new TreeMap<>(bidsHistory);
 
         for (Map.Entry<Double, Bid> entry : bidsHistorySorted.entrySet()) {
-            Map<Integer, Double> pBHMap = utilitiesHelper.calculatePhbMap(entry.getValue(), plausibleUtilitySpacesForTheAgent, entry.getKey());
+            Map<Integer, Double> pBHMap = utilitiesHelper.calculatePhbMap(entry.getValue(), plausibleUtilitySpacesForTheAgent, entry.getKey(), totalTime);
             double denominator = utilitiesHelper.calculateDenominator(plausibleUtilitySpacesForTheAgent, pBHMap);
             for (int i = 0; i < plausibleUtilitySpacesForTheAgent.size(); i++) {
                 UtilitySpaceSimple utilitySpaceSimple = plausibleUtilitySpacesForTheAgent.get(i);
@@ -315,4 +316,7 @@ public class OpponentSpace {
         return new UtilityProbabilityObject(maxUtilitySpaceSimple, max);
     }
 
+    public Map<AgentID, List<UtilitySpaceSimple>> getOpponentUtilitySpaceMap() {
+        return opponentUtilitySpaceMap;
+    }
 }

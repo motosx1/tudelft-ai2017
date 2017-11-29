@@ -6,7 +6,7 @@
         <tournament>
             <deadline>
                 <value>60</value>
-                <type>TIME</type>
+                <type>ROUND</type>
             </deadline>
             <protocolItem hasMediatorProfile="false" hasMediator="false"
                           description="Each agents makes offer, counter-offer, or accepts"
@@ -16,7 +16,7 @@
                 <party classPath="agents.anac.y2015.Atlas3.Atlas3">
                     <properties/>
                 </party>
-                <party classPath="agents.anac.y2015.AgentW.AgentW">
+                <party classPath="negotiator.parties.RandomParty2">
                     <properties/>
                 </party>
                 <party classPath="ai2017.group5.Group5">
@@ -25,11 +25,11 @@
 
             </partyRepItems>
             <partyProfileItems>
-                <item url="file:etc/templates/partydomain/bartosz_utility.xml"/>
-                <item url="file:etc/templates/partydomain/edoardo_utility.xml"/>
-                <item url="file:etc/templates/partydomain/lukas_utility.xml"/>
+                <item url="file:etc/templates/partydomain/party1_utility.xml"/>
+                <item url="file:etc/templates/partydomain/party2_utility.xml"/>
+                <item url="file:etc/templates/partydomain/party3_utility.xml"/>
             </partyProfileItems>
-            <repeats>5</repeats>
+            <repeats>1</repeats>
             <numberOfPartiesPerSession>3</numberOfPartiesPerSession>
             <repetitionAllowed>false</repetitionAllowed>
             <persistentDataType>DISABLED</persistentDataType>

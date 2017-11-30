@@ -29,7 +29,7 @@
                 <item url="file:etc/templates/partydomain/party2_utility.xml"/>
                 <item url="file:etc/templates/partydomain/party3_utility.xml"/>
             </partyProfileItems>
-            <repeats>5</repeats>
+            <repeats>2</repeats>
             <numberOfPartiesPerSession>3</numberOfPartiesPerSession>
             <repetitionAllowed>false</repetitionAllowed>
             <persistentDataType>DISABLED</persistentDataType>

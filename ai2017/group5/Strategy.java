@@ -18,7 +18,9 @@ import negotiator.parties.NegotiationInfo;
 import negotiator.timeline.TimeLineInfo;
 import negotiator.utility.AdditiveUtilitySpace;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 class Strategy {
@@ -30,6 +32,7 @@ class Strategy {
     private final UtilitiesHelper utilitiesHelper = new UtilitiesHelper();
     private Position opponentPreviousPosition = null;
     private Position myPreviousPosition = null;
+    private Map<Bid, Bid> bidResponseMap = new HashMap<>();
 
     Strategy(NegotiationInfo info, MyNegotiationInfoEnhanced myNegotiationInfo, double totalTime) {
         this.info = info;
@@ -50,10 +53,30 @@ class Strategy {
             Action returnOffer = new Offer(myPartyId, myUtilitySpace.getMaxUtilityBid());
             return returnOffer;
         }
-//        if (timeline.getCurrentTime() == 15) {
-//            Action returnOffer = new Offer(myPartyId, myUtilitySpace.getMaxUtilityBid());
-//            return returnOffer;
-//        }
+
+
+        List<Bid> possibleResponses = new ArrayList<>();
+        for (Map.Entry<AgentID, Bid> entry : lastReceivedBids.entrySet()) {
+            if (bidResponseMap.get(entry.getValue()) != null) {
+                possibleResponses.add(bidResponseMap.get(entry.getValue()));
+            }
+        }
+        double maxUtilityResponse = 0;
+        Bid finalResponse = null;
+        if (possibleResponses.size() > 0) {
+            for (Bid possibleResponse : possibleResponses) {
+                if( myUtilitySpace.getUtility(possibleResponse) > maxUtilityResponse){
+                    maxUtilityResponse = myUtilitySpace.getUtility(possibleResponse);
+                    finalResponse = possibleResponse;
+                }
+            }
+        }
+
+        if (finalResponse != null) {
+            Action returnOffer = new Offer(myPartyId, finalResponse);
+            return returnOffer;
+        }
+
 
         // create average opponent utility space
 //        UtilityProbabilityObject averageOpponentUtilitySpace = getAverageOpponentUtilitySpace(lastReceivedBids);
@@ -102,6 +125,9 @@ class Strategy {
         opponentPreviousPosition = opponentCurrentPosition;
         myPreviousPosition = new Position(myUtilitySpace.getUtility(myBid), averageOpponentUtilitySpace.getUtilitySpace().getUtility(myBid));
 
+        for (Map.Entry<AgentID, Bid> entry : lastReceivedBids.entrySet()) {
+            bidResponseMap.put(entry.getValue(), myBid);
+        }
 
         return returnOffer;
 
@@ -109,17 +135,6 @@ class Strategy {
     }
 
     private Vector getDesiredVector(Vector opponentVector, MoveType moveType, TimeLineInfo timeline) {
-        double timefactor = timeline.getCurrentTime() / timeline.getTotalTime();
-        double factor = 1.5;  //-\ln\left(x+0.3\right)+1.3
-//        double factor = -Math.log(timefactor + 0.3) + 1.3;  //-\ln\left(x+0.3\right)+1.3
-//        double factor = -Math.log(100 * timefactor + 0.14);
-//        double factor = Math.log(10 * timefactor + 2.8);
-//        double factor = 0.5;
-//\ln\left(10x+2.8\right)
-//        if (factor <= 1){
-//            factor = 1;
-//        }
-
 
         Vector myDesiredVector;
         if (moveType == MoveType.SELFISH) {

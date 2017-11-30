@@ -66,7 +66,7 @@ public class OpponentSpace {
             }
         }
 
-//        if (true || wasAlreadyPlaced(newestBid, oldBids) || lastOpponentBidsList.size() == 1 || !isSniffingTime(agentId, timeline)) {
+//         if (true || wasAlreadyPlaced(newestBid, oldBids) || lastOpponentBidsList.size() == 1 || !isSniffingTime(agentId, timeline)) {
         if (opponentUniqueBidsNumber.get(agentId) <= 5) {
             List<UtilitySpaceSimple> plausibleExistingUtilitySpacesForTheAgent = opponentUtilitySpaceMap.get(agentId);
             updateIssueWeights(newestBid, timeline.getCurrentTime(), timeline.getTotalTime(), plausibleExistingUtilitySpacesForTheAgent);

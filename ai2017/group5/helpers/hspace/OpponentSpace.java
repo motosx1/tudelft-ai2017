@@ -23,6 +23,7 @@ public class OpponentSpace {
     private final UtilitiesHelper utilitiesHelper = new UtilitiesHelper();
     private final Map<AgentID, List<UtilitySpaceSimple>> opponentUtilitySpaceMap = new HashMap<>();
     private final Map<AgentID, Integer> opponentRecalculateTimesNumber = new HashMap<>();
+    private final Map<AgentID, Integer> opponentUniqueBidsNumber = new HashMap<>();
     private final Domain domain;
     private final double a = 0.5; //0.2 + Math.sin(Math.PI / 6);
     private final int SNIFFING_MAX_NUMBER;
@@ -32,7 +33,7 @@ public class OpponentSpace {
     public OpponentSpace(Domain domain, double totalTime) {
         this.domain = domain;
 
-        this.SNIFFING_MAX_NEGO_TIME = (int)(0.25 * totalTime);
+        this.SNIFFING_MAX_NEGO_TIME = (int) (0.25 * totalTime);
         this.SNIFFING_MAX_NUMBER = 5;
     }
 
@@ -57,27 +58,37 @@ public class OpponentSpace {
 
         initializeUtilitySpace(agentId, newestBid);
 
-        if (true || wasAlreadyPlaced(newestBid, oldBids) || lastOpponentBidsList.size() == 1 || !isSniffingTime(agentId, timeline)) {
+        if (!wasAlreadyPlaced(newestBid, oldBids)) {
+            if (opponentUniqueBidsNumber.get(agentId) == null) {
+                opponentUniqueBidsNumber.put(agentId, 1);
+            } else {
+                opponentUniqueBidsNumber.put(agentId, opponentUniqueBidsNumber.get(agentId) + 1);
+            }
+        }
+
+//        if (true || wasAlreadyPlaced(newestBid, oldBids) || lastOpponentBidsList.size() == 1 || !isSniffingTime(agentId, timeline)) {
+        if (opponentUniqueBidsNumber.get(agentId) <= 5) {
             List<UtilitySpaceSimple> plausibleExistingUtilitySpacesForTheAgent = opponentUtilitySpaceMap.get(agentId);
             updateIssueWeights(newestBid, timeline.getCurrentTime(), timeline.getTotalTime(), plausibleExistingUtilitySpacesForTheAgent);
-        } else {
-
-            // increment number of newly placed bids
-            opponentRecalculateTimesNumber.put(agentId, opponentRecalculateTimesNumber.get(agentId) + 1);
-
-            //get old utility space
-            List<UtilitySpaceSimple> plausibleExistingUtilitySpacesForTheAgent = opponentUtilitySpaceMap.get(agentId);
-
-            //create new utility space based on the newest bid
-            List<UtilitySpaceSimple> newHSpaceExistingUtilitySpacesForTheAgent = prepareHSpace(newestBid);
-
-            //combine old and new space
-            List<UtilitySpaceSimple> combinedUtilitySpace = combine(plausibleExistingUtilitySpacesForTheAgent, newHSpaceExistingUtilitySpacesForTheAgent);
-            opponentUtilitySpaceMap.put(agentId, combinedUtilitySpace);
-
-            recalculateWeights(lastOpponentBidsMap, opponentUtilitySpaceMap.get(agentId), timeline.getTotalTime());
-
         }
+//        else {
+//
+//            // increment number of newly placed bids
+//            opponentRecalculateTimesNumber.put(agentId, opponentRecalculateTimesNumber.get(agentId) + 1);
+//
+//            //get old utility space
+//            List<UtilitySpaceSimple> plausibleExistingUtilitySpacesForTheAgent = opponentUtilitySpaceMap.get(agentId);
+//
+//            //create new utility space based on the newest bid
+//            List<UtilitySpaceSimple> newHSpaceExistingUtilitySpacesForTheAgent = prepareHSpace(newestBid);
+//
+//            //combine old and new space
+//            List<UtilitySpaceSimple> combinedUtilitySpace = combine(plausibleExistingUtilitySpacesForTheAgent, newHSpaceExistingUtilitySpacesForTheAgent);
+//            opponentUtilitySpaceMap.put(agentId, combinedUtilitySpace);
+//
+//            recalculateWeights(lastOpponentBidsMap, opponentUtilitySpaceMap.get(agentId), timeline.getTotalTime());
+//
+//        }
 
     }
 
@@ -122,24 +133,31 @@ public class OpponentSpace {
 
     /**
      * updates probabilities of given utility spaces after every received bid
+     *
      * @param oppBid                            new opponent bid
      * @param step                              current step
      * @param totalTime
      * @param plausibleUtilitySpacesForTheAgent plausible Utility Spaces For The Agent
      */
     private void updateIssueWeights(Bid oppBid, double step, double totalTime, List<UtilitySpaceSimple> plausibleUtilitySpacesForTheAgent) {
-        Map<Integer, Double> pBHMap = utilitiesHelper.calculatePhbMap(oppBid, plausibleUtilitySpacesForTheAgent, step, totalTime);
-        double denominator = utilitiesHelper.calculateDenominator(plausibleUtilitySpacesForTheAgent, pBHMap);
-        for (int i = 0; i < plausibleUtilitySpacesForTheAgent.size(); i++) {
-            UtilitySpaceSimple utilitySpaceSimple = plausibleUtilitySpacesForTheAgent.get(i);
-            double newPhb = utilitiesHelper.calculatePhb(plausibleUtilitySpacesForTheAgent, i, pBHMap, denominator);
-            utilitySpaceSimple.setWeight(newPhb);
+        try {
+            Map<Integer, Double> pBHMap = utilitiesHelper.calculatePhbMap(oppBid, plausibleUtilitySpacesForTheAgent, step, totalTime);
+            double denominator = utilitiesHelper.calculateDenominator(plausibleUtilitySpacesForTheAgent, pBHMap);
+            for (int i = 0; i < plausibleUtilitySpacesForTheAgent.size(); i++) {
+                UtilitySpaceSimple utilitySpaceSimple = plausibleUtilitySpacesForTheAgent.get(i);
+                double newPhb = utilitiesHelper.calculatePhb(plausibleUtilitySpacesForTheAgent, i, pBHMap, denominator);
+
+                utilitySpaceSimple.setWeight(newPhb);
+            }
+        } catch (Exception e) {
+            System.out.println("stop4");
         }
     }
 
     /**
      * Recalculate bid from scratch
-     * @param bidsHistory bids with the timestamp
+     *
+     * @param bidsHistory                       bids with the timestamp
      * @param plausibleUtilitySpacesForTheAgent clean utility space to be updated
      * @param totalTime
      */

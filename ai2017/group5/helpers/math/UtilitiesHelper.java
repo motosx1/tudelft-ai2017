@@ -26,7 +26,7 @@ public class UtilitiesHelper {
             pBHMap.put(i, calculatePbh(oppBid, hSpaceEntry, step, totalTime));
         }
 
-         return pBHMap;
+        return pBHMap;
     }
 
     public double calculatePhb(List<UtilitySpaceSimple> hSpace, int elementIndex, Map<Integer, Double> pBHMap, double denominator) {
@@ -43,18 +43,26 @@ public class UtilitiesHelper {
         for (int i = 0; i < hSpace.size(); i++) {
             result += hSpace.get(i).getWeight() * pBHMap.get(i);
         }
+        if (result == 0) {
+            result = 0.00001;
+        }
 
         return result;
 
     }
 
     private double calculatePbh(Bid oppBid, UtilitySpaceSimple utilitySpaceSimple, double step, double totalTime) {
-        double sigma = 0.1;
+        double sigma = 0.3;
         double c = 1 / (sigma * Math.sqrt(2 * Math.PI));
 
         double index = Math.pow(utilitySpaceSimple.getUtility(oppBid) - utilityB(step, totalTime), 2) / (2 * Math.pow(sigma, 2));
 
-        return c * Math.exp(-index);
+        double exp = Math.exp(-index);
+        if(exp==0){
+            exp = 0.00001;
+        }
+
+        return c * exp;
     }
 
 
@@ -68,10 +76,10 @@ public class UtilitiesHelper {
         return 0.0;
     }
 
-    public double getMaxFeatureWeight( CriterionFeatures myCriterionFeaturesList) {
+    public double getMaxFeatureWeight(CriterionFeatures myCriterionFeaturesList) {
         double max = 0;
         for (Map.Entry<ValueDiscrete, Double> entry : myCriterionFeaturesList.getFeatures().entrySet()) {
-            if(max < entry.getValue()){
+            if (max < entry.getValue()) {
                 max = entry.getValue();
             }
         }

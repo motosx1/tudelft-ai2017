@@ -55,4 +55,10 @@ public class Vector {
         this.y = this.y / divideBy;
         return this;
     }
+
+    public Vector multiplyBy(double multiplyBy) {
+        this.x = this.x * multiplyBy;
+        this.y = this.y * multiplyBy;
+        return this;
+    }
 }

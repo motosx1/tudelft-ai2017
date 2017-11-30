@@ -5,7 +5,7 @@
 
         <tournament>
             <deadline>
-                <value>400</value>
+                <value>100</value>
                 <type>ROUND</type>
             </deadline>
             <protocolItem hasMediatorProfile="false" hasMediator="false"
@@ -25,11 +25,11 @@
 
             </partyRepItems>
             <partyProfileItems>
-                <item url="file:etc/templates/partydomain/party1_utility.xml"/>
-                <item url="file:etc/templates/partydomain/party2_utility.xml"/>
-                <item url="file:etc/templates/partydomain/party3_utility.xml"/>
+                <item url="file:etc/templates/partydomain/bartosz_utility.xml"/>
+                <item url="file:etc/templates/partydomain/edoardo_utility.xml"/>
+                <item url="file:etc/templates/partydomain/lukas_utility.xml"/>
             </partyProfileItems>
-            <repeats>5</repeats>
+            <repeats>2</repeats>
             <numberOfPartiesPerSession>3</numberOfPartiesPerSession>
             <repetitionAllowed>false</repetitionAllowed>
             <persistentDataType>DISABLED</persistentDataType>

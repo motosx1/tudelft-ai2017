@@ -6,6 +6,7 @@ import ai2017.group5.dao.Vector;
 import ai2017.group5.helpers.BidHistory;
 import ai2017.group5.helpers.MoveType;
 import ai2017.group5.helpers.MyNegotiationInfoEnhanced;
+import ai2017.group5.helpers.RandomBidHelper;
 import ai2017.group5.helpers.hspace.OpponentSpace;
 import ai2017.group5.helpers.math.UtilitiesHelper;
 import negotiator.AgentID;
@@ -42,13 +43,25 @@ class Strategy {
     Action chooseAction(Map<AgentID, Bid> lastReceivedBids, BidHistory bidHistory, TimeLineInfo timeline, AgentID lastOpponent) throws Exception {
 
         updateOpponentUtilitySpace(bidHistory, timeline);
+        if (timeline.getCurrentTime() <= 5) {
+            Action returnOffer = new Offer(myPartyId, RandomBidHelper.getRandomBid(info));
+            return returnOffer;
+        } else if (timeline.getCurrentTime() <= 15) {
+            Action returnOffer = new Offer(myPartyId, myUtilitySpace.getMaxUtilityBid());
+            return returnOffer;
+        }
+//        if (timeline.getCurrentTime() == 15) {
+//            Action returnOffer = new Offer(myPartyId, myUtilitySpace.getMaxUtilityBid());
+//            return returnOffer;
+//        }
 
         // create average opponent utility space
 //        UtilityProbabilityObject averageOpponentUtilitySpace = getAverageOpponentUtilitySpace(lastReceivedBids);
         UtilityProbabilityObject averageOpponentUtilitySpace = getMaxOpponentUtilitySpace(lastReceivedBids);
 
         if (averageOpponentUtilitySpace == null) {
-            return (Action) myUtilitySpace.getMaxUtilityBid();
+            Action returnOffer = new Offer(myPartyId, myUtilitySpace.getMaxUtilityBid());
+            return returnOffer;
         }
 
         Bid lastOpponentBid = lastReceivedBids.get(lastOpponent);
@@ -109,10 +122,14 @@ class Strategy {
 
 
         Vector myDesiredVector;
-        if (moveType == MoveType.SELFISH || moveType.equals(MoveType.CONCESSION)) {
-            myDesiredVector = Vector.getMirroredVector(opponentVector).divideBy(factor);
-        } else { //if( moveType == MoveType.FORTUNATE || moveType == MoveType.UNFORTUNATE){
-            myDesiredVector = Vector.getSameVector(opponentVector).divideBy(factor);
+        if (moveType == MoveType.SELFISH) {
+            myDesiredVector = Vector.getMirroredVector(opponentVector).multiplyBy(2);
+        } else if (moveType.equals(MoveType.CONCESSION)) {
+            myDesiredVector = Vector.getMirroredVector(opponentVector).multiplyBy(0.5);
+        } else if (moveType == MoveType.UNFORTUNATE) {
+            myDesiredVector = Vector.getSameVector(opponentVector).multiplyBy(0.001);
+        } else { //FORTUNATE
+            myDesiredVector = Vector.getSameVector(opponentVector).multiplyBy(2);
         }
         return myDesiredVector;
     }
@@ -174,7 +191,7 @@ class Strategy {
         for (Map.Entry<AgentID, Bid> entry : lastReceivedBids.entrySet()) {
             UtilityProbabilityObject oppSpace = opponentSpace.getHSpaceElementWithBiggestWeight(entry.getKey());
             Bid bidToAccept = entry.getValue();
-            if (myUtilitySpace.getUtility(bidToAccept) < oppSpace.getUtilitySpace().getUtility(bidToAccept)*1.2) {
+            if (myUtilitySpace.getUtility(bidToAccept) < oppSpace.getUtilitySpace().getUtility(bidToAccept) * 1.2) {
                 return false;
             }
         }

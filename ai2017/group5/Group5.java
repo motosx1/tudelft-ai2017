@@ -71,7 +71,7 @@ public class Group5 extends AbstractNegotiationParty {
             if (maxUtilityBid != null) {
                 return new Offer(getPartyId(), maxUtilityBid);
             } else {
-                return new Offer(getPartyId(), RandomBidHelper.generateRandomBid(info));
+                return new Offer(getPartyId(), RandomBidHelper.getRandomBid(info));
             }
 
         }

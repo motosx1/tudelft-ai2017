@@ -16,6 +16,9 @@
                 <party classPath="agents.anac.y2015.agentBuyogV2.AgentBuyogMain">
                     <properties/>
                 </party>
+                <party classPath="agents.anac.y2015.Atlas3.Atlas3">
+                    <properties/>
+                </party>
                 <party classPath="agents.anac.y2015.AgentW.AgentW">
                     <properties/>
                 </party>
@@ -27,10 +30,11 @@
             <partyProfileItems>
                 <item url="file:etc/templates/partydomain/bartosz_utility.xml"/>
                 <item url="file:etc/templates/partydomain/edoardo_utility.xml"/>
+                <item url="file:etc/templates/partydomain/lukas_utility.xml"/>
                 <item url="file:etc/templates/partydomain/dan_utility.xml"/>
             </partyProfileItems>
-            <repeats>3</repeats>
-            <numberOfPartiesPerSession>3</numberOfPartiesPerSession>
+            <repeats>4</repeats>
+            <numberOfPartiesPerSession>4</numberOfPartiesPerSession>
             <repetitionAllowed>false</repetitionAllowed>
             <persistentDataType>DISABLED</persistentDataType>
         </tournament>

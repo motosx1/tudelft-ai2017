@@ -55,6 +55,8 @@ class Strategy {
         }
 
 
+//        if( timeline.getCurrentTime()/timeline.getTotalTime() < 0.85) {
+        //-------------------------------------
         List<Bid> possibleResponses = new ArrayList<>();
         for (Map.Entry<AgentID, Bid> entry : lastReceivedBids.entrySet()) {
             if (bidResponseMap.get(entry.getValue()) != null) {
@@ -65,7 +67,7 @@ class Strategy {
         Bid finalResponse = null;
         if (possibleResponses.size() > 0) {
             for (Bid possibleResponse : possibleResponses) {
-                if( myUtilitySpace.getUtility(possibleResponse) > maxUtilityResponse){
+                if (myUtilitySpace.getUtility(possibleResponse) > maxUtilityResponse) {
                     maxUtilityResponse = myUtilitySpace.getUtility(possibleResponse);
                     finalResponse = possibleResponse;
                 }
@@ -76,6 +78,9 @@ class Strategy {
             Action returnOffer = new Offer(myPartyId, finalResponse);
             return returnOffer;
         }
+//        }
+
+//-----------------------------------
 
 
         // create average opponent utility space
@@ -110,8 +115,9 @@ class Strategy {
             myBid = myUtilitySpace.getMaxUtilityBid();
             returnOffer = new Offer(myPartyId, myBid);
         } else {
-            if (shouldAccept(lastOpponentBid, oppUtility, lastReceivedBids)) {
-                return new Accept(myPartyId, lastReceivedBids.get(lastOpponent));
+            if (shouldAccept(lastOpponentBid, oppUtility, lastReceivedBids, timeline)) {
+                myBid = lastReceivedBids.get(lastOpponent);
+                returnOffer = new Accept(myPartyId, myBid);
             } else {
 
                 Position myDesiredPosition = myPreviousPosition.add(myDesiredVector);
@@ -202,11 +208,13 @@ class Strategy {
     }
 
 
-    private boolean shouldAccept(Bid lastOpponentBid, double oppUtility, Map<AgentID, Bid> lastReceivedBids) {
+    private boolean shouldAccept(Bid lastOpponentBid, double oppUtility, Map<AgentID, Bid> lastReceivedBids, TimeLineInfo timeline) {
+        double timeFactor = timeline.getCurrentTime() / timeline.getTotalTime();
+        double factor = 1.2 / (1 + Math.exp(7 * timeFactor - 6));
         for (Map.Entry<AgentID, Bid> entry : lastReceivedBids.entrySet()) {
             UtilityProbabilityObject oppSpace = opponentSpace.getHSpaceElementWithBiggestWeight(entry.getKey());
             Bid bidToAccept = entry.getValue();
-            if (myUtilitySpace.getUtility(bidToAccept) < oppSpace.getUtilitySpace().getUtility(bidToAccept) * 1.2) {
+            if (myUtilitySpace.getUtility(bidToAccept) < oppSpace.getUtilitySpace().getUtility(bidToAccept) * factor) {
                 return false;
             }
         }

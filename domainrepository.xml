@@ -16,6 +16,7 @@
                 <profile url="file:etc/templates/partydomain/party9_utility.xml"/>
                 <profile url="file:etc/templates/partydomain/bartosz_utility.xml"/>
                 <profile url="file:etc/templates/partydomain/edoardo_utility.xml"/>
+                <profile url="file:etc/templates/partydomain/dan_utility.xml"/>
                 <profile url="file:etc/templates/partydomain/lukas_utility.xml"/>
             </domainRepItem>
             <domainRepItem url="file:etc/templates/pie/pie_domain.xml">

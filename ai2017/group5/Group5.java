@@ -60,7 +60,7 @@ public class Group5 extends AbstractNegotiationParty {
             return new Offer(getPartyId(), myNegotiationInfo.getMaxUtilityBid());
         } else {
             try {
-                return this.strategy.chooseAction(lastReceivedBids, bidHistory, timeline, lastOpponent);
+                return this.strategy.chooseAction(lastReceivedBids, bidHistory, timeline, step, lastOpponent);
 
             } catch (Exception e) {
                 e.printStackTrace();
@@ -99,11 +99,11 @@ public class Group5 extends AbstractNegotiationParty {
                 this.myNegotiationInfo.setOpponentsNum(opponentsNum);
             } else if (action instanceof Offer) {
                 lastReceivedBids.put(sender, ((Offer) action).getBid());
-                bidHistory.putBid(sender, ((Offer) action).getBid(), timeline.getCurrentTime());
+                bidHistory.putBid(sender, ((Offer) action).getBid(), step);
                 lastOpponent = sender;
             } else if (action instanceof Accept) {
                 lastReceivedBids.put(sender, ((Accept) action).getBid());
-                bidHistory.putBid(sender, ((Accept) action).getBid(), timeline.getCurrentTime());
+                bidHistory.putBid(sender, ((Accept) action).getBid(), step);
 //                lastOpponent = sender;
             }
         }

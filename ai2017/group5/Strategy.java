@@ -43,48 +43,20 @@ class Strategy {
     }
 
 
-    Action chooseAction(Map<AgentID, Bid> lastReceivedBids, BidHistory bidHistory, TimeLineInfo timeline, AgentID lastOpponent) throws Exception {
-
-        updateOpponentUtilitySpace(bidHistory, timeline);
-        if (timeline.getCurrentTime() <= 5) {
+    Action chooseAction(Map<AgentID, Bid> lastReceivedBids, BidHistory bidHistory, TimeLineInfo timeline, int myStepCounter, AgentID lastOpponent) throws Exception {
+        updateOpponentUtilitySpace(bidHistory, myStepCounter);
+        if (myStepCounter <= 5) {
             Action returnOffer = new Offer(myPartyId, RandomBidHelper.getRandomBid(info));
             return returnOffer;
-        } else if (timeline.getCurrentTime() <= 15) {
+        } else if (myStepCounter <= 15) {
             Action returnOffer = new Offer(myPartyId, myUtilitySpace.getMaxUtilityBid());
             return returnOffer;
         }
 
-
-//        if( timeline.getCurrentTime()/timeline.getTotalTime() < 0.85) {
-        //-------------------------------------
-        List<Bid> possibleResponses = new ArrayList<>();
-        for (Map.Entry<AgentID, Bid> entry : lastReceivedBids.entrySet()) {
-            if (bidResponseMap.get(entry.getValue()) != null) {
-                possibleResponses.add(bidResponseMap.get(entry.getValue()));
-            }
-        }
-        double maxUtilityResponse = 0;
-        Bid finalResponse = null;
-        if (possibleResponses.size() > 0) {
-            for (Bid possibleResponse : possibleResponses) {
-                if (myUtilitySpace.getUtility(possibleResponse) > maxUtilityResponse) {
-                    maxUtilityResponse = myUtilitySpace.getUtility(possibleResponse);
-                    finalResponse = possibleResponse;
-                }
-            }
-        }
-
-        if (finalResponse != null) {
-            Action returnOffer = new Offer(myPartyId, finalResponse);
-            return returnOffer;
-        }
-//        }
-
-//-----------------------------------
-
+        Action returnOffer1 = respontToAlreadyGivenBid(lastReceivedBids);
+        if (returnOffer1 != null) return returnOffer1;
 
         // create average opponent utility space
-//        UtilityProbabilityObject averageOpponentUtilitySpace = getAverageOpponentUtilitySpace(lastReceivedBids);
         UtilityProbabilityObject averageOpponentUtilitySpace = getMaxOpponentUtilitySpace(lastReceivedBids);
 
         if (averageOpponentUtilitySpace == null) {
@@ -107,7 +79,7 @@ class Strategy {
 
         // create a vector, corresponding to my next move, based on the opponent move type,
         // and passed time (the longer we play, the better we know the opponent model, so our vector can be longer)
-        Vector myDesiredVector = getDesiredVector(opponentVector, moveType, timeline);
+        Vector myDesiredVector = getDesiredVector(opponentVector, moveType);
 
         Action returnOffer;
         Bid myBid;
@@ -115,9 +87,8 @@ class Strategy {
             myBid = myUtilitySpace.getMaxUtilityBid();
             returnOffer = new Offer(myPartyId, myBid);
         } else {
-            if (shouldAccept(lastOpponentBid, oppUtility, lastReceivedBids, timeline)) {
-                myBid = lastReceivedBids.get(lastOpponent);
-                returnOffer = new Accept(myPartyId, myBid);
+            if (shouldAccept(lastReceivedBids, timeline)) {
+                return new Accept(myPartyId, lastReceivedBids.get(lastOpponent));
             } else {
 
                 Position myDesiredPosition = myPreviousPosition.add(myDesiredVector);
@@ -140,7 +111,32 @@ class Strategy {
 
     }
 
-    private Vector getDesiredVector(Vector opponentVector, MoveType moveType, TimeLineInfo timeline) {
+    private Action respontToAlreadyGivenBid(Map<AgentID, Bid> lastReceivedBids) {
+        List<Bid> possibleResponses = new ArrayList<>();
+        for (Map.Entry<AgentID, Bid> entry : lastReceivedBids.entrySet()) {
+            if (bidResponseMap.get(entry.getValue()) != null) {
+                possibleResponses.add(bidResponseMap.get(entry.getValue()));
+            }
+        }
+        double maxUtilityResponse = 0;
+        Bid finalResponse = null;
+        if (possibleResponses.size() > 0) {
+            for (Bid possibleResponse : possibleResponses) {
+                if (myUtilitySpace.getUtility(possibleResponse) > maxUtilityResponse) {
+                    maxUtilityResponse = myUtilitySpace.getUtility(possibleResponse);
+                    finalResponse = possibleResponse;
+                }
+            }
+        }
+
+        if (finalResponse != null) {
+            Action returnOffer = new Offer(myPartyId, finalResponse);
+            return returnOffer;
+        }
+        return null;
+    }
+
+    private Vector getDesiredVector(Vector opponentVector, MoveType moveType) {
 
         Vector myDesiredVector;
         if (moveType == MoveType.SELFISH) {
@@ -155,13 +151,13 @@ class Strategy {
         return myDesiredVector;
     }
 
-    private void updateOpponentUtilitySpace(BidHistory bidHistory, TimeLineInfo timeline) {
+    private void updateOpponentUtilitySpace(BidHistory bidHistory, int step) {
 
-        for (Map.Entry<AgentID, Map<Double, Bid>> bidHistoryEntry : bidHistory.getBidHistory().entrySet()) {
+        for (Map.Entry<AgentID, Map<Integer, Bid>> bidHistoryEntry : bidHistory.getBidHistory().entrySet()) {
             AgentID opponentId = bidHistoryEntry.getKey();
-            Map<Double, Bid> lastOpponentBids = bidHistoryEntry.getValue();
+            Map<Integer, Bid> lastOpponentBids = bidHistoryEntry.getValue();
 
-            opponentSpace.updateHSpace(opponentId, lastOpponentBids, timeline);
+            opponentSpace.updateHSpace(opponentId, lastOpponentBids, step);
         }
     }
 
@@ -181,8 +177,6 @@ class Strategy {
     }
 
     private UtilityProbabilityObject getMaxOpponentUtilitySpace(Map<AgentID, Bid> lastReceivedBids) throws Exception {
-        Map<AgentID, UtilityProbabilityObject> opponentsWeightsMap = new HashMap<>();
-        Map<AgentID, Double> opponentsLastBidUtilities = new HashMap<>();
         Double maxUtility = 0.0;
         UtilityProbabilityObject maxUtilitySpace = null;
 
@@ -191,24 +185,22 @@ class Strategy {
             Bid lastBid = lastBidEntry.getValue();
 
             UtilityProbabilityObject utilityProbabilityObject = opponentSpace.getHSpaceElementWithBiggestWeight(opponentId);
-//            UtilitySpaceSimple opponentsWeights = utilityProbabilityObject.getUtilitySpace();
-
-            double agentsUtility = utilityProbabilityObject.getUtilitySpace().getUtility(lastBid);
-            if (maxUtility < agentsUtility) {
-                maxUtility = agentsUtility;
-                maxUtilitySpace = new UtilityProbabilityObject(utilityProbabilityObject.getUtilitySpace(), utilityProbabilityObject.getProbability());
+            if (utilityProbabilityObject.getUtilitySpace() != null) {
+                double agentsUtility = utilityProbabilityObject.getUtilitySpace().getUtility(lastBid);
+                if (maxUtility < agentsUtility) {
+                    maxUtility = agentsUtility;
+                    maxUtilitySpace = new UtilityProbabilityObject(utilityProbabilityObject.getUtilitySpace(), utilityProbabilityObject.getProbability());
+                }
             }
 
-//            opponentsLastBidUtilities.put(opponentId, agentsUtility);
-//            opponentsWeightsMap.put(opponentId, utilityProbabilityObject);
         }
 
-//        return utilitiesHelper.getMaxWeights(myUtilitySpace, opponentsWeightsMap);
+
         return maxUtilitySpace;
     }
 
 
-    private boolean shouldAccept(Bid lastOpponentBid, double oppUtility, Map<AgentID, Bid> lastReceivedBids, TimeLineInfo timeline) {
+    private boolean shouldAccept(Map<AgentID, Bid> lastReceivedBids, TimeLineInfo timeline) {
         double timeFactor = timeline.getCurrentTime() / timeline.getTotalTime();
         double factor = 1.2 / (1 + Math.exp(7 * timeFactor - 6));
         for (Map.Entry<AgentID, Bid> entry : lastReceivedBids.entrySet()) {
@@ -219,8 +211,6 @@ class Strategy {
             }
         }
         return true;
-//        return myUtilitySpace.getUtility(lastOpponentBid) >= oppUtility;
-//        return myUtilitySpace.getUtility(lastOpponentBid) >= myPreviousPosition.getMyUtility();
     }
 
     private boolean isMyFirstBid() {

@@ -5,8 +5,8 @@
 
         <tournament>
             <deadline>
-                <value>300</value>
-                <type>ROUND</type>
+                <value>60</value>
+                <type>TIME</type>
             </deadline>
             <protocolItem hasMediatorProfile="false" hasMediator="false"
                           description="Each agents makes offer, counter-offer, or accepts"
@@ -14,9 +14,6 @@
                           protocolName="Stacked Alternating Offers Protocol for Multi-Lateral Negotiation (SAOPMN)"/>
             <partyRepItems>
                 <party classPath="agents.anac.y2015.agentBuyogV2.AgentBuyogMain">
-                    <properties/>
-                </party>
-                <party classPath="agents.anac.y2015.Atlas3.Atlas3">
                     <properties/>
                 </party>
                 <party classPath="agents.anac.y2015.AgentW.AgentW">
@@ -30,11 +27,10 @@
             <partyProfileItems>
                 <item url="file:etc/templates/partydomain/bartosz_utility.xml"/>
                 <item url="file:etc/templates/partydomain/edoardo_utility.xml"/>
-                <item url="file:etc/templates/partydomain/lukas_utility.xml"/>
                 <item url="file:etc/templates/partydomain/dan_utility.xml"/>
             </partyProfileItems>
             <repeats>4</repeats>
-            <numberOfPartiesPerSession>4</numberOfPartiesPerSession>
+            <numberOfPartiesPerSession>3</numberOfPartiesPerSession>
             <repetitionAllowed>false</repetitionAllowed>
             <persistentDataType>DISABLED</persistentDataType>
         </tournament>

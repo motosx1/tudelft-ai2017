@@ -45,9 +45,9 @@ public class OpponentSpace {
      *
      * @param agentId             agentId
      * @param lastOpponentBidsMap lastOpponentBidsMap
-     * @param timeline            timeline
+     * @param step                current step
      */
-    public void updateHSpace(AgentID agentId, Map<Double, Bid> lastOpponentBidsMap, TimeLineInfo timeline) {
+    public void updateHSpace(AgentID agentId, Map<Integer, Bid> lastOpponentBidsMap, int step) {
         if (opponentRecalculateTimesNumber.get(agentId) == null) {
             opponentRecalculateTimesNumber.put(agentId, 0);
         }
@@ -67,9 +67,9 @@ public class OpponentSpace {
         }
 
 //         if (true || wasAlreadyPlaced(newestBid, oldBids) || lastOpponentBidsList.size() == 1 || !isSniffingTime(agentId, timeline)) {
-        if (opponentUniqueBidsNumber.get(agentId) <= 5) {
+        if (opponentUniqueBidsNumber.get(agentId) <= 5 && step <= 200) {
             List<UtilitySpaceSimple> plausibleExistingUtilitySpacesForTheAgent = opponentUtilitySpaceMap.get(agentId);
-            updateIssueWeights(newestBid, timeline.getCurrentTime(), timeline.getTotalTime(), plausibleExistingUtilitySpacesForTheAgent);
+            updateIssueWeights(newestBid, step, plausibleExistingUtilitySpacesForTheAgent);
         }
 //        else {
 //
@@ -136,18 +136,21 @@ public class OpponentSpace {
      *
      * @param oppBid                            new opponent bid
      * @param step                              current step
-     * @param totalTime
      * @param plausibleUtilitySpacesForTheAgent plausible Utility Spaces For The Agent
      */
-    private void updateIssueWeights(Bid oppBid, double step, double totalTime, List<UtilitySpaceSimple> plausibleUtilitySpacesForTheAgent) {
+    private void updateIssueWeights(Bid oppBid, double step, List<UtilitySpaceSimple> plausibleUtilitySpacesForTheAgent) {
         try {
-            Map<Integer, Double> pBHMap = utilitiesHelper.calculatePhbMap(oppBid, plausibleUtilitySpacesForTheAgent, step, totalTime);
+            Map<Integer, Double> pBHMap = utilitiesHelper.calculatePhbMap(oppBid, plausibleUtilitySpacesForTheAgent, step);
             double denominator = utilitiesHelper.calculateDenominator(plausibleUtilitySpacesForTheAgent, pBHMap);
             for (int i = 0; i < plausibleUtilitySpacesForTheAgent.size(); i++) {
                 UtilitySpaceSimple utilitySpaceSimple = plausibleUtilitySpacesForTheAgent.get(i);
                 double newPhb = utilitiesHelper.calculatePhb(plausibleUtilitySpacesForTheAgent, i, pBHMap, denominator);
 
+//                if (newPhb == 0) {
+//                    utilitySpaceSimple.setWeight(0.0000001);
+//                } else {
                 utilitySpaceSimple.setWeight(newPhb);
+//                }
             }
         } catch (Exception e) {
             System.out.println("stop4");
@@ -159,9 +162,8 @@ public class OpponentSpace {
      *
      * @param bidsHistory                       bids with the timestamp
      * @param plausibleUtilitySpacesForTheAgent clean utility space to be updated
-     * @param totalTime
      */
-    private void recalculateWeights(Map<Double, Bid> bidsHistory, List<UtilitySpaceSimple> plausibleUtilitySpacesForTheAgent, double totalTime) {
+    private void recalculateWeights(Map<Double, Bid> bidsHistory, List<UtilitySpaceSimple> plausibleUtilitySpacesForTheAgent) {
 
         for (UtilitySpaceSimple utilitySpaceSimple : plausibleUtilitySpacesForTheAgent) {
             utilitySpaceSimple.setWeight(1 / (double) plausibleUtilitySpacesForTheAgent.size());
@@ -170,7 +172,7 @@ public class OpponentSpace {
         TreeMap<Double, Bid> bidsHistorySorted = new TreeMap<>(bidsHistory);
 
         for (Map.Entry<Double, Bid> entry : bidsHistorySorted.entrySet()) {
-            Map<Integer, Double> pBHMap = utilitiesHelper.calculatePhbMap(entry.getValue(), plausibleUtilitySpacesForTheAgent, entry.getKey(), totalTime);
+            Map<Integer, Double> pBHMap = utilitiesHelper.calculatePhbMap(entry.getValue(), plausibleUtilitySpacesForTheAgent, entry.getKey());
             double denominator = utilitiesHelper.calculateDenominator(plausibleUtilitySpacesForTheAgent, pBHMap);
             for (int i = 0; i < plausibleUtilitySpacesForTheAgent.size(); i++) {
                 UtilitySpaceSimple utilitySpaceSimple = plausibleUtilitySpacesForTheAgent.get(i);

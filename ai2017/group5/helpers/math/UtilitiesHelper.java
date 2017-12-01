@@ -18,12 +18,12 @@ import java.util.Map;
 
 public class UtilitiesHelper {
 
-    public Map<Integer, Double> calculatePhbMap(Bid oppBid, List<UtilitySpaceSimple> hSpace, double step, double totalTime) {
+    public Map<Integer, Double> calculatePhbMap(Bid oppBid, List<UtilitySpaceSimple> hSpace, double step) {
         Map<Integer, Double> pBHMap = new HashMap<>();
 
         for (int i = 0; i < hSpace.size(); i++) {
             UtilitySpaceSimple hSpaceEntry = hSpace.get(i);
-            pBHMap.put(i, calculatePbh(oppBid, hSpaceEntry, step, totalTime));
+            pBHMap.put(i, calculatePbh(oppBid, hSpaceEntry, step));
         }
 
         return pBHMap;
@@ -51,11 +51,11 @@ public class UtilitiesHelper {
 
     }
 
-    private double calculatePbh(Bid oppBid, UtilitySpaceSimple utilitySpaceSimple, double step, double totalTime) {
+    private double calculatePbh(Bid oppBid, UtilitySpaceSimple utilitySpaceSimple, double step) {
         double sigma = 0.3;
         double c = 1 / (sigma * Math.sqrt(2 * Math.PI));
 
-        double index = Math.pow(utilitySpaceSimple.getUtility(oppBid) - utilityB(step, totalTime), 2) / (2 * Math.pow(sigma, 2));
+        double index = Math.pow(utilitySpaceSimple.getUtility(oppBid) - utilityB(step), 2) / (2 * Math.pow(sigma, 2));
 
         double exp = Math.exp(-index);
         if(exp==0){
@@ -109,11 +109,8 @@ public class UtilitiesHelper {
     }
 
 
-    private double utilityB(double step, double totalTime) {
-//        double factor = step/(totalTime/20.0);
-        double factor = step;
-
-        return 1 - 0.05 * factor;  //TODO change to consider time horizon
+    private double utilityB(double step) {
+        return 1 - 0.05 * step;
     }
 
 

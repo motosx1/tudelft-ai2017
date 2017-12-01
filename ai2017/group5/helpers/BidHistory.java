@@ -8,23 +8,23 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class BidHistory {
-    private final Map<AgentID, Map<Double, Bid>> bidHistory = new HashMap<>();
+    private final Map<AgentID, Map<Integer, Bid>> bidHistory = new HashMap<>();
 
-    public Map<AgentID, Map<Double, Bid>> getBidHistory() {
+    public Map<AgentID, Map<Integer, Bid>> getBidHistory() {
         return bidHistory;
     }
 
-    public Map<Double, Bid> getBidHistory(AgentID agentId) {
+    public Map<Integer, Bid> getBidHistory(AgentID agentId) {
         if (bidHistory.get(agentId) == null) {
-            bidHistory.put(agentId, new HashMap<Double, Bid>());
+            bidHistory.put(agentId, new HashMap<Integer, Bid>());
         }
 
         return bidHistory.get(agentId);
     }
 
-    public void putBid(AgentID agentId, Bid bid, Double time) {
+    public void putBid(AgentID agentId, Bid bid, Integer time) {
         if (bidHistory.get(agentId) == null) {
-            bidHistory.put(agentId, new HashMap<Double, Bid>());
+            bidHistory.put(agentId, new HashMap<Integer, Bid>());
         }
         bidHistory.get(agentId).put(time, bid);
     }
